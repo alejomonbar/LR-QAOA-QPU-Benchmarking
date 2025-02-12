@@ -45,6 +45,9 @@ These experiments were conducted on **19 QPUs** from **5 vendors**:
 - [NL-Experiments.ipynb](./NL-Experiments.ipynb) - Experimental results for native layout graphs.
 - [NL-Figures.ipynb](./NL-Figures.ipynb) - Visualizations and analysis for native layout graphs.
 
+### **Random problems generator**
+- [generate_problems.ipynb](./generate_problems.ipynb) - Generate the random graphs used for the FC, NL, and 1D-Chain experiments.
+  
 ### **Dependencies**
 - [requirements.txt](./requirements.txt) - Required Python libraries for running the notebooks.
 
