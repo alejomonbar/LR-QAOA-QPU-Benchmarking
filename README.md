@@ -1,4 +1,4 @@
-# Quantum Computing Benchmarking with LR-QAOA: Evaluating the performance of quantum process units at large width and depth
+# Quantum Computing Benchmarking with LR-QAOA: Evaluating the performance of quantum processing units at large width and depth
 Paper:https://arxiv.org/abs/2502.06471
 
 ## Overview
