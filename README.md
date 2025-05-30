@@ -18,7 +18,7 @@ We evaluate this methodology using **three graph topologies**:
 - **Native Layout (NL)**
 - **Fully Connected (FC)**  
 
-These experiments were conducted on **21 QPUs** from **6 vendors**:  
+These experiments were conducted on **24 QPUs** from **6 vendors**:  
 ✅ IBM  
 ✅ IQM  
 ✅ IonQ  
