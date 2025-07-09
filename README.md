@@ -1,4 +1,4 @@
-# Quantum Computing Benchmarking with LR-QAOA: Evaluating the performance of quantum process units at large width and depth
+# Quantum Computing Benchmarking with LR-QAOA: Evaluating the performance of quantum processing units at large width and depth
 Paper:https://arxiv.org/abs/2502.06471
 
 ## Overview
@@ -18,7 +18,7 @@ We evaluate this methodology using **three graph topologies**:
 - **Native Layout (NL)**
 - **Fully Connected (FC)**  
 
-These experiments were conducted on **21 QPUs** from **6 vendors**:  
+These experiments were conducted on **24 QPUs** from **6 vendors**:  
 ✅ IBM  
 ✅ IQM  
 ✅ IonQ  
