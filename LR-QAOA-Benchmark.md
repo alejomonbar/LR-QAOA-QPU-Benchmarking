@@ -54,12 +54,12 @@ The 1D-chain benchmark evaluates how well a QPU preserves the algorithmic signal
 </div>
 Approximation ratio versus number of LR-QAOA layers for 1D-chain WMC problems on IBM, IQM, Rigetti, and OriginQ devices.
 (a) Performance on a 100-qubit problem across IBM Eagle and Heron QPUs. Numbers in parentheses indicate EPLG at the time of execution.(b) Cross-platform comparison for a 5-qubit problem run on different QPUs.
-(c) Scaling study on \texttt{ibm\_fez} from \(p=3\) to \(p=10{,}000\), reaching 990,000 ZZ gates at the deepest layer using fractional gates. The dashed line in (c) marks the expected approximation ratio of a random sampler.
+(c) Scaling study on *ibm_fez* from $p=3$ to $p=10,000$, reaching 990,000 ZZ gates at the deepest layer using fractional gates. The dashed line in (c) marks the expected approximation ratio of a random sampler.
 
 ### Native Layout
 
 The NL benchmark stresses system-wide performance by employing all qubits and native couplers in each device’s layout.  
-A QPU is considered to pass at a given depth $p$ if the observed approximation ratio $r$ exceeds the 99.73\% confidence threshold of the random-sampler baseline. Among all tested platforms, only \texttt{rigetti\_ankaa\_3} fails to pass the benchmark at any depth. The best-performing devices are \texttt{ibm\_fez}, \texttt{ibm\_marrakesh}, and \texttt{ibm\_torino}, all of which support fractional gates. Interestingly, \texttt{ibm\_aachen} achieves a comparable performance peak despite lacking fractional gate support, implying that it could potentially outperform the other devices once fractional gates become available on this QPU. 
+A QPU is considered to pass at a given depth $p$ if the observed approximation ratio $r$ exceeds the 99.73\% confidence threshold of the random-sampler baseline. Among all tested platforms, only *rigetti_ankaa_3* fails to pass the benchmark at any depth. The best-performing devices are *ibm_fez*, *ibm_marrakesh*, and *ibm_torino*, all of which support fractional gates. Interestingly, *ibm_aachen* achieves a comparable performance peak despite lacking fractional gate support, implying that it could potentially outperform the other devices once fractional gates become available on this QPU. 
 
 <div class="center">
   <img src="./Figures/HE-small.png" class="img-medium" alt="NL-based benchmarking using LR-QAOA for WMC problems on different QPUs from 5 to 156 qubits."/> 
@@ -73,8 +73,8 @@ Nodes represent qubits, and edges represent native two-qubit connectivity.
 Edge colors denote the WMC instance weights, randomly chosen from \{0.1, 0.2, 0.3, 0.5, 1\}, as shown at the top.
 (b) Approximation ratio versus number of LR-QAOA layers $p$ for each processor.
 The dashed horizontal line indicates the random-sampler baseline.
-Labels with an 'f' suffix, e.g., \texttt{ibm\_marrakesh}-f, denote experiments using fractional gates.
-(c) Scaling experiment with up to \(p = 1{,}000\) LR-QAOA layers using fractional gates.
+Labels with an 'f' suffix, e.g., *ibm_marrakesh*-f, denote experiments using fractional gates.
+(c) Scaling experiment with up to $p = 1,000$ LR-QAOA layers using fractional gates.
 Semitransparent points mark the sample with the maximum approximation ratio observed.
 
 ### Fully Connected
