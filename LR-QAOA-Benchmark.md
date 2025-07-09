@@ -66,7 +66,7 @@ A QPU is considered to pass at a given depth $p$ if the observed approximation r
 </div>
 
 
-NL-based benchmarking using LR-QAOA for WMC problems on \texttt{iqm\_spark}, \texttt{iqm\_garnet}, \texttt{rigetti\_ankaa\_3}, \texttt{ibm\_brisbane}, \texttt{ibm\_torino}, and \texttt{ibm\_fez}/\texttt{ibm\_marrakesh}/\texttt{ibm\_aachen}/\texttt{ibm\_kingston}. 
+NL-based benchmarking using LR-QAOA for WMC problems on *iqm_spark*, *iqm_garnet*, *rigetti_ankaa_3*, *ibm_brisbane*, *ibm_torino*, and *ibm_fez*/*ibm_marrakesh*/*ibm_aachen*/*ibm_kingston*. 
 Problem sizes (with number of edges in parentheses) are: 5 (4), 20 (30), 82 (138), 127 (144), 133 (150), and 156 (176).
 (a) QPU layouts used in each experiment. 
 Nodes represent qubits, and edges represent native two-qubit connectivity. 
