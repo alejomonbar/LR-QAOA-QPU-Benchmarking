@@ -45,6 +45,20 @@ We benchmark quantum devices by solving instances of the weighted maxcut problem
 
 ## Results
 
+{% include tables/q-score-table.html %}  
+<script type="text/javascript"> 
+    $(document).ready(function() {
+      $('./Data/qpu_benchmark_results.xlsx').DataTable(
+        {
+          "pageLength": 10,
+          "drawCallback": function(settings){
+           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);ss
+          }  
+        }  
+      );  
+    });  
+</script>
+
 ### 1D-Chain
 
 The 1D-chain benchmark evaluates how well a QPU preserves the algorithmic signal as LR-QAOA depth increases along a linear qubit chain. This topology isolates the impact of circuit depth from layout constraints. We use the 99.73\% confidence threshold from a random sampler to define benchmark pass/fail behavior.
