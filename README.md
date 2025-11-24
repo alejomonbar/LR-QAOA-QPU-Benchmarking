@@ -18,13 +18,14 @@ We evaluate this methodology using **three graph topologies**:
 - **Native Layout (NL)**
 - **Fully Connected (FC)**  
 
-These experiments were conducted on **24 QPUs** from **6 vendors**:  
+These experiments were conducted on **28 QPUs** from **7 vendors**:  
 ✅ IBM  
 ✅ IQM  
 ✅ IonQ  
 ✅ Quantinuum  
 ✅ Rigetti  
 ✅ OriginQ
+✅ AQT
 
 ### **Key Findings**
 - The largest problem tested: **1D-chain with \( p = 10,000 \)** involving **990,000 2-qubit gates on `ibm_fez`**.
