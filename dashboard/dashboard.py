@@ -674,60 +674,58 @@ with tab3:
         st.header("1D Chain Experiments")
     
     st.markdown("""
-    Approximation ratio vs QAOA layers (p) for 1D chain graphs.
-    Comparing various QPUs including OriginQ Wukong at 5 qubits.
+    Approximation ratio vs QAOA layers (p) for 1D chain graphs at different scales.
     """)
     
     chain_results = load_1d_chain_results()
     
-    # Color and marker definitions
-    colors_1d = {
-        "originq_wukong": "#8dd3c7", "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
-        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fdb462", "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada",
-        "ibm_sherbrooke": "#fb8072", "ibm_kyiv": "#d9d9d9", "ibm_nazca": "#80b1d3",
-        "ibm_kyoto": "#bc80bd", "ibm_osaka": "#ccebc5", "ibm_brussels": "#fccde5",
-        "ibm_strasbourg": "#ffffb3"
+    # ========== 5 QUBIT EXPERIMENTS ==========
+    st.subheader("5-Qubit Comparison")
+    st.markdown("Comparing multiple QPUs on small-scale 1D chain problems.")
+    
+    results_5q = chain_results.get("5q", {})
+    
+    # Color and marker definitions for 5q
+    colors_5q = {
+        "originq_wukong": "#8dd3c7", "qasm_simulator": "#bebada", "iqm_emerald": "#fb8072",
+        "iqm_garnet": "#80b1d3", "ibm_fez_5q": "#b3de69", "ibm_marrakesh_5q": "#ffed6f",
+        "ibm_brisbane_5q": "#fdb462", "rigetti_ankaa_2": "#fccde5", "rigetti_ankaa_3": "#bc80bd",
+        "iqm_sirius": "#ccebc5"
     }
     
-    markers_1d = {
-        "originq_wukong": "star", "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
-        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_torino": "square", "ibm_brisbane": "diamond",
-        "ibm_sherbrooke": "triangle-left", "ibm_kyiv": "x", "ibm_nazca": "circle",
-        "ibm_kyoto": "cross", "ibm_osaka": "square", "ibm_brussels": "triangle-up",
-        "ibm_strasbourg": "diamond-open"
+    markers_5q = {
+        "originq_wukong": "star", "qasm_simulator": "cross", "iqm_emerald": "triangle-up",
+        "iqm_garnet": "x", "ibm_fez_5q": "diamond-tall", "ibm_marrakesh_5q": "circle",
+        "ibm_brisbane_5q": "circle-open", "rigetti_ankaa_2": "hexagon", "rigetti_ankaa_3": "hexagon2",
+        "iqm_sirius": "circle"
     }
     
-    linestyles_1d = {
-        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_torino": "dash", "ibm_fez": "dash"
-    }
+    fig_5q = go.Figure()
     
-    fig_1d = go.Figure()
+    # Plot each 5q backend
+    backend_order_5q = ["originq_wukong", "qasm_simulator", "iqm_emerald", "iqm_garnet", "iqm_sirius",
+                        "ibm_fez_5q", "ibm_marrakesh_5q", "ibm_brisbane_5q", 
+                        "rigetti_ankaa_2", "rigetti_ankaa_3"]
     
-    # Plot each backend
-    backend_order = ["originq_wukong", "ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino", "ibm_torino-v1", 
-                     "ibm_torino-v0", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv",
-                     "ibm_nazca", "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
-    
-    for backend_name in backend_order:
-        if backend_name not in chain_results:
+    for backend_name in backend_order_5q:
+        if backend_name not in results_5q:
             continue
-        data = chain_results[backend_name]
+        data = results_5q[backend_name]
         
-        fig_1d.add_trace(go.Scatter(
+        fig_5q.add_trace(go.Scatter(
             x=data["p_values"],
             y=data["r_values"],
             mode='lines+markers',
-            name=backend_name,
+            name=backend_name.replace("_5q", ""),
             marker=dict(
-                symbol=markers_1d.get(backend_name, "circle"),
+                symbol=markers_5q.get(backend_name, "circle"),
                 size=8,
-                color=colors_1d.get(backend_name, "#808080"),
+                color=colors_5q.get(backend_name, "#808080"),
                 line=dict(color='black', width=1)
             ),
             line=dict(
-                color=colors_1d.get(backend_name, "#808080"),
-                width=2,
-                dash=linestyles_1d.get(backend_name, "solid")
+                color=colors_5q.get(backend_name, "#808080"),
+                width=2
             ),
             hovertemplate='<b>%{fullData.name}</b><br>' +
                           'p: %{x}<br>' +
@@ -735,19 +733,13 @@ with tab3:
                           '<extra></extra>'
         ))
     
-    # Add random baseline from first backend that has it
-    random_baseline = None
-    for backend_name in chain_results:
-        if "random_r" in chain_results[backend_name]:
-            # Calculate baseline range (mock 3sigma for visualization)
-            random_baseline = chain_results[backend_name]["random_r"]
-            break
-    
-    if random_baseline:
+    # Add random baseline for 5q
+    if results_5q and "qasm_simulator" in results_5q:
+        random_baseline = results_5q["qasm_simulator"]["random_r"]
         y1 = random_baseline
-        y2 = 0.02  # Mock sigma for visualization
+        y2 = 0.02
         
-        fig_1d.add_trace(go.Scatter(
+        fig_5q.add_trace(go.Scatter(
             x=[1, 100],
             y=[y1-y2, y1-y2],
             fill=None,
@@ -757,7 +749,7 @@ with tab3:
             hoverinfo='skip'
         ))
         
-        fig_1d.add_trace(go.Scatter(
+        fig_5q.add_trace(go.Scatter(
             x=[1, 100],
             y=[y1+y2, y1+y2],
             fill='tonexty',
@@ -768,7 +760,7 @@ with tab3:
             hovertemplate='Random baseline<br>r: %{y:.3f}<extra></extra>'
         ))
     
-    fig_1d.update_layout(
+    fig_5q.update_layout(
         xaxis_title="QAOA Layers (p)",
         yaxis_title="Approximation Ratio (r)",
         height=600,
@@ -782,25 +774,141 @@ with tab3:
         template="plotly_white"
     )
     
-    st.plotly_chart(fig_1d, use_container_width=True)
+    st.plotly_chart(fig_5q, use_container_width=True)
     
-    # Statistics table
-    st.subheader("Backend Performance Statistics")
-    stats_1d = []
-    for backend_name in backend_order:
-        if backend_name not in chain_results:
+    # Statistics table for 5q
+    stats_5q = []
+    for backend_name in backend_order_5q:
+        if backend_name not in results_5q:
             continue
-        data = chain_results[backend_name]
-        stats_1d.append({
+        data = results_5q[backend_name]
+        stats_5q.append({
+            "Backend": backend_name.replace("_5q", ""),
+            "Qubits": data["qubits"],
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "p range": f"{min(data['p_values'])}-{max(data['p_values'])}"
+        })
+    
+    if stats_5q:
+        st.dataframe(pd.DataFrame(stats_5q), use_container_width=True, hide_index=True)
+    
+    st.markdown("---")
+    
+    # ========== 100 QUBIT EXPERIMENTS ==========
+    st.subheader("100-Qubit Comparison")
+    st.markdown("Large-scale 1D chain experiments on IBM Eagle and Heron processors.")
+    
+    results_100q = chain_results.get("100q", {})
+    
+    # Color and marker definitions for 100q
+    colors_100q = {
+        "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
+        "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada"
+    }
+    
+    markers_100q = {
+        "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
+        "ibm_torino": "square", "ibm_brisbane": "diamond"
+    }
+    
+    linestyles_100q = {
+        "ibm_torino": "dash", "ibm_fez": "dash"
+    }
+    
+    fig_100q = go.Figure()
+    
+    # Plot each 100q backend
+    backend_order_100q = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino", "ibm_brisbane"]
+    
+    for backend_name in backend_order_100q:
+        if backend_name not in results_100q:
+            continue
+        data = results_100q[backend_name]
+        
+        fig_100q.add_trace(go.Scatter(
+            x=data["p_values"],
+            y=data["r_values"],
+            mode='lines+markers',
+            name=backend_name,
+            marker=dict(
+                symbol=markers_100q.get(backend_name, "circle"),
+                size=8,
+                color=colors_100q.get(backend_name, "#808080"),
+                line=dict(color='black', width=1)
+            ),
+            line=dict(
+                color=colors_100q.get(backend_name, "#808080"),
+                width=2,
+                dash=linestyles_100q.get(backend_name, "solid")
+            ),
+            hovertemplate='<b>%{fullData.name}</b><br>' +
+                          'p: %{x}<br>' +
+                          'r: %{y:.3f}<br>' +
+                          '<extra></extra>'
+        ))
+    
+    # Add random baseline for 100q
+    if results_100q:
+        for backend_name in results_100q:
+            if "random_r" in results_100q[backend_name]:
+                random_baseline = results_100q[backend_name]["random_r"]
+                y1 = random_baseline
+                y2 = 0.02
+                
+                fig_100q.add_trace(go.Scatter(
+                    x=[1, 100],
+                    y=[y1-y2, y1-y2],
+                    fill=None,
+                    mode='lines',
+                    line=dict(color='rgba(128,128,128,0)', width=0),
+                    showlegend=False,
+                    hoverinfo='skip'
+                ))
+                
+                fig_100q.add_trace(go.Scatter(
+                    x=[1, 100],
+                    y=[y1+y2, y1+y2],
+                    fill='tonexty',
+                    mode='lines',
+                    line=dict(color='rgba(128,128,128,0)', width=0),
+                    fillcolor='rgba(128,128,128,0.3)',
+                    name='random baseline',
+                    hovertemplate='Random baseline<br>r: %{y:.3f}<extra></extra>'
+                ))
+                break
+    
+    fig_100q.update_layout(
+        xaxis_title="QAOA Layers (p)",
+        yaxis_title="Approximation Ratio (r)",
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        template="plotly_white"
+    )
+    
+    st.plotly_chart(fig_100q, use_container_width=True)
+    
+    # Statistics table for 100q
+    stats_100q = []
+    for backend_name in backend_order_100q:
+        if backend_name not in results_100q:
+            continue
+        data = results_100q[backend_name]
+        stats_100q.append({
             "Backend": backend_name,
             "Qubits": data["qubits"],
             "Max r": f"{data['max_r']:.3f}",
             "Optimal p": data["optimal_p"],
-            "Min p tested": min(data["p_values"]),
-            "Max p tested": max(data["p_values"])
+            "p range": f"{min(data['p_values'])}-{max(data['p_values'])}"
         })
     
-    if stats_1d:
-        st.dataframe(pd.DataFrame(stats_1d), use_container_width=True, hide_index=True)
+    if stats_100q:
+        st.dataframe(pd.DataFrame(stats_100q), use_container_width=True, hide_index=True)
 
 
