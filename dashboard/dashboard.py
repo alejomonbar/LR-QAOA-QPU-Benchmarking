@@ -93,8 +93,8 @@ def load_fc_results():
         json_path = data_dir / "fc_processed.json"
         with open(json_path, 'r') as f:
             fc_data = json.load(f)
-        
-        debug_info.append(f"✅ Loaded JSON data from {json_path.name}")
+
+        debug_info.append(f"OK Loaded JSON data from {json_path.name}")
         
         # Extract r_eff values for each backend
         for backend_name in backends:
@@ -106,22 +106,93 @@ def load_fc_results():
                     
                     if data["statistics"]["significant"]:
                         r[backend_name][nq] = data["r_eff"]
-                        debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={data['r_eff']:.4f}, p-value={p_val_str}")
+                        debug_info.append(f"OK {backend_name} nq={nq}: r_eff={data['r_eff']:.4f}, p-value={p_val_str}")
                     else:
-                        debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={p_val_str} >= 0.001)")
+                        debug_info.append(f"WARN {backend_name} nq={nq}: Failed significance test (p-value={p_val_str} >= 0.001)")
             else:
-                debug_info.append(f"⚠️ {backend_name} not found in JSON data")
+                debug_info.append(f"WARN {backend_name} not found in JSON data")
     
     except FileNotFoundError as e:
-        debug_info.append(f"🔴 JSON file not found: {str(e)}")
+        debug_info.append(f"ERR JSON file not found: {str(e)}")
         fc_data = {}
     except Exception as e:
-        debug_info.append(f"🔴 Error loading JSON: {str(e)}")
+        debug_info.append(f"ERR Error loading JSON: {str(e)}")
         import traceback
-        debug_info.append(f"🔴 Traceback: {traceback.format_exc()}")
+        debug_info.append(f"ERR Traceback: {traceback.format_exc()}")
         fc_data = {}
     
     return r, backends, debug_info, fc_data
+
+
+def compute_fc_interesting_facts(fc_data: dict) -> list[str]:
+    """Compute compact dataset statistics from processed FC data"""
+    if not fc_data:
+        return []
+
+    num_backends = len(fc_data)
+    num_records = 0
+    num_significant = 0
+    max_qubits_significant = 0
+    dates = []
+    num_hpc_sim = 0
+
+    for backend_name, backend_entries in fc_data.items():
+        if not isinstance(backend_entries, dict):
+            continue
+        for nq_str, record in backend_entries.items():
+            if not isinstance(record, dict):
+                continue
+            num_records += 1
+
+            if record.get("source") == "HPC_simulation":
+                num_hpc_sim += 1
+
+            stats = record.get("statistics") or {}
+            if stats.get("significant") is True:
+                num_significant += 1
+                try:
+                    nq = int(nq_str)
+                    if nq > max_qubits_significant:
+                        max_qubits_significant = nq
+                except Exception:
+                    pass
+
+            d = record.get("file_created")
+            if isinstance(d, str) and d:
+                dates.append(d)
+
+    facts = []
+    facts.append(f"Processors represented (FC): {num_backends}")
+    facts.append(f"Processed experiment records (FC): {num_records}")
+    if num_records:
+        pct = round(100 * num_significant / num_records)
+        facts.append(f"Significant results (p < 0.001): {num_significant}/{num_records} ({pct}%)")
+    if dates:
+        facts.append(f"Experiment date range: {min(dates)} → {max(dates)}")
+    if max_qubits_significant:
+        facts.append(f"Largest significant qubit count (FC): {max_qubits_significant}")
+    if num_hpc_sim:
+        facts.append(f"HPC-simulation entries included: {num_hpc_sim}")
+    return facts
+
+
+# Compact dataset snapshot (derived from the same processed JSON used by plots)
+_r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
+_facts = compute_fc_interesting_facts(_fc_data_tmp)
+if _facts:
+    st.subheader("Interesting facts (from the plotted data)")
+    st.caption("Quick snapshot from the processed dataset currently loaded by this dashboard.")
+    st.markdown("\n".join([f"- {fact}" for fact in _facts]))
+    st.markdown("---")
+
+# Create tabs
+_r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
+_facts = compute_fc_interesting_facts(_fc_data_tmp)
+if _facts:
+    st.subheader("Interesting facts (from the plotted data)")
+    st.caption("Quick snapshot from the processed dataset currently loaded by this dashboard.")
+    st.markdown("\n".join([f"- {fact}" for fact in _facts]))
+    st.markdown("---")
 
 
 # Create tabs
@@ -239,11 +310,11 @@ with tab1:
     # Add debug expander
     with st.expander("Debug Information - Data Loading Status"):
         for info in debug_info:
-            if "✅" in info:
+            if info.startswith("OK "):
                 st.success(info)
-            elif "❌" in info:
+            elif info.startswith("WARN "):
                 st.warning(info)
-            elif "🔴" in info:
+            elif info.startswith("ERR "):
                 st.error(info)
             else:
                 st.info(info)
