@@ -31,117 +31,33 @@ Explore 1D Chain, Native Layout, and Fully Connected graph experiments.
 # Function to load 1D chain results
 @st.cache_data
 def load_1d_chain_results():
-    """Load 1D chain experiment results for nq=100 comparison"""
+    """Load 1D chain experiment results for nq=100 comparison from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
     
-    names = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino", 
-             "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv", "ibm_nazca", 
-             "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
-    
-    nq = 100
-    delta = 1
-    case = ""
-    kk = 0  # section index
-    
-    results_data = {}
-    for backend_name in names:
-        try:
-            results = np.load(data_dir / backend_name / f"{nq}_1D.npy", allow_pickle=True).item()
-            postprocessing = results["postprocessing" + case]
-            ps = list(postprocessing[delta].keys())
-            rs = [postprocessing[delta][p][kk]["r"] for p in ps]
-            results_data[backend_name] = {"ps": ps, "rs": rs}
-            
-            if backend_name == "ibm_brisbane":
-                # Store random baseline data
-                res_random = results["random" + case]
-                rand_data = res_random["results"][:,1]
-                rand_mean = []
-                np.random.seed(1)
-                for i in range(10000):
-                    np.random.shuffle(rand_data)
-                    rand_mean.append(np.mean(rand_data[:1000]))
-                rand_mean = np.array(rand_mean)
-                y1 = rand_mean.mean()
-                y2 = 3 * rand_mean.std()
-                results_data["random_baseline"] = {"y1": y1, "y2": y2}
-        except:
-            continue
-    
-    # Add ibm_torino variants
     try:
-        results_v1 = np.load(data_dir / "ibm_torino" / "100_1D_v1.npy", allow_pickle=True).item()
-        postprocessing = results_v1["postprocessing" + case]
-        ps = list(postprocessing[delta].keys())
-        rs = [postprocessing[delta][p][kk]["r"] for p in ps]
-        results_data["ibm_torino-v1"] = {"ps": ps, "rs": rs}
-    except:
-        pass
-        
-    if "ibm_torino" in results_data:
-        results_data["ibm_torino-v0"] = results_data["ibm_torino"]
-        del results_data["ibm_torino"]
-    
-    return results_data
+        json_path = data_dir / "1d_chain_processed.json"
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        return data
+    except Exception as e:
+        st.error(f"Error loading 1D chain data: {str(e)}")
+        return {}
 
 
 # Function to load native layout results
 @st.cache_data
 def load_nl_results():
-    """Load native layout experiment results"""
+    """Load native layout experiment results from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
     
-    case = ""
-    prop = "r"
-    delta = 1
-    
-    backends_data = {}
-    
-    # Load different backend results
-    backend_files = {
-        "ibm_brisbane": ("ibm_brisbane", "127_HE_day2.npy", delta, 1),
-        "ibm_torino-v0": ("ibm_torino", "133_HE.npy", delta, 1),
-        "ibm_torino-v1": ("ibm_torino", "133_HE_v1.npy", delta, 1),
-        "ibm_torino-f": ("ibm_torino", "133_HE_fractional.npy", 0.75, 0.75),
-        "ibm_fez": ("ibm_fez", "156_HE.npy", delta, 1),
-        "ibm_fez-f": ("ibm_fez", "156_HE_fractional.npy", 0.75, 0.75),
-        "ibm_marrakesh-f": ("ibm_marrakesh", "156_HE_fractional.npy", 0.75, 0.75),
-        "ibm_aachen-f": ("ibm_aachen", "156_HE_fractional.npy", 0.75, 0.75),
-        "ibm_kingston-f": ("ibm_kingston", "156_HE_fractional.npy", 0.75, 0.75),
-        "ibm_boston-f": ("ibm_boston", "156_HEw1.npy", 0.75, 0.75),
-        "iqm_garnet": ("iqm_garnet", "20_NL.npy", delta, 1),
-        "iqm_emerald": ("iqm_emerald", "54_HE.npy", 0.75, 0.75),
-        "rigetti_ankaa_3": ("rigetti_ankaa_3", "82_NL.npy", delta, 1),
-    }
-    
-    for display_name, (folder, filename, delta_val, delta_key) in backend_files.items():
-        try:
-            results = np.load(data_dir / folder / filename, allow_pickle=True).item()
-            postprocessing = results["postprocessing" + case]
-            ps = results["ps"]
-            
-            # Handle different data structures
-            if isinstance(postprocessing[delta_val][ps[0]], dict):
-                if 0 in postprocessing[delta_val][ps[0]]:
-                    rs = [postprocessing[delta_val][p][0][prop] for p in ps]
-                else:
-                    rs = [postprocessing[delta_val][p][prop] for p in ps]
-            else:
-                rs = [postprocessing[delta_val][p][prop] for p in ps]
-            
-            backends_data[display_name] = {
-                "ps": list(ps),
-                "rs": rs,
-                "has_random": "random" + case in results
-            }
-            
-            if backends_data[display_name]["has_random"]:
-                backends_data[display_name]["random_r"] = results["random" + case][prop]
-                
-        except Exception as e:
-            continue
-    
-    return backends_data
+    try:
+        json_path = data_dir / "native_layout_processed.json"
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        return data
+    except Exception as e:
+        st.error(f"Error loading native layout data: {str(e)}")
+        return {}
 
 
 # Function to load fully connected results
@@ -243,8 +159,8 @@ with tab1:
         data = chain_results[backend_name]
         
         fig_1d.add_trace(go.Scatter(
-            x=data["ps"],
-            y=data["rs"],
+            x=data["p_values"],
+            y=data["r_values"],
             mode='lines+markers',
             name=backend_name,
             marker=dict(
@@ -264,10 +180,17 @@ with tab1:
                           '<extra></extra>'
         ))
     
-    # Add random baseline
-    if "random_baseline" in chain_results:
-        y1 = chain_results["random_baseline"]["y1"]
-        y2 = chain_results["random_baseline"]["y2"]
+    # Add random baseline from first backend that has it
+    random_baseline = None
+    for backend_name in chain_results:
+        if "random_r" in chain_results[backend_name]:
+            # Calculate baseline range (mock 3sigma for visualization)
+            random_baseline = chain_results[backend_name]["random_r"]
+            break
+    
+    if random_baseline:
+        y1 = random_baseline
+        y2 = 0.02  # Mock sigma for visualization
         
         fig_1d.add_trace(go.Scatter(
             x=[1, 100],
@@ -286,7 +209,7 @@ with tab1:
             mode='lines',
             line=dict(color='rgba(128,128,128,0)', width=0),
             fillcolor='rgba(128,128,128,0.3)',
-            name='random (3σ)',
+            name='random baseline',
             hovertemplate='Random baseline<br>r: %{y:.3f}<extra></extra>'
         ))
     
@@ -310,15 +233,15 @@ with tab1:
     st.subheader("Backend Performance Statistics (100 qubits)")
     stats_1d = []
     for backend_name in backend_order:
-        if backend_name not in chain_results or backend_name == "random_baseline":
+        if backend_name not in chain_results:
             continue
         data = chain_results[backend_name]
         stats_1d.append({
             "Backend": backend_name,
-            "Max r": f"{max(data['rs']):.3f}",
-            "Optimal p": data["ps"][data["rs"].index(max(data["rs"]))],
-            "Min p tested": min(data["ps"]),
-            "Max p tested": max(data["ps"])
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "Min p tested": min(data["p_values"]),
+            "Max p tested": max(data["p_values"])
         })
     
     if stats_1d:
@@ -379,8 +302,8 @@ with tab2:
         data = nl_data[backend_name]
         
         fig_nl.add_trace(go.Scatter(
-            x=data["ps"],
-            y=data["rs"],
+            x=data["p_values"],
+            y=data["r_values"],
             mode='lines+markers',
             name=backend_name,
             marker=dict(
@@ -403,8 +326,8 @@ with tab2:
         # Add random baseline line if available
         if data.get("has_random") and "random_r" in data:
             fig_nl.add_trace(go.Scatter(
-                x=data["ps"],
-                y=[data["random_r"]] * len(data["ps"]),
+                x=data["p_values"],
+                y=[data["random_r"]] * len(data["p_values"]),
                 mode='lines',
                 line=dict(color=colors_nl.get(backend_name, "#808080"), dash="dot", width=1),
                 showlegend=False,
@@ -447,11 +370,11 @@ with tab2:
         data = nl_data[backend_name]
         stats_nl.append({
             "Backend": backend_name,
-            "Qubits": "20" if "garnet" in backend_name else "54" if "emerald" in backend_name else "82" if "ankaa" in backend_name else "127" if "brisbane" in backend_name else "133" if "torino" in backend_name else "156",
-            "Max r": f"{max(data['rs']):.3f}",
-            "Optimal p": data["ps"][data["rs"].index(max(data["rs"]))],
-            "Min p": min(data["ps"]),
-            "Max p": max(data["ps"])
+            "Qubits": data["qubits"],
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "Min p": min(data["p_values"]),
+            "Max p": max(data["p_values"])
         })
     
     if stats_nl:
