@@ -550,7 +550,7 @@ with tab2:
     
     st.markdown("""
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
-    Testing large-scale Heron processors with native connectivity.
+    Testing large-scale IBM Eagle and Heron processors with native connectivity.
     """)
     
     # Add cache clear button in expander
@@ -568,13 +568,13 @@ with tab2:
     
     # Color definitions for native layout
     colors_nl = {
-        # 127q Heron-r1 (shades of purple/lavender)
+        # 127q Eagle (shades of purple/lavender)
         "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
         "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
         "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
-        # 133q Heron-r2 (shades of orange)
+        # 133q Heron-r1 (shades of orange)
         "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
-        # 156q Heron-r2/r3 (various colors)
+        # 156q Heron-r2 (various colors)
         "ibm_fez": "#b3de69", "ibm_fez-f": "#b3de69",
         "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
         "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
@@ -612,11 +612,11 @@ with tab2:
     
     backend_order_nl = [
         "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
-        # 127q Heron-r1 devices
+        # 127q Eagle devices
         "ibm_brisbane", "ibm_brussels", "ibm_kyiv", "ibm_kyoto", "ibm_osaka", "ibm_strasbourg",
-        # 133q Heron-r2 devices
+        # 133q Heron-r1 devices
         "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
-        # 156q Heron-r2/r3 devices
+        # 156q Heron-r2 devices
         "ibm_fez", "ibm_fez-f", "ibm_marrakesh-f",
         "ibm_kingston-f", "ibm_aachen-f", "ibm_boston-f"
     ]
@@ -715,13 +715,13 @@ with tab2:
     
     # Enhanced color scheme for IBM devices
     colors_ibm = {
-        # 127q Heron-r1 (shades of purple/lavender)
+        # 127q Eagle (shades of purple/lavender)
         "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
         "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
         "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
-        # 133q Heron-r2 (shades of orange)
+        # 133q Heron-r1 (shades of orange)
         "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fb8072", "ibm_torino-f": "#ff7f00",
-        # 156q Heron-r2/r3
+        # 156q Heron-r2
         "ibm_fez": "#b3de69", "ibm_fez-f": "#8dd3c7",
         "ibm_marrakesh-f": "#ffed6f", 
         "ibm_aachen-f": "#e41a1c", "ibm_kingston-f": "#377eb8", 
@@ -826,11 +826,11 @@ with tab2:
         
         # Determine processor type
         if "brisbane" in backend_name or "brussels" in backend_name or "kyiv" in backend_name or "kyoto" in backend_name or "nazca" in backend_name or "osaka" in backend_name or "sherbrooke" in backend_name or "strasbourg" in backend_name:
-            proc_type = "Heron-r1 (127q)"
+            proc_type = "Eagle (127q)"
         elif "torino" in backend_name:
-            proc_type = "Heron-r2 (133q)"
+            proc_type = "Heron-r1 (133q)"
         elif "fez" in backend_name or "marrakesh" in backend_name or "aachen" in backend_name or "kingston" in backend_name or "boston" in backend_name or "pittsburgh" in backend_name:
-            proc_type = "Heron-r2/r3 (156q)"
+            proc_type = "Heron-r2 (156q)"
         else:
             proc_type = "Unknown"
         
