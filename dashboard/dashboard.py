@@ -671,40 +671,40 @@ with tab3:
         if chain_logo_path.exists():
             st.image(str(chain_logo_path), width=120, use_column_width=False)
     with col_header:
-        st.header("1D Chain Experiments - 100 Qubit Comparison")
+        st.header("1D Chain Experiments")
     
     st.markdown("""
-    Approximation ratio vs QAOA layers (p) for 1D chain graphs with 100 qubits.
-    Comparing Eagle and Heron IBM QPUs with random baseline.
+    Approximation ratio vs QAOA layers (p) for 1D chain graphs.
+    Comparing various QPUs including OriginQ Wukong at 5 qubits.
     """)
     
     chain_results = load_1d_chain_results()
     
     # Color and marker definitions
     colors_1d = {
-        "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
-        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fdb462", "ibm_brisbane": "#bebada",
+        "originq_wukong": "#8dd3c7", "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
+        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fdb462", "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada",
         "ibm_sherbrooke": "#fb8072", "ibm_kyiv": "#d9d9d9", "ibm_nazca": "#80b1d3",
         "ibm_kyoto": "#bc80bd", "ibm_osaka": "#ccebc5", "ibm_brussels": "#fccde5",
         "ibm_strasbourg": "#ffffb3"
     }
     
     markers_1d = {
-        "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
-        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_brisbane": "diamond",
+        "originq_wukong": "star", "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
+        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_torino": "square", "ibm_brisbane": "diamond",
         "ibm_sherbrooke": "triangle-left", "ibm_kyiv": "x", "ibm_nazca": "circle",
         "ibm_kyoto": "cross", "ibm_osaka": "square", "ibm_brussels": "triangle-up",
         "ibm_strasbourg": "diamond-open"
     }
     
     linestyles_1d = {
-        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_fez": "dash"
+        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_torino": "dash", "ibm_fez": "dash"
     }
     
     fig_1d = go.Figure()
     
     # Plot each backend
-    backend_order = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino-v1", 
+    backend_order = ["originq_wukong", "ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino", "ibm_torino-v1", 
                      "ibm_torino-v0", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv",
                      "ibm_nazca", "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
     
@@ -785,7 +785,7 @@ with tab3:
     st.plotly_chart(fig_1d, use_container_width=True)
     
     # Statistics table
-    st.subheader("Backend Performance Statistics (100 qubits)")
+    st.subheader("Backend Performance Statistics")
     stats_1d = []
     for backend_name in backend_order:
         if backend_name not in chain_results:
@@ -793,6 +793,7 @@ with tab3:
         data = chain_results[backend_name]
         stats_1d.append({
             "Backend": backend_name,
+            "Qubits": data["qubits"],
             "Max r": f"{data['max_r']:.3f}",
             "Optimal p": data["optimal_p"],
             "Min p tested": min(data["p_values"]),
