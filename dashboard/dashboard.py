@@ -19,7 +19,7 @@ col1, col2 = st.columns([1, 10])
 with col1:
     logo_path = Path(__file__).parent / "Logo.png"
     if logo_path.exists():
-        st.image(str(logo_path), width=80)
+        st.image(str(logo_path), width=100, use_column_width=False)
 with col2:
     st.title("LR-QAOA QPU Benchmarking Dashboard")
 
