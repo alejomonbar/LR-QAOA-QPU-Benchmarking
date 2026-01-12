@@ -24,14 +24,14 @@ with col2:
     st.title("LR-QAOA QPU Benchmarking Dashboard")
 
 st.markdown("""
-### Benchmarking Long-Range QAOA on Quantum Processing Units
+### Benchmarking Linear Ramp QAOA on Quantum Processing Units
 
-This dashboard presents comprehensive benchmarking results of the **Long-Range Quantum Approximate Optimization Algorithm (LR-QAOA)** 
+This dashboard presents comprehensive benchmarking results of the **Linear Ramp Quantum Approximate Optimization Algorithm (LR-QAOA)** 
 across multiple quantum processors from leading quantum computing providers including IBM, IonQ, Rigetti, IQM, and AQT.
 
-**What is LR-QAOA?** LR-QAOA extends the standard QAOA by incorporating long-range interactions, enabling efficient 
-implementation of fully connected problems on quantum hardware with limited connectivity. This approach significantly 
-reduces circuit depth and improves performance on near-term quantum devices.
+**What is LR-QAOA?** LR-QAOA is a variant of QAOA that uses a linear ramp scheduling approach for the mixing and 
+problem Hamiltonians. This method enables efficient implementation of optimization problems on quantum hardware and 
+improves performance on near-term quantum devices.
 
 **Key Features:**
 - 📊 **Fully Connected Graphs**: Up to 56 qubits tested across multiple QPUs
