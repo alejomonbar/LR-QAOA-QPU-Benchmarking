@@ -61,7 +61,7 @@ def load_nl_results():
 
 
 # Function to load fully connected results
-@st.cache_data
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def load_fc_results():
     """Load fully connected experiment results from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
@@ -391,6 +391,11 @@ with tab3:
     
     r_data, backends, debug_info, fc_data = load_fc_results()
     
+    # Force cache clear button
+    if st.button("🔄 Clear Cache and Reload Data"):
+        st.cache_data.clear()
+        st.rerun()
+    
     # Add debug expander
     with st.expander("🔍 Debug Information - Data Loading Status"):
         for info in debug_info:
@@ -661,6 +666,27 @@ with tab3:
     # Show statistics
     st.markdown("---")
     st.subheader("Backend Statistics")
+    
+    # Debug: check if fc_data has the data
+    if st.checkbox("Show debug info for dates", value=False):
+        st.write(f"fc_data type: {type(fc_data)}")
+        st.write(f"fc_data is dict: {isinstance(fc_data, dict)}")
+        st.write(f"Number of backends in fc_data: {len(fc_data)}")
+        st.write("Backends in fc_data:", list(fc_data.keys())[:5])
+        st.write("Backends in r_data:", list(r_data.keys())[:5])
+        if backends:
+            first_backend = backends[0] if backends[0] in r_data else (list(r_data.keys())[0] if r_data else None)
+            if first_backend:
+                st.write(f"\nExample: {first_backend}")
+                st.write(f"  In fc_data: {first_backend in fc_data}")
+                if first_backend in r_data:
+                    max_nq = max(r_data[first_backend].keys())
+                    st.write(f"  Max nq in r_data: {max_nq}")
+                    st.write(f"  str(max_nq) in fc_data[backend]: {str(max_nq) in fc_data.get(first_backend, {})}")
+                    if first_backend in fc_data and str(max_nq) in fc_data[first_backend]:
+                        st.write(f"  file_created: {fc_data[first_backend][str(max_nq)].get('file_created', 'NOT FOUND')}")
+
+    
     stats_data = []
     for backend_name in backends:
         if backend_name in r_data and len(r_data[backend_name]) > 0:
@@ -670,8 +696,16 @@ with tab3:
             # Get creation date for max qubit experiment from JSON
             max_nq = max(nqs_list)
             exp_date = "N/A"
-            if backend_name in fc_data and str(max_nq) in fc_data[backend_name]:
-                exp_date = fc_data[backend_name][str(max_nq)].get("file_created", "N/A")
+            
+            # Debug for specific backend
+            if backend_name in fc_data:
+                if str(max_nq) in fc_data[backend_name]:
+                    exp_date = fc_data[backend_name][str(max_nq)].get("file_created", "N/A")
+                else:
+                    st.write(f"DEBUG {backend_name}: max_nq {max_nq} (str: '{str(max_nq)}') not in fc_data keys: {list(fc_data[backend_name].keys())[:5]}")
+            else:
+                st.write(f"DEBUG: {backend_name} not in fc_data")
+
             
             stats_data.append({
                 "Backend": backend_name,
