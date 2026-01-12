@@ -668,6 +668,68 @@ with tab3:
         if not available_backends:
             st.info(f"No backends have data for {selected_nq} qubits.")
     
+    # Show QPU capabilities over time
+    st.markdown("---")
+    st.subheader("📅 QPU Capabilities Timeline")
+    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
+    
+    # Collect max qubits and file dates for each backend
+    timeline_data = []
+    data_dir = Path(__file__).parent.parent / "Data"
+    
+    for backend_name in backends:
+        if backend_name in r_data and len(r_data[backend_name]) > 0:
+            nqs_list = sorted(r_data[backend_name].keys())
+            max_nq = max(nqs_list)
+            
+            # Get file modification time for the max qubit experiment
+            file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
+            if file_path.exists():
+                import datetime
+                mod_time = datetime.datetime.fromtimestamp(file_path.stat().st_mtime)
+                timeline_data.append({
+                    "backend": backend_name,
+                    "max_qubits": max_nq,
+                    "date": mod_time
+                })
+    
+    if timeline_data:
+        # Create timeline plot
+        fig_timeline = go.Figure()
+        
+        for item in timeline_data:
+            fig_timeline.add_trace(go.Scatter(
+                x=[item["date"]],
+                y=[item["max_qubits"]],
+                mode='markers+text',
+                name=item["backend"],
+                marker=dict(
+                    symbol=markers_map.get(item["backend"], "circle"),
+                    size=15,
+                    color=colors_map.get(item["backend"], "#808080"),
+                    line=dict(color='black', width=1)
+                ),
+                text=[item["backend"]],
+                textposition="top center",
+                textfont=dict(size=10),
+                hovertemplate='<b>%{text}</b><br>' +
+                              'Date: %{x|%Y-%m-%d}<br>' +
+                              'Max Qubits: %{y}<br>' +
+                              '<extra></extra>'
+            ))
+        
+        fig_timeline.update_layout(
+            xaxis_title="Experiment Date",
+            yaxis_title="Maximum Number of Qubits",
+            hovermode='closest',
+            height=500,
+            showlegend=False,
+            template="plotly_white",
+            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56])
+        )
+        
+        st.plotly_chart(fig_timeline, use_container_width=True)
+    
     # Show statistics
     st.markdown("---")
     st.subheader("Backend Statistics")
@@ -676,8 +738,20 @@ with tab3:
         if backend_name in r_data and len(r_data[backend_name]) > 0:
             nqs_list = sorted(r_data[backend_name].keys())
             r_values = [r_data[backend_name][nq] for nq in nqs_list]
+            
+            # Get date for max qubit experiment
+            max_nq = max(nqs_list)
+            file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
+            exp_date = "N/A"
+            if file_path.exists():
+                import datetime
+                mod_time = datetime.datetime.fromtimestamp(file_path.stat().st_mtime)
+                exp_date = mod_time.strftime("%Y-%m-%d")
+            
             stats_data.append({
                 "Backend": backend_name,
+                "Max Qubits": max_nq,
+                "Experiment Date": exp_date,
                 "Qubit Range": f"{min(nqs_list)}-{max(nqs_list)}",
                 "Data Points": len(nqs_list),
                 "Max r_eff": f"{max(r_values):.3f}",
