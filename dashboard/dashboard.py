@@ -41,9 +41,9 @@ across 1D chains, native layouts, and fully connected topologies.
 """)
 
 # Function to load 1D chain results
-@st.cache_data
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def load_1d_chain_results():
-    """Load 1D chain experiment results for nq=100 comparison from JSON"""
+    """Load 1D chain experiment results for 5q and 100q comparisons from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
     
     try:
@@ -53,7 +53,7 @@ def load_1d_chain_results():
         return data
     except Exception as e:
         st.error(f"Error loading 1D chain data: {str(e)}")
-        return {}
+        return {"5q": {}, "100q": {}}
 
 
 # Function to load native layout results
@@ -679,11 +679,20 @@ with tab3:
     
     chain_results = load_1d_chain_results()
     
+    # Debug: Show what was loaded
+    if not chain_results or (not chain_results.get("5q") and not chain_results.get("100q")):
+        st.warning("⚠️ No 1D chain data loaded. Please check if Data/1d_chain_processed.json exists.")
+    
     # ========== 5 QUBIT EXPERIMENTS ==========
     st.subheader("5-Qubit Comparison")
     st.markdown("Comparing multiple QPUs on small-scale 1D chain problems.")
     
     results_5q = chain_results.get("5q", {})
+    
+    if not results_5q:
+        st.info("No 5-qubit data available.")
+    else:
+        st.caption(f"📊 Loaded {len(results_5q)} backends for 5-qubit comparison")
     
     # Color and marker definitions for 5q
     colors_5q = {
@@ -800,6 +809,11 @@ with tab3:
     st.markdown("Large-scale 1D chain experiments on IBM Eagle and Heron processors.")
     
     results_100q = chain_results.get("100q", {})
+    
+    if not results_100q:
+        st.info("No 100-qubit data available.")
+    else:
+        st.caption(f"📊 Loaded {len(results_100q)} backends for 100-qubit comparison")
     
     # Color and marker definitions for 100q
     colors_100q = {
