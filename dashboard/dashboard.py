@@ -129,7 +129,7 @@ def load_fc_results():
 
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs(["📊 Fully Connected", "🔷 Native Layout", "🔗 1D Chain"])
+tab1, tab2, tab3 = st.tabs(["Fully Connected", "Native Layout", "1D Chain"])
 
 # Tab 1: Fully Connected Experiments
 with tab1:
