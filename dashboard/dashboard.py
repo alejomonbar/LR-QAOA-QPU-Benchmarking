@@ -19,8 +19,8 @@ st.set_page_config(
 # Title and description
 st.title("⚛️ LR-QAOA QPU Benchmarking Dashboard")
 st.markdown("""
-Interactive dashboard for comparing QAOA performance across different quantum processors.
-Click on data points to see detailed information, zoom in/out, and filter by backend.
+Interactive dashboard for comparing QAOA performance across quantum processors.
+Click on data points for details, zoom in/out, and filter by backend.
 """)
 
 # Function to load all results from Data directory
