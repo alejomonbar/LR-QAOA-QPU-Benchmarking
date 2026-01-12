@@ -65,15 +65,23 @@ def load_1d_chain_results():
 
 
 # Function to load native layout results
-@st.cache_data
+@st.cache_data(ttl=600)
 def load_nl_results():
     """Load native layout experiment results from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
     
     try:
         json_path = data_dir / "native_layout_processed.json"
+        # Add file timestamp to force cache invalidation when file changes
+        file_mtime = json_path.stat().st_mtime
+        
         with open(json_path, 'r') as f:
             data = json.load(f)
+        
+        # Verify data loaded
+        if not data:
+            st.warning("⚠️ Loaded empty native layout data")
+        
         return data
     except Exception as e:
         st.error(f"Error loading native layout data: {str(e)}")
@@ -542,10 +550,21 @@ with tab2:
     
     st.markdown("""
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
-    Testing large-scale Eagle and Heron processors with native connectivity.
+    Testing large-scale Heron processors with native connectivity.
     """)
     
+    # Add cache clear button in expander
+    with st.expander("🔧 Advanced Options"):
+        if st.button("Clear Cache & Reload Data", key="nl_clear_cache"):
+            st.cache_data.clear()
+            st.rerun()
+    
     nl_data = load_nl_results()
+    
+    if not nl_data:
+        st.warning("⚠️ No native layout data loaded. Please check if Data/native_layout_processed.json exists.")
+    else:
+        st.caption(f"📊 Loaded {len(nl_data)} backends for native layout comparison")
     
     # Color definitions for native layout
     colors_nl = {
@@ -780,12 +799,12 @@ with tab2:
         data = nl_data[backend_name]
         
         # Determine processor type
-        if "brisbane" in backend_name:
-            proc_type = "Heron (127q)"
+        if "brisbane" in backend_name or "brussels" in backend_name or "kyiv" in backend_name or "kyoto" in backend_name or "nazca" in backend_name or "osaka" in backend_name or "sherbrooke" in backend_name or "strasbourg" in backend_name:
+            proc_type = "Heron-r1 (127q)"
         elif "torino" in backend_name:
-            proc_type = "Heron (133q)"
-        elif "fez" in backend_name or "marrakesh" in backend_name or "aachen" in backend_name or "kingston" in backend_name or "boston" in backend_name:
-            proc_type = "Eagle (156q)"
+            proc_type = "Heron-r2 (133q)"
+        elif "fez" in backend_name or "marrakesh" in backend_name or "aachen" in backend_name or "kingston" in backend_name or "boston" in backend_name or "pittsburgh" in backend_name:
+            proc_type = "Heron-r2/r3 (156q)"
         else:
             proc_type = "Unknown"
         
