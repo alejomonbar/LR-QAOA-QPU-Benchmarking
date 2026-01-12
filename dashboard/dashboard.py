@@ -27,7 +27,8 @@ Click on data points to see detailed information, zoom in/out, and filter by bac
 @st.cache_data
 def load_all_results():
     """Load all benchmark results from the Data directory"""
-    data_dir = Path("../Data")
+    # Use absolute path relative to this file's location
+    data_dir = Path(__file__).parent.parent / "Data"
     results_dict = {}
     
     # Scan all subdirectories for .npy files
