@@ -668,6 +668,138 @@ with tab2:
     
     if stats_nl:
         st.dataframe(pd.DataFrame(stats_nl), use_container_width=True, hide_index=True)
+    
+    # ========== IBM DEVICES COMPARISON ==========
+    st.markdown("---")
+    st.subheader("IBM Quantum Processors Comparison")
+    st.markdown("Comparing IBM Eagle and Heron processors across different configurations on native layout problems.")
+    
+    # Filter for IBM devices only
+    ibm_backends = [b for b in backend_order_nl if b.startswith("ibm_")]
+    
+    # Enhanced color scheme for IBM devices
+    colors_ibm = {
+        "ibm_brisbane": "#bebada", 
+        "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fb8072", "ibm_torino-f": "#ff7f00",
+        "ibm_fez": "#b3de69", "ibm_fez-f": "#8dd3c7",
+        "ibm_marrakesh-f": "#ffed6f", 
+        "ibm_aachen-f": "#e41a1c", "ibm_kingston-f": "#377eb8", 
+        "ibm_boston-f": "#984ea3"
+    }
+    
+    markers_ibm = {
+        "ibm_brisbane": "diamond", 
+        "ibm_torino-v0": "circle", "ibm_torino-v1": "cross", "ibm_torino-f": "square",
+        "ibm_fez": "triangle-up", "ibm_fez-f": "star",
+        "ibm_marrakesh-f": "circle-open", 
+        "ibm_aachen-f": "triangle-down", "ibm_kingston-f": "x",
+        "ibm_boston-f": "pentagon"
+    }
+    
+    linestyles_ibm = {
+        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_torino-f": "dash",
+        "ibm_fez": "solid", "ibm_fez-f": "dash",
+        "ibm_marrakesh-f": "dash", "ibm_aachen-f": "dash", 
+        "ibm_kingston-f": "dash", "ibm_boston-f": "dash"
+    }
+    
+    fig_ibm = go.Figure()
+    
+    for backend_name in ibm_backends:
+        if backend_name not in nl_data:
+            continue
+        data = nl_data[backend_name]
+        
+        fig_ibm.add_trace(go.Scatter(
+            x=data["p_values"],
+            y=data["r_values"],
+            mode='lines+markers',
+            name=backend_name,
+            marker=dict(
+                symbol=markers_ibm.get(backend_name, "circle"),
+                size=8,
+                color=colors_ibm.get(backend_name, "#808080"),
+                line=dict(color='black', width=1)
+            ),
+            line=dict(
+                color=colors_ibm.get(backend_name, "#808080"),
+                width=2,
+                dash=linestyles_ibm.get(backend_name, "solid")
+            ),
+            hovertemplate='<b>%{fullData.name}</b><br>' +
+                          f'Qubits: {data["qubits"]}<br>' +
+                          'p: %{x}<br>' +
+                          'r: %{y:.3f}<br>' +
+                          '<extra></extra>'
+        ))
+        
+        # Add random baseline line if available
+        if data.get("has_random") and "random_r" in data:
+            fig_ibm.add_trace(go.Scatter(
+                x=data["p_values"],
+                y=[data["random_r"]] * len(data["p_values"]),
+                mode='lines',
+                line=dict(color=colors_ibm.get(backend_name, "#808080"), dash="dot", width=1),
+                showlegend=False,
+                hoverinfo='skip'
+            ))
+    
+    # Add legend for random baseline
+    fig_ibm.add_trace(go.Scatter(
+        x=[None],
+        y=[None],
+        mode='lines',
+        line=dict(color='black', dash='dot', width=1),
+        name='random baseline',
+        showlegend=True
+    ))
+    
+    fig_ibm.update_layout(
+        xaxis_title="QAOA Layers (p)",
+        yaxis_title="Approximation Ratio (r)",
+        xaxis=dict(tickvals=[3, 10, 25, 50, 75, 100]),
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        template="plotly_white"
+    )
+    
+    st.plotly_chart(fig_ibm, use_container_width=True, key="nl_ibm_comparison_plot")
+    
+    # IBM Statistics table
+    st.subheader("IBM Processor Statistics")
+    stats_ibm = []
+    for backend_name in ibm_backends:
+        if backend_name not in nl_data:
+            continue
+        data = nl_data[backend_name]
+        
+        # Determine processor type
+        if "brisbane" in backend_name:
+            proc_type = "Heron (127q)"
+        elif "torino" in backend_name:
+            proc_type = "Heron (133q)"
+        elif "fez" in backend_name or "marrakesh" in backend_name or "aachen" in backend_name or "kingston" in backend_name or "boston" in backend_name:
+            proc_type = "Eagle (156q)"
+        else:
+            proc_type = "Unknown"
+        
+        stats_ibm.append({
+            "Backend": backend_name,
+            "Processor": proc_type,
+            "Qubits Used": data["qubits"],
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "p Range": f"{min(data['p_values'])}-{max(data['p_values'])}"
+        })
+    
+    if stats_ibm:
+        st.dataframe(pd.DataFrame(stats_ibm), use_container_width=True, hide_index=True)
 
 
 # Tab 3: 1D Chain Experiments
