@@ -186,12 +186,14 @@ def load_fc_results():
     
     except FileNotFoundError as e:
         debug_info.append(f"🔴 JSON file not found: {str(e)}")
+        fc_data = {}
     except Exception as e:
         debug_info.append(f"🔴 Error loading JSON: {str(e)}")
         import traceback
         debug_info.append(f"🔴 Traceback: {traceback.format_exc()}")
+        fc_data = {}
     
-    return r, backends, debug_info
+    return r, backends, debug_info, fc_data
 
 
 # Create tabs
@@ -464,7 +466,7 @@ with tab3:
     Results are normalized against random sampling baseline (3σ threshold).
     """)
     
-    r_data, backends, debug_info = load_fc_results()
+    r_data, backends, debug_info, fc_data = load_fc_results()
     
     # Add debug expander
     with st.expander("🔍 Debug Information - Data Loading Status"):
