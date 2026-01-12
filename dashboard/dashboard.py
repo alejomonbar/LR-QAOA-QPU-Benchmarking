@@ -596,7 +596,7 @@ with tab3:
     # Show QPU capabilities over time
     st.markdown("---")
     st.subheader("📅 QPU Capabilities Timeline")
-    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
+    st.markdown("Maximum qubit count per backend and when experiments were conducted (based on file creation date).")
     
     # Collect max qubits and file dates for each backend
     timeline_data = []
@@ -607,15 +607,22 @@ with tab3:
             nqs_list = sorted(r_data[backend_name].keys())
             max_nq = max(nqs_list)
             
-            # Get file modification time for the max qubit experiment
+            # Get file creation time for the max qubit experiment
             file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
             if file_path.exists():
                 import datetime
-                mod_time = datetime.datetime.fromtimestamp(file_path.stat().st_mtime)
+                file_stat = file_path.stat()
+                # Try to get creation time (st_birthtime on macOS/BSD, st_ctime on some systems)
+                if hasattr(file_stat, 'st_birthtime'):
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_birthtime)
+                else:
+                    # Fallback to st_ctime (change time on Unix, creation time on Windows)
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_ctime)
+                
                 timeline_data.append({
                     "backend": backend_name,
                     "max_qubits": max_nq,
-                    "date": mod_time
+                    "date": creation_time
                 })
     
     if timeline_data:
@@ -664,14 +671,20 @@ with tab3:
             nqs_list = sorted(r_data[backend_name].keys())
             r_values = [r_data[backend_name][nq] for nq in nqs_list]
             
-            # Get date for max qubit experiment
+            # Get creation date for max qubit experiment
             max_nq = max(nqs_list)
             file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
             exp_date = "N/A"
             if file_path.exists():
                 import datetime
-                mod_time = datetime.datetime.fromtimestamp(file_path.stat().st_mtime)
-                exp_date = mod_time.strftime("%Y-%m-%d")
+                file_stat = file_path.stat()
+                # Try to get creation time (st_birthtime on macOS/BSD, st_ctime on some systems)
+                if hasattr(file_stat, 'st_birthtime'):
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_birthtime)
+                else:
+                    # Fallback to st_ctime (change time on Unix, creation time on Windows)
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_ctime)
+                exp_date = creation_time.strftime("%Y-%m-%d")
             
             stats_data.append({
                 "Backend": backend_name,
