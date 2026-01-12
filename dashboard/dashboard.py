@@ -138,7 +138,7 @@ with tab1:
     with col_logo:
         fc_logo_path = Path(__file__).parent / "FC-logo.png"
         if fc_logo_path.exists():
-            st.image(str(fc_logo_path), width=80)
+            st.image(str(fc_logo_path), width=120, use_column_width=False)
     with col_header:
         st.header("Fully Connected Graph Experiments")
     
@@ -464,7 +464,7 @@ with tab2:
     with col_logo:
         nl_logo_path = Path(__file__).parent / "NL-logo.png"
         if nl_logo_path.exists():
-            st.image(str(nl_logo_path), width=80)
+            st.image(str(nl_logo_path), width=120, use_column_width=False)
     with col_header:
         st.header("Native Layout Experiments")
     
@@ -605,7 +605,7 @@ with tab3:
     with col_logo:
         chain_logo_path = Path(__file__).parent / "1D-logo.png"
         if chain_logo_path.exists():
-            st.image(str(chain_logo_path), width=80)
+            st.image(str(chain_logo_path), width=120, use_column_width=False)
     with col_header:
         st.header("1D Chain Experiments - 100 Qubit Comparison")
     
