@@ -168,18 +168,23 @@ def load_fc_results():
             if backend_name in fc_data:
                 for nq_str, data in fc_data[backend_name].items():
                     nq = int(nq_str)
+                    p_val = data["statistics"]["p_value"]
+                    p_val_str = f"{p_val:.6f}" if p_val is not None else "N/A"
+                    
                     if data["statistics"]["significant"]:
                         r[backend_name][nq] = data["r_eff"]
-                        debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={data['r_eff']:.4f}, p-value={data['statistics']['p_value']:.6f}")
+                        debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={data['r_eff']:.4f}, p-value={p_val_str}")
                     else:
-                        debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={data['statistics']['p_value']:.6f} >= 0.001)")
+                        debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={p_val_str} >= 0.001)")
             else:
                 debug_info.append(f"⚠️ {backend_name} not found in JSON data")
     
-    except FileNotFoundError:
-        debug_info.append(f"🔴 JSON file not found: {json_path}")
+    except FileNotFoundError as e:
+        debug_info.append(f"🔴 JSON file not found: {str(e)}")
     except Exception as e:
         debug_info.append(f"🔴 Error loading JSON: {str(e)}")
+        import traceback
+        debug_info.append(f"🔴 Traceback: {traceback.format_exc()}")
     
     return r, backends, debug_info
 
