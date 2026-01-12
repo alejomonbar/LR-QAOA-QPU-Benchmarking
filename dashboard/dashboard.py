@@ -24,8 +24,24 @@ with col2:
     st.title("LR-QAOA QPU Benchmarking Dashboard")
 
 st.markdown("""
-Benchmarking QAOA performance across quantum processors for different problem types.
-Explore 1D Chain, Native Layout, and Fully Connected graph experiments.
+### Benchmarking Long-Range QAOA on Quantum Processing Units
+
+This dashboard presents comprehensive benchmarking results of the **Long-Range Quantum Approximate Optimization Algorithm (LR-QAOA)** 
+across multiple quantum processors from leading quantum computing providers including IBM, IonQ, Rigetti, IQM, and AQT.
+
+**What is LR-QAOA?** LR-QAOA extends the standard QAOA by incorporating long-range interactions, enabling efficient 
+implementation of fully connected problems on quantum hardware with limited connectivity. This approach significantly 
+reduces circuit depth and improves performance on near-term quantum devices.
+
+**Key Features:**
+- 📊 **Fully Connected Graphs**: Up to 56 qubits tested across multiple QPUs
+- 🔷 **Native Layout Problems**: Hardware-native graph structures (up to 156 qubits)
+- 🔗 **1D Chain Graphs**: 100-qubit comparisons across IBM Eagle and Heron processors
+
+**Reference:** For detailed methodology and results, see our paper:  
+[*Benchmarking of Quantum Processors with the Long Range QAOA*](https://arxiv.org/abs/2502.06471) (arXiv:2502.06471)
+
+---
 """)
 
 # Function to load 1D chain results
@@ -117,7 +133,15 @@ tab1, tab2, tab3 = st.tabs(["📊 Fully Connected", "🔷 Native Layout", "🔗 
 
 # Tab 1: Fully Connected Experiments
 with tab1:
-    st.header("Fully Connected Graph Experiments")
+    # Add logo for FC experiments
+    col_logo, col_header = st.columns([1, 10])
+    with col_logo:
+        fc_logo_path = Path(__file__).parent / "FC-logo.png"
+        if fc_logo_path.exists():
+            st.image(str(fc_logo_path), width=80)
+    with col_header:
+        st.header("Fully Connected Graph Experiments")
+    
     st.markdown("""
     Effective approximation ratio vs number of qubits for fully connected graphs.
     Results are normalized against random sampling baseline (3σ threshold).
@@ -435,7 +459,15 @@ with tab1:
 
 # Tab 2: Native Layout Experiments
 with tab2:
-    st.header("Native Layout Experiments")
+    # Add logo for NL experiments
+    col_logo, col_header = st.columns([1, 10])
+    with col_logo:
+        nl_logo_path = Path(__file__).parent / "NL-logo.png"
+        if nl_logo_path.exists():
+            st.image(str(nl_logo_path), width=80)
+    with col_header:
+        st.header("Native Layout Experiments")
+    
     st.markdown("""
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
     Testing large-scale Eagle and Heron processors with native connectivity.
@@ -568,7 +600,15 @@ with tab2:
 
 # Tab 3: 1D Chain Experiments
 with tab3:
-    st.header("1D Chain Experiments - 100 Qubit Comparison")
+    # Add logo for 1D Chain experiments
+    col_logo, col_header = st.columns([1, 10])
+    with col_logo:
+        chain_logo_path = Path(__file__).parent / "1D-logo.png"
+        if chain_logo_path.exists():
+            st.image(str(chain_logo_path), width=80)
+    with col_header:
+        st.header("1D Chain Experiments - 100 Qubit Comparison")
+    
     st.markdown("""
     Approximation ratio vs QAOA layers (p) for 1D chain graphs with 100 qubits.
     Comparing Eagle and Heron IBM QPUs with random baseline.
