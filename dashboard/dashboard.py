@@ -9,13 +9,20 @@ import json
 # Set page configuration
 st.set_page_config(
     page_title="LR-QAOA QPU Benchmarking",
-    page_icon="⚛️",
+    page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Title and description
-st.title("⚛️ LR-QAOA QPU Benchmarking Dashboard")
+# Title and description with logo
+col1, col2 = st.columns([1, 10])
+with col1:
+    logo_path = Path(__file__).parent / "Logo.png"
+    if logo_path.exists():
+        st.image(str(logo_path), width=80)
+with col2:
+    st.title("LR-QAOA QPU Benchmarking Dashboard")
+
 st.markdown("""
 Benchmarking QAOA performance across quantum processors for different problem types.
 Explore 1D Chain, Native Layout, and Fully Connected graph experiments.
