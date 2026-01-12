@@ -113,283 +113,85 @@ def load_fc_results():
 
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs(["� 1D Chain", "🔷 Native Layout", "📊 Fully Connected"])
+tab1, tab2, tab3 = st.tabs(["📊 Fully Connected", "🔷 Native Layout", "🔗 1D Chain"])
 
-# Tab 1: 1D Chain Experiments
-with tab1:
-    st.header("1D Chain Experiments - 100 Qubit Comparison")
-    st.markdown("""
-    Approximation ratio vs QAOA layers (p) for 1D chain graphs with 100 qubits.
-    Comparing Eagle and Heron IBM QPUs with random baseline.
-    """)
-    
-    chain_results = load_1d_chain_results()
-    
-    # Color and marker definitions
-    colors_1d = {
-        "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
-        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fdb462", "ibm_brisbane": "#bebada",
-        "ibm_sherbrooke": "#fb8072", "ibm_kyiv": "#d9d9d9", "ibm_nazca": "#80b1d3",
-        "ibm_kyoto": "#bc80bd", "ibm_osaka": "#ccebc5", "ibm_brussels": "#fccde5",
-        "ibm_strasbourg": "#ffffb3"
-    }
-    
-    markers_1d = {
-        "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
-        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_brisbane": "diamond",
-        "ibm_sherbrooke": "triangle-left", "ibm_kyiv": "x", "ibm_nazca": "circle",
-        "ibm_kyoto": "cross", "ibm_osaka": "square", "ibm_brussels": "triangle-up",
-        "ibm_strasbourg": "diamond-open"
-    }
-    
-    linestyles_1d = {
-        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_fez": "dash"
-    }
-    
-    fig_1d = go.Figure()
-    
-    # Plot each backend
-    backend_order = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino-v1", 
-                     "ibm_torino-v0", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv",
-                     "ibm_nazca", "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
-    
-    for backend_name in backend_order:
-        if backend_name not in chain_results:
-            continue
-        data = chain_results[backend_name]
-        
-        fig_1d.add_trace(go.Scatter(
-            x=data["p_values"],
-            y=data["r_values"],
-            mode='lines+markers',
-            name=backend_name,
-            marker=dict(
-                symbol=markers_1d.get(backend_name, "circle"),
-                size=8,
-                color=colors_1d.get(backend_name, "#808080"),
-                line=dict(color='black', width=1)
-            ),
-            line=dict(
-                color=colors_1d.get(backend_name, "#808080"),
-                width=2,
-                dash=linestyles_1d.get(backend_name, "solid")
-            ),
-            hovertemplate='<b>%{fullData.name}</b><br>' +
-                          'p: %{x}<br>' +
-                          'r: %{y:.3f}<br>' +
-                          '<extra></extra>'
-        ))
-    
-    # Add random baseline from first backend that has it
-    random_baseline = None
-    for backend_name in chain_results:
-        if "random_r" in chain_results[backend_name]:
-            # Calculate baseline range (mock 3sigma for visualization)
-            random_baseline = chain_results[backend_name]["random_r"]
-            break
-    
-    if random_baseline:
-        y1 = random_baseline
-        y2 = 0.02  # Mock sigma for visualization
-        
-        fig_1d.add_trace(go.Scatter(
-            x=[1, 100],
-            y=[y1-y2, y1-y2],
-            fill=None,
-            mode='lines',
-            line=dict(color='rgba(128,128,128,0)', width=0),
-            showlegend=False,
-            hoverinfo='skip'
-        ))
-        
-        fig_1d.add_trace(go.Scatter(
-            x=[1, 100],
-            y=[y1+y2, y1+y2],
-            fill='tonexty',
-            mode='lines',
-            line=dict(color='rgba(128,128,128,0)', width=0),
-            fillcolor='rgba(128,128,128,0.3)',
-            name='random baseline',
-            hovertemplate='Random baseline<br>r: %{y:.3f}<extra></extra>'
-        ))
-    
-    fig_1d.update_layout(
-        xaxis_title="QAOA Layers (p)",
-        yaxis_title="Approximation Ratio (r)",
-        height=600,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5
-        ),
-        template="plotly_white"
-    )
-    
-    st.plotly_chart(fig_1d, use_container_width=True)
-    
-    # Statistics table
-    st.subheader("Backend Performance Statistics (100 qubits)")
-    stats_1d = []
-    for backend_name in backend_order:
-        if backend_name not in chain_results:
-            continue
-        data = chain_results[backend_name]
-        stats_1d.append({
-            "Backend": backend_name,
-            "Max r": f"{data['max_r']:.3f}",
-            "Optimal p": data["optimal_p"],
-            "Min p tested": min(data["p_values"]),
-            "Max p tested": max(data["p_values"])
-        })
-    
-    if stats_1d:
-        st.dataframe(pd.DataFrame(stats_1d), use_container_width=True, hide_index=True)
-
-
-# Tab 2: Native Layout Experiments
-with tab2:
-    st.header("Native Layout Experiments")
-    st.markdown("""
-    Approximation ratio vs QAOA layers for hardware-native graph topologies.
-    Testing large-scale Eagle and Heron processors with native connectivity.
-    """)
-    
-    nl_data = load_nl_results()
-    
-    # Color definitions for native layout
-    colors_nl = {
-        "ibm_brisbane": "#bebada", "ibm_torino-v0": "#fdb462",
-        "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
-        "ibm_fez": "#b3de69", "ibm_fez-f": "#b3de69",
-        "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
-        "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
-        "iqm_garnet": "#fb8072", "iqm_emerald": "#80b1d3",
-        "rigetti_ankaa_3": "#fccde5"
-    }
-    
-    markers_nl = {
-        "ibm_brisbane": "diamond", "ibm_torino-v0": "circle",
-        "ibm_torino-v1": "cross", "ibm_torino-f": "square",
-        "ibm_fez": "triangle-up", "ibm_fez-f": "star",
-        "ibm_marrakesh-f": "circle-open", "ibm_aachen-f": "triangle-down",
-        "ibm_kingston-f": "triangle-down", "ibm_boston-f": "circle",
-        "iqm_garnet": "diamond-open", "iqm_emerald": "circle",
-        "rigetti_ankaa_3": "diamond-tall"
-    }
-    
-    linestyles_nl = {
-        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash",
-        "ibm_torino-f": "dash", "ibm_fez": "dash",
-        "ibm_fez-f": "dash", "ibm_marrakesh-f": "dash",
-        "ibm_aachen-f": "dash", "ibm_kingston-f": "dash",
-        "ibm_boston-f": "dash"
-    }
-    
-    fig_nl = go.Figure()
-    
-    backend_order_nl = [
-        "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
-        "ibm_brisbane", "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
-        "ibm_fez", "ibm_fez-f", "ibm_marrakesh-f",
-        "ibm_kingston-f", "ibm_aachen-f", "ibm_boston-f"
-    ]
-    
-    for backend_name in backend_order_nl:
-        if backend_name not in nl_data:
-            continue
-        data = nl_data[backend_name]
-        
-        fig_nl.add_trace(go.Scatter(
-            x=data["p_values"],
-            y=data["r_values"],
-            mode='lines+markers',
-            name=backend_name,
-            marker=dict(
-                symbol=markers_nl.get(backend_name, "circle"),
-                size=8,
-                color=colors_nl.get(backend_name, "#808080"),
-                line=dict(color='black', width=1)
-            ),
-            line=dict(
-                color=colors_nl.get(backend_name, "#808080"),
-                width=2,
-                dash=linestyles_nl.get(backend_name, "solid")
-            ),
-            hovertemplate='<b>%{fullData.name}</b><br>' +
-                          'p: %{x}<br>' +
-                          'r: %{y:.3f}<br>' +
-                          '<extra></extra>'
-        ))
-        
-        # Add random baseline line if available
-        if data.get("has_random") and "random_r" in data:
-            fig_nl.add_trace(go.Scatter(
-                x=data["p_values"],
-                y=[data["random_r"]] * len(data["p_values"]),
-                mode='lines',
-                line=dict(color=colors_nl.get(backend_name, "#808080"), dash="dot", width=1),
-                showlegend=False,
-                hoverinfo='skip'
-            ))
-    
-    # Add legend for random baseline
-    fig_nl.add_trace(go.Scatter(
-        x=[None],
-        y=[None],
-        mode='lines',
-        line=dict(color='black', dash='dot', width=1),
-        name='random',
-        showlegend=True
-    ))
-    
-    fig_nl.update_layout(
-        xaxis_title="QAOA Layers (p)",
-        yaxis_title="Approximation Ratio (r)",
-        xaxis=dict(tickvals=[3, 10, 25, 50, 75, 100]),
-        height=600,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5
-        ),
-        template="plotly_white"
-    )
-    
-    st.plotly_chart(fig_nl, use_container_width=True)
-    
-    # Statistics table
-    st.subheader("Backend Performance Statistics")
-    stats_nl = []
-    for backend_name in backend_order_nl:
-        if backend_name not in nl_data:
-            continue
-        data = nl_data[backend_name]
-        stats_nl.append({
-            "Backend": backend_name,
-            "Qubits": data["qubits"],
-            "Max r": f"{data['max_r']:.3f}",
-            "Optimal p": data["optimal_p"],
-            "Min p": min(data["p_values"]),
-            "Max p": max(data["p_values"])
-        })
-    
-    if stats_nl:
-        st.dataframe(pd.DataFrame(stats_nl), use_container_width=True, hide_index=True)
-
-
-# Tab 3: Fully Connected Experiments
+# Tab 1: Fully Connected Experiments
 with tab3:
-    st.header("Fully Connected Graph Experiments")
-    st.markdown("""
-    Effective approximation ratio vs number of qubits for fully connected graphs.
-    Results are normalized against random sampling baseline (3σ threshold).
-    """)
-    
+    st.header("1D Chain Experiments - 100 Qubit Comparison")
     r_data, backends, debug_info, fc_data = load_fc_results()
+
+    # Show QPU capabilities over time
+    st.markdown("---")
+    st.subheader("📅 QPU Capabilities Timeline")
+    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
+    
+    # Collect max qubits and file dates for each backend from JSON
+    timeline_data = []
+    
+    for backend_name in backends:
+        if backend_name in fc_data:
+            # Find the entry with maximum qubits
+            max_nq = 0
+            max_date = None
+            for nq_str, data in fc_data[backend_name].items():
+                nq = int(nq_str)
+                if nq > max_nq and data["statistics"]["significant"]:
+                    max_nq = nq
+                    if "file_created" in data:
+                        max_date = data["file_created"]
+            
+            if max_nq > 0 and max_date:
+                import datetime
+                timeline_data.append({
+                    "backend": backend_name,
+                    "max_qubits": max_nq,
+                    "date": datetime.datetime.strptime(max_date, "%Y-%m-%d")
+                })
+    
+    if timeline_data:
+        # Create timeline plot
+        fig_timeline = go.Figure()
+        
+        for item in timeline_data:
+            fig_timeline.add_trace(go.Scatter(
+                x=[item["date"]],
+                y=[item["max_qubits"]],
+                mode='markers',
+                name=item["backend"],
+                marker=dict(
+                    symbol=markers_map.get(item["backend"], "circle"),
+                    size=12,
+                    color=colors_map.get(item["backend"], "#808080"),
+                    line=dict(color='white', width=2)
+                ),
+                hovertemplate='<b>%{fullData.name}</b><br>' +
+                              'Date: %{x|%Y-%m-%d}<br>' +
+                              'Max Qubits: %{y}<br>' +
+                              '<extra></extra>'
+            ))
+        
+        fig_timeline.update_layout(
+            xaxis_title="Experiment Date",
+            yaxis_title="Maximum Number of Qubits",
+            hovermode='closest',
+            height=600,
+            showlegend=True,
+            legend=dict(
+                orientation="v",
+                yanchor="middle",
+                y=0.5,
+                xanchor="left",
+                x=1.02,
+                font=dict(size=10)
+            ),
+            template="plotly_white",
+            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56]),
+            margin=dict(r=150)
+        )
+        
+        st.plotly_chart(fig_timeline, use_container_width=True)
+    
+
     
     # Add debug expander
     with st.expander("🔍 Debug Information - Data Loading Status"):
@@ -593,77 +395,6 @@ with tab3:
         if not available_backends:
             st.info(f"No backends have data for {selected_nq} qubits.")
     
-    # Show QPU capabilities over time
-    st.markdown("---")
-    st.subheader("📅 QPU Capabilities Timeline")
-    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
-    
-    # Collect max qubits and file dates for each backend from JSON
-    timeline_data = []
-    
-    for backend_name in backends:
-        if backend_name in fc_data:
-            # Find the entry with maximum qubits
-            max_nq = 0
-            max_date = None
-            for nq_str, data in fc_data[backend_name].items():
-                nq = int(nq_str)
-                if nq > max_nq and data["statistics"]["significant"]:
-                    max_nq = nq
-                    if "file_created" in data:
-                        max_date = data["file_created"]
-            
-            if max_nq > 0 and max_date:
-                import datetime
-                timeline_data.append({
-                    "backend": backend_name,
-                    "max_qubits": max_nq,
-                    "date": datetime.datetime.strptime(max_date, "%Y-%m-%d")
-                })
-    
-    if timeline_data:
-        # Create timeline plot
-        fig_timeline = go.Figure()
-        
-        for item in timeline_data:
-            fig_timeline.add_trace(go.Scatter(
-                x=[item["date"]],
-                y=[item["max_qubits"]],
-                mode='markers',
-                name=item["backend"],
-                marker=dict(
-                    symbol=markers_map.get(item["backend"], "circle"),
-                    size=12,
-                    color=colors_map.get(item["backend"], "#808080"),
-                    line=dict(color='white', width=2)
-                ),
-                hovertemplate='<b>%{fullData.name}</b><br>' +
-                              'Date: %{x|%Y-%m-%d}<br>' +
-                              'Max Qubits: %{y}<br>' +
-                              '<extra></extra>'
-            ))
-        
-        fig_timeline.update_layout(
-            xaxis_title="Experiment Date",
-            yaxis_title="Maximum Number of Qubits",
-            hovermode='closest',
-            height=600,
-            showlegend=True,
-            legend=dict(
-                orientation="v",
-                yanchor="middle",
-                y=0.5,
-                xanchor="left",
-                x=1.02,
-                font=dict(size=10)
-            ),
-            template="plotly_white",
-            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56]),
-            margin=dict(r=150)
-        )
-        
-        st.plotly_chart(fig_timeline, use_container_width=True)
-    
     # Show statistics
     st.markdown("---")
     st.subheader("Backend Statistics")
@@ -692,4 +423,270 @@ with tab3:
     
     if stats_data:
         st.dataframe(pd.DataFrame(stats_data), use_container_width=True, hide_index=True)
+
+# Tab 2: Native Layout Experiments
+with tab2:
+    st.header("Native Layout Experiments")
+    st.markdown("""
+    Approximation ratio vs QAOA layers for hardware-native graph topologies.
+    Testing large-scale Eagle and Heron processors with native connectivity.
+    """)
+    
+    nl_data = load_nl_results()
+    
+    # Color definitions for native layout
+    colors_nl = {
+        "ibm_brisbane": "#bebada", "ibm_torino-v0": "#fdb462",
+        "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
+        "ibm_fez": "#b3de69", "ibm_fez-f": "#b3de69",
+        "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
+        "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
+        "iqm_garnet": "#fb8072", "iqm_emerald": "#80b1d3",
+        "rigetti_ankaa_3": "#fccde5"
+    }
+    
+    markers_nl = {
+        "ibm_brisbane": "diamond", "ibm_torino-v0": "circle",
+        "ibm_torino-v1": "cross", "ibm_torino-f": "square",
+        "ibm_fez": "triangle-up", "ibm_fez-f": "star",
+        "ibm_marrakesh-f": "circle-open", "ibm_aachen-f": "triangle-down",
+        "ibm_kingston-f": "triangle-down", "ibm_boston-f": "circle",
+        "iqm_garnet": "diamond-open", "iqm_emerald": "circle",
+        "rigetti_ankaa_3": "diamond-tall"
+    }
+    
+    linestyles_nl = {
+        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash",
+        "ibm_torino-f": "dash", "ibm_fez": "dash",
+        "ibm_fez-f": "dash", "ibm_marrakesh-f": "dash",
+        "ibm_aachen-f": "dash", "ibm_kingston-f": "dash",
+        "ibm_boston-f": "dash"
+    }
+    
+    fig_nl = go.Figure()
+    
+    backend_order_nl = [
+        "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
+        "ibm_brisbane", "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
+        "ibm_fez", "ibm_fez-f", "ibm_marrakesh-f",
+        "ibm_kingston-f", "ibm_aachen-f", "ibm_boston-f"
+    ]
+    
+    for backend_name in backend_order_nl:
+        if backend_name not in nl_data:
+            continue
+        data = nl_data[backend_name]
+        
+        fig_nl.add_trace(go.Scatter(
+            x=data["p_values"],
+            y=data["r_values"],
+            mode='lines+markers',
+            name=backend_name,
+            marker=dict(
+                symbol=markers_nl.get(backend_name, "circle"),
+                size=8,
+                color=colors_nl.get(backend_name, "#808080"),
+                line=dict(color='black', width=1)
+            ),
+            line=dict(
+                color=colors_nl.get(backend_name, "#808080"),
+                width=2,
+                dash=linestyles_nl.get(backend_name, "solid")
+            ),
+            hovertemplate='<b>%{fullData.name}</b><br>' +
+                          'p: %{x}<br>' +
+                          'r: %{y:.3f}<br>' +
+                          '<extra></extra>'
+        ))
+        
+        # Add random baseline line if available
+        if data.get("has_random") and "random_r" in data:
+            fig_nl.add_trace(go.Scatter(
+                x=data["p_values"],
+                y=[data["random_r"]] * len(data["p_values"]),
+                mode='lines',
+                line=dict(color=colors_nl.get(backend_name, "#808080"), dash="dot", width=1),
+                showlegend=False,
+                hoverinfo='skip'
+            ))
+    
+    # Add legend for random baseline
+    fig_nl.add_trace(go.Scatter(
+        x=[None],
+        y=[None],
+        mode='lines',
+        line=dict(color='black', dash='dot', width=1),
+        name='random',
+        showlegend=True
+    ))
+    
+    fig_nl.update_layout(
+        xaxis_title="QAOA Layers (p)",
+        yaxis_title="Approximation Ratio (r)",
+        xaxis=dict(tickvals=[3, 10, 25, 50, 75, 100]),
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        template="plotly_white"
+    )
+    
+    st.plotly_chart(fig_nl, use_container_width=True)
+    
+    # Statistics table
+    st.subheader("Backend Performance Statistics")
+    stats_nl = []
+    for backend_name in backend_order_nl:
+        if backend_name not in nl_data:
+            continue
+        data = nl_data[backend_name]
+        stats_nl.append({
+            "Backend": backend_name,
+            "Qubits": data["qubits"],
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "Min p": min(data["p_values"]),
+            "Max p": max(data["p_values"])
+        })
+    
+    if stats_nl:
+        st.dataframe(pd.DataFrame(stats_nl), use_container_width=True, hide_index=True)
+
+
+# Tab 3: 1D Chain Experiments
+with tab1:
+    st.header("Fully Connected Graph Experiments")
+    st.markdown("""
+    Effective approximation ratio vs number of qubits for fully connected graphs.
+    Results are normalized against random sampling baseline (3σ threshold).
+    """)
+    
+    chain_results = load_1d_chain_results()
+    
+    # Color and marker definitions
+    colors_1d = {
+        "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
+        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fdb462", "ibm_brisbane": "#bebada",
+        "ibm_sherbrooke": "#fb8072", "ibm_kyiv": "#d9d9d9", "ibm_nazca": "#80b1d3",
+        "ibm_kyoto": "#bc80bd", "ibm_osaka": "#ccebc5", "ibm_brussels": "#fccde5",
+        "ibm_strasbourg": "#ffffb3"
+    }
+    
+    markers_1d = {
+        "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
+        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_brisbane": "diamond",
+        "ibm_sherbrooke": "triangle-left", "ibm_kyiv": "x", "ibm_nazca": "circle",
+        "ibm_kyoto": "cross", "ibm_osaka": "square", "ibm_brussels": "triangle-up",
+        "ibm_strasbourg": "diamond-open"
+    }
+    
+    linestyles_1d = {
+        "ibm_torino-v0": "dash", "ibm_torino-v1": "dash", "ibm_fez": "dash"
+    }
+    
+    fig_1d = go.Figure()
+    
+    # Plot each backend
+    backend_order = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino-v1", 
+                     "ibm_torino-v0", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv",
+                     "ibm_nazca", "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
+    
+    for backend_name in backend_order:
+        if backend_name not in chain_results:
+            continue
+        data = chain_results[backend_name]
+        
+        fig_1d.add_trace(go.Scatter(
+            x=data["p_values"],
+            y=data["r_values"],
+            mode='lines+markers',
+            name=backend_name,
+            marker=dict(
+                symbol=markers_1d.get(backend_name, "circle"),
+                size=8,
+                color=colors_1d.get(backend_name, "#808080"),
+                line=dict(color='black', width=1)
+            ),
+            line=dict(
+                color=colors_1d.get(backend_name, "#808080"),
+                width=2,
+                dash=linestyles_1d.get(backend_name, "solid")
+            ),
+            hovertemplate='<b>%{fullData.name}</b><br>' +
+                          'p: %{x}<br>' +
+                          'r: %{y:.3f}<br>' +
+                          '<extra></extra>'
+        ))
+    
+    # Add random baseline from first backend that has it
+    random_baseline = None
+    for backend_name in chain_results:
+        if "random_r" in chain_results[backend_name]:
+            # Calculate baseline range (mock 3sigma for visualization)
+            random_baseline = chain_results[backend_name]["random_r"]
+            break
+    
+    if random_baseline:
+        y1 = random_baseline
+        y2 = 0.02  # Mock sigma for visualization
+        
+        fig_1d.add_trace(go.Scatter(
+            x=[1, 100],
+            y=[y1-y2, y1-y2],
+            fill=None,
+            mode='lines',
+            line=dict(color='rgba(128,128,128,0)', width=0),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
+        
+        fig_1d.add_trace(go.Scatter(
+            x=[1, 100],
+            y=[y1+y2, y1+y2],
+            fill='tonexty',
+            mode='lines',
+            line=dict(color='rgba(128,128,128,0)', width=0),
+            fillcolor='rgba(128,128,128,0.3)',
+            name='random baseline',
+            hovertemplate='Random baseline<br>r: %{y:.3f}<extra></extra>'
+        ))
+    
+    fig_1d.update_layout(
+        xaxis_title="QAOA Layers (p)",
+        yaxis_title="Approximation Ratio (r)",
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+        template="plotly_white"
+    )
+    
+    st.plotly_chart(fig_1d, use_container_width=True)
+    
+    # Statistics table
+    st.subheader("Backend Performance Statistics (100 qubits)")
+    stats_1d = []
+    for backend_name in backend_order:
+        if backend_name not in chain_results:
+            continue
+        data = chain_results[backend_name]
+        stats_1d.append({
+            "Backend": backend_name,
+            "Max r": f"{data['max_r']:.3f}",
+            "Optimal p": data["optimal_p"],
+            "Min p tested": min(data["p_values"]),
+            "Max p tested": max(data["p_values"])
+        })
+    
+    if stats_1d:
+        st.dataframe(pd.DataFrame(stats_1d), use_container_width=True, hide_index=True)
+
 
