@@ -774,7 +774,7 @@ with tab3:
         template="plotly_white"
     )
     
-    st.plotly_chart(fig_5q, use_container_width=True)
+    st.plotly_chart(fig_5q, use_container_width=True, key="1d_chain_5q_plot")
     
     # Statistics table for 5q
     stats_5q = []
@@ -900,7 +900,7 @@ with tab3:
         template="plotly_white"
     )
     
-    st.plotly_chart(fig_100q, use_container_width=True)
+    st.plotly_chart(fig_100q, use_container_width=True, key="1d_chain_100q_plot")
     
     # Statistics table for 100q
     stats_100q = []
