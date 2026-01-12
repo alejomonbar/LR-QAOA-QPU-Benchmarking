@@ -170,6 +170,15 @@ def process_fc_experiments():
                     r_max_nq = res_hpc[nq][0]["objective"]["r"]
                     r_eff = float((r_max_nq - (y1+y2))/(1-(y1+y2)))
                     
+                    # Get file creation date for HPC data file
+                    import datetime
+                    hpc_file_path = data_dir / "LR_HPC_WMC_B.npy"
+                    hpc_file_stat = hpc_file_path.stat()
+                    if hasattr(hpc_file_stat, 'st_birthtime'):
+                        hpc_creation_time = datetime.datetime.fromtimestamp(hpc_file_stat.st_birthtime)
+                    else:
+                        hpc_creation_time = datetime.datetime.fromtimestamp(hpc_file_stat.st_ctime)
+                    
                     fc_results["qasm_simulator"][str(nq)] = {
                         "r_eff": r_eff,
                         "r_max_qpu": float(r_max_nq),
@@ -185,7 +194,8 @@ def process_fc_experiments():
                             "significant": True
                         },
                         "shots": int(shots),
-                        "source": "HPC_simulation"
+                        "source": "HPC_simulation",
+                        "file_created": hpc_creation_time.strftime("%Y-%m-%d")
                     }
                     
                     print(f"✓ qasm_simulator nq={nq}: r_eff={r_eff:.4f} (HPC)")
