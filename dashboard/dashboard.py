@@ -6,6 +6,7 @@ import pandas as pd
 from pathlib import Path
 from collections import defaultdict
 from scipy import stats
+import json
 
 # Set page configuration
 st.set_page_config(
@@ -141,28 +142,8 @@ def load_nl_results():
 # Function to load fully connected results
 @st.cache_data
 def load_fc_results():
-    """Load and process fully connected experiment results"""
+    """Load fully connected experiment results from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
-    
-    # Backend configurations
-    nqs = {
-        "ibm_boston": [5,7,10,12,15,17,18,20,22,25,27,30,31,32,33,34,35],
-        "ionq_forte": [10,13,15,17,20,21,23,25,27,30,35],
-        "ibm_brisbane": [5,7,10,12,14,15,17,20],
-        "ibm_fez": [5,7,10,12,15,17,18,20,22,25],
-        "ibm_torino": [5,7,10,12,15,17,20,30,40],
-        "ionq_harmony": [5,7,10],
-        "iqm_garnet": [5,7,9,10,12,13,14,15],
-        "H1-1E": [5,7,10,13,15,17,20],
-        "H2-1E": [20,25,30],
-        "qasm_simulator": [5,7,10,11,12,13,14,15,20,25],
-        "ionq_aria_2": [5,10,13,15,17,20,23,25],
-        "H2-1": [40, 50, 56],
-        "ionq_forte_enterprise": [5,7,10,13,15,17,20,23,25,27,28,29,30],
-        "ibm_marrakesh": [10,15,17,20],
-        "iqm_emerald": [5,7,10,12,15],
-        "aqt_ibexq1": [5,6,7,10,12]
-    }
     
     backends = [
         "aqt_ibexq1", "ibm_brisbane", "ibm_fez", "ibm_boston",
@@ -171,95 +152,34 @@ def load_fc_results():
         "ionq_forte_enterprise", "ibm_marrakesh", "iqm_garnet", "iqm_emerald"
     ]
     
-    # Load HPC results
-    try:
-        res_hpc = np.load(data_dir / "LR_HPC_WMC_B.npy", allow_pickle=True).item()
-    except:
-        res_hpc = {}
-    
     r = defaultdict(dict)
-    case = ""
     debug_info = []
     
-    for backend_name in backends:
-        if backend_name not in nqs:
-            debug_info.append(f"⚠️ {backend_name} not in nqs configuration")
-            continue
-            
-        for nq in nqs[backend_name]:
-            try:
-                file_path = data_dir / backend_name / f"{nq}_FC.npy"
-                results = np.load(file_path, allow_pickle=True).item()
-                postprocessing = results["postprocessing" + case]
-                postprocessing_random = results["random" + case]
-                shots = sum(list(results["samples"][results["Deltas"][0]][results["ps"][0]].values()))
-                
-                # Process random data
-                rand_data = []
-                for v, c in zip(postprocessing_random["results"][:,1], postprocessing_random["results"][:,2]):
-                    rand_data += int(c) * [v]
-                rand_data = np.array(rand_data)
-                
-                # Random sampling analysis
-                rand_mean = []
-                np.random.seed(1)
-                n_rand = 50
-                for i in range(n_rand):
-                    np.random.shuffle(rand_data)
-                    rand_mean.append(np.mean(rand_data[:shots]))
-                rand_mean = np.array(rand_mean)
-                y1 = rand_mean.mean()
-                y2 = 3 * rand_mean.std()
-                
-                # Calculate max approximation ratio
-                deltas = results["Deltas"]
-                ps = results["ps"]
-                sections = results["sections"]
-                r_max_nq = np.max([max([postprocessing[deltas[0]][p][i]["r"] for i in range(sections)]) for p in ps])
-                
-                # Statistical test
-                std = rand_mean.std()
-                t_score = (r_max_nq - y1) / std
-                p_value = (1 - stats.t.cdf(t_score, df=n_rand-1))
-                
-                if p_value < 0.001:  # 3σ level
-                    r[backend_name][nq] = ((r_max_nq - (y1+y2))/(1-(y1+y2)))
-                    debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={r[backend_name][nq]:.4f}, p-value={p_value:.6f}")
-                else:
-                    debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={p_value:.6f} >= 0.001)")
-                    
-            except Exception as e:
-                debug_info.append(f"🔴 {backend_name} nq={nq}: Error - {str(e)}")
-                continue
+    try:
+        # Load processed JSON data
+        json_path = data_dir / "fc_processed.json"
+        with open(json_path, 'r') as f:
+            fc_data = json.load(f)
+        
+        debug_info.append(f"✅ Loaded JSON data from {json_path.name}")
+        
+        # Extract r_eff values for each backend
+        for backend_name in backends:
+            if backend_name in fc_data:
+                for nq_str, data in fc_data[backend_name].items():
+                    nq = int(nq_str)
+                    if data["statistics"]["significant"]:
+                        r[backend_name][nq] = data["r_eff"]
+                        debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={data['r_eff']:.4f}, p-value={data['statistics']['p_value']:.6f}")
+                    else:
+                        debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={data['statistics']['p_value']:.6f} >= 0.001)")
+            else:
+                debug_info.append(f"⚠️ {backend_name} not found in JSON data")
     
-    # Add HPC results for specific cases
-    if "ibm_torino" in r and res_hpc:
-        for nq in [30, 40]:
-            if nq in res_hpc:
-                try:
-                    results = np.load(data_dir / "ibm_torino" / f"{nq}_FC.npy", allow_pickle=True).item()
-                    postprocessing_random = results["random"]
-                    shots = sum(list(results["samples"][results["Deltas"][0]][results["ps"][0]].values()))
-                    
-                    rand_data = []
-                    for v, c in zip(postprocessing_random["results"][:,1], postprocessing_random["results"][:,2]):
-                        rand_data += int(c) * [v]
-                    rand_data = np.array(rand_data)
-                    
-                    rand_mean = []
-                    np.random.seed(1)
-                    for i in range(50):
-                        np.random.shuffle(rand_data)
-                        rand_mean.append(np.mean(rand_data[:shots]))
-                    rand_mean = np.array(rand_mean)
-                    y1 = rand_mean.mean()
-                    y2 = 3 * rand_mean.std()
-                    
-                    r_max_nq = res_hpc[nq][0]["objective"]["r"]
-                    r["qasm_simulator"][nq] = ((r_max_nq - (y1+y2))/(1-(y1+y2)))
-                    debug_info.append(f"✅ qasm_simulator nq={nq}: r_eff={r['qasm_simulator'][nq]:.4f} (from HPC)")
-                except Exception as e:
-                    debug_info.append(f"🔴 qasm_simulator nq={nq}: Error loading HPC - {str(e)}")
+    except FileNotFoundError:
+        debug_info.append(f"🔴 JSON file not found: {json_path}")
+    except Exception as e:
+        debug_info.append(f"🔴 Error loading JSON: {str(e)}")
     
     return r, backends, debug_info
 
