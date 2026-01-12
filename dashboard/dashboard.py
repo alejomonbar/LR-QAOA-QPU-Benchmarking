@@ -129,50 +129,57 @@ def compute_fc_interesting_facts(fc_data: dict) -> list[str]:
     if not fc_data:
         return []
 
-    num_backends = len(fc_data)
-    num_records = 0
-    num_significant = 0
-    max_qubits_significant = 0
-    dates = []
-    num_hpc_sim = 0
+    # Vendor mapping
+    vendor_map = {
+        "ibm_brisbane": "IBM", "ibm_fez": "IBM", "ibm_boston": "IBM", "ibm_torino": "IBM", "ibm_marrakesh": "IBM",
+        "ionq_forte": "IonQ", "ionq_aria_2": "IonQ", "ionq_harmony": "IonQ", "ionq_forte_enterprise": "IonQ",
+        "iqm_garnet": "IQM", "iqm_emerald": "IQM",
+        "H1-1E": "Quantinuum", "H2-1": "Quantinuum", "H2-1E": "Quantinuum",
+        "aqt_ibexq1": "AQT",
+        "qasm_simulator": "Simulator"
+    }
+
+    num_qpus = 0
+    max_depth = 0
+    vendors = set()
+    quantinuum_backends = []
 
     for backend_name, backend_entries in fc_data.items():
         if not isinstance(backend_entries, dict):
             continue
+        
+        # Count QPUs (exclude simulator)
+        if backend_name != "qasm_simulator":
+            num_qpus += 1
+        
+        # Track vendors
+        vendor = vendor_map.get(backend_name, "Other")
+        if vendor != "Simulator":
+            vendors.add(vendor)
+        
+        # Track Quantinuum backends
+        if vendor == "Quantinuum":
+            quantinuum_backends.append(backend_name)
+        
+        # Find max depth
         for nq_str, record in backend_entries.items():
             if not isinstance(record, dict):
                 continue
-            num_records += 1
-
-            if record.get("source") == "HPC_simulation":
-                num_hpc_sim += 1
-
-            stats = record.get("statistics") or {}
-            if stats.get("significant") is True:
-                num_significant += 1
-                try:
-                    nq = int(nq_str)
-                    if nq > max_qubits_significant:
-                        max_qubits_significant = nq
-                except Exception:
-                    pass
-
-            d = record.get("file_created")
-            if isinstance(d, str) and d:
-                dates.append(d)
+            
+            r_vs_p = record.get("r_vs_p") or {}
+            p_values = r_vs_p.get("p_values") or []
+            if p_values:
+                max_p = max(p_values)
+                if max_p > max_depth:
+                    max_depth = max_p
 
     facts = []
-    facts.append(f"Processors represented (FC): {num_backends}")
-    facts.append(f"Processed experiment records (FC): {num_records}")
-    if num_records:
-        pct = round(100 * num_significant / num_records)
-        facts.append(f"Significant results (p < 0.001): {num_significant}/{num_records} ({pct}%)")
-    if dates:
-        facts.append(f"Experiment date range: {min(dates)} → {max(dates)}")
-    if max_qubits_significant:
-        facts.append(f"Largest significant qubit count (FC): {max_qubits_significant}")
-    if num_hpc_sim:
-        facts.append(f"HPC-simulation entries included: {num_hpc_sim}")
+    facts.append(f"Quantum processors tested: {num_qpus}")
+    facts.append(f"Vendors represented: {len(vendors)} ({', '.join(sorted(vendors))})")
+    if max_depth > 0:
+        facts.append(f"Largest experiment depth: {max_depth} QAOA layers")
+    if quantinuum_backends:
+        facts.append(f"Note: {', '.join(sorted(quantinuum_backends))} are Quantinuum systems")
     return facts
 
 
@@ -184,16 +191,6 @@ if _facts:
     st.caption("Quick snapshot from the processed dataset currently loaded by this dashboard.")
     st.markdown("\n".join([f"- {fact}" for fact in _facts]))
     st.markdown("---")
-
-# Create tabs
-_r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
-_facts = compute_fc_interesting_facts(_fc_data_tmp)
-if _facts:
-    st.subheader("Interesting facts (from the plotted data)")
-    st.caption("Quick snapshot from the processed dataset currently loaded by this dashboard.")
-    st.markdown("\n".join([f"- {fact}" for fact in _facts]))
-    st.markdown("---")
-
 
 # Create tabs
 tab1, tab2, tab3 = st.tabs(["Fully Connected", "Native Layout", "1D Chain"])
