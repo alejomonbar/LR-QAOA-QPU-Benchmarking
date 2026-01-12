@@ -274,9 +274,9 @@ with tab1:
                 name=item["backend"],
                 marker=dict(
                     symbol=markers_map.get(item["backend"], "circle"),
-                    size=18,
+                    size=14,
                     color=colors_map.get(item["backend"], "#808080"),
-                    line=dict(color='white', width=3)
+                    line=dict(color='black', width=2)
                 ),
                 hovertemplate='<b>%{fullData.name}</b><br>' +
                               'Date: %{x|%Y-%m-%d}<br>' +
