@@ -94,7 +94,16 @@ def process_fc_experiments():
                 # Calculate effective approximation ratio
                 r_eff = float((r_max_nq - (y1+y2))/(1-(y1+y2)))
                 
-                # Store essential data
+                # Find best section across all p values
+                best_yp = 0
+                yp = []
+                for i in range(sections):
+                    ypi = [postprocessing[deltas[0]][p][i]["r"] for p in ps]
+                    if np.max(ypi) > best_yp:
+                        yp = ypi
+                        best_yp = max(ypi)
+                
+                # Store essential data including r vs p curve
                 fc_results[backend_name][str(nq)] = {
                     "r_eff": r_eff,
                     "r_max_qpu": float(r_max_nq),
@@ -109,7 +118,11 @@ def process_fc_experiments():
                         "p_value": p_value,
                         "significant": p_value < 0.001
                     },
-                    "shots": int(shots)
+                    "shots": int(shots),
+                    "r_vs_p": {
+                        "p_values": [int(p) for p in ps],
+                        "r_values": [float(r) for r in yp]
+                    }
                 }
                 
                 print(f"✓ {backend_name} nq={nq}: r_eff={r_eff:.4f}, p-value={p_value:.6f}")

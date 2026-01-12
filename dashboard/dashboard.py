@@ -1,11 +1,9 @@
 import streamlit as st
-import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 from pathlib import Path
 from collections import defaultdict
-from scipy import stats
 import json
 
 # Set page configuration
@@ -568,70 +566,58 @@ with tab3:
         case = ""
         
         # Find which backends have this qubit count
-        available_backends = [b for b in backends if b in r_data and selected_nq in r_data[b]]
+        available_backends = [b for b in backends if b in fc_data and str(selected_nq) in fc_data[b]]
         
         for backend_name in available_backends:
             try:
-                results = np.load(data_dir / backend_name / f"{selected_nq}_FC.npy", allow_pickle=True).item()
-                ps = results["ps"]
-                sections = results["sections"]
-                delta = results["Deltas"][0]
+                data = fc_data[backend_name][str(selected_nq)]
                 
-                # Find best section performance across all p values
-                best_yp = 0
-                yp = []
-                for i in results["postprocessing" + case][delta][ps[0]].keys():
-                    ypi = [results["postprocessing" + case][delta][p][i]["r"] for p in ps]
-                    if np.max(ypi) > best_yp:
-                        yp = ypi
-                        best_yp = max(ypi)
+                # Check if r_vs_p data exists
+                if "r_vs_p" not in data:
+                    continue
+                    
+                r_vs_p = data["r_vs_p"]
+                ps = r_vs_p["p_values"]
+                yp = r_vs_p["r_values"]
                 
                 # Filter out zero or negative values
-                ps_filtered = [ps[nn] for nn, yi in enumerate(yp) if yi > 0]
+                ps_filtered = [ps[i] for i in range(len(yp)) if yp[i] > 0]
                 yp_filtered = [yi for yi in yp if yi > 0]
                 
-                fig_detail.add_trace(go.Scatter(
-                    x=ps_filtered,
-                    y=yp_filtered,
-                    mode='markers',
-                    name=backend_name,
-                    marker=dict(
-                        symbol=markers_map.get(backend_name, "circle"),
-                        size=12 if backend_name == "ionq_forte" else 10,
-                        color=colors_map.get(backend_name, "#808080"),
-                        line=dict(color='black', width=1)
-                    ),
-                    hovertemplate='<b>%{fullData.name}</b><br>' +
-                                  'Depth (p): %{x}<br>' +
-                                  'r: %{y:.4f}<br>' +
-                                  '<extra></extra>'
-                ))
+                if ps_filtered:
+                    fig_detail.add_trace(go.Scatter(
+                        x=ps_filtered,
+                        y=yp_filtered,
+                        mode='markers',
+                        name=backend_name,
+                        marker=dict(
+                            symbol=markers_map.get(backend_name, "circle"),
+                            size=12 if backend_name == "ionq_forte" else 10,
+                            color=colors_map.get(backend_name, "#808080"),
+                            line=dict(color='black', width=1)
+                        ),
+                        hovertemplate='<b>%{fullData.name}</b><br>' +
+                                      'Depth (p): %{x}<br>' +
+                                      'r: %{y:.4f}<br>' +
+                                      '<extra></extra>'
+                    ))
             except Exception as e:
                 st.warning(f"Could not load detailed data for {backend_name} at {selected_nq} qubits: {str(e)}")
         
-        # Add random baseline shaded region
+        # Add random baseline shaded region from JSON
         if available_backends:
             try:
-                # Use the last loaded results for random baseline
-                rand_data = []
-                for v, c in zip(results["random" + case]["results"][:, 1], results["random" + case]["results"][:, 2]):
-                    rand_data += int(c) * [v]
-                rand_data = np.array(rand_data)
+                # Use the first available backend to get random baseline
+                baseline = fc_data[available_backends[0]][str(selected_nq)]["random_baseline"]
+                y1 = baseline["mean"]
+                y2 = baseline["std_3sigma"]
                 
-                # Random resampling
-                rand_mean = []
-                np.random.seed(1)
-                for i in range(100):
-                    np.random.shuffle(rand_data)
-                    rand_mean.append(np.mean(rand_data[:1000]))
-                rand_mean = np.array(rand_mean)
-                
-                y1 = rand_mean.mean()
-                y2 = 3 * rand_mean.std()
+                # Find max p value
+                max_p = max([max(fc_data[b][str(selected_nq)]["r_vs_p"]["p_values"]) 
+                            for b in available_backends 
+                            if "r_vs_p" in fc_data[b][str(selected_nq)]])
                 
                 # Add shaded region
-                max_p = max([max(results["ps"]) for backend_name in available_backends for results in [np.load(data_dir / backend_name / f"{selected_nq}_FC.npy", allow_pickle=True).item()]])
-                
                 fig_detail.add_trace(go.Scatter(
                     x=[0, max_p],
                     y=[y1 + y2, y1 + y2],
@@ -652,8 +638,8 @@ with tab3:
                     name='Random baseline (μ ± 3σ)',
                     hovertemplate='Random: %{y:.4f}<extra></extra>'
                 ))
-            except:
-                pass
+            except Exception as e:
+                st.warning(f"Could not add random baseline: {str(e)}")
         
         fig_detail.update_layout(
             xaxis_title="Circuit Depth (p)",
