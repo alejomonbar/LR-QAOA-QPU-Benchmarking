@@ -688,15 +688,15 @@ with tab3:
     # Color and marker definitions for 5q
     colors_5q = {
         "originq_wukong": "#8dd3c7", "qasm_simulator": "#bebada", "iqm_emerald": "#fb8072",
-        "iqm_garnet": "#80b1d3", "ibm_fez_5q": "#b3de69", "ibm_marrakesh_5q": "#ffed6f",
-        "ibm_brisbane_5q": "#fdb462", "rigetti_ankaa_2": "#fccde5", "rigetti_ankaa_3": "#bc80bd",
+        "iqm_garnet": "#80b1d3", "ibm_fez": "#b3de69", "ibm_marrakesh": "#ffed6f",
+        "ibm_brisbane": "#fdb462", "rigetti_ankaa_2": "#fccde5", "rigetti_ankaa_3": "#bc80bd",
         "iqm_sirius": "#ccebc5"
     }
     
     markers_5q = {
         "originq_wukong": "star", "qasm_simulator": "cross", "iqm_emerald": "triangle-up",
-        "iqm_garnet": "x", "ibm_fez_5q": "diamond-tall", "ibm_marrakesh_5q": "circle",
-        "ibm_brisbane_5q": "circle-open", "rigetti_ankaa_2": "hexagon", "rigetti_ankaa_3": "hexagon2",
+        "iqm_garnet": "x", "ibm_fez": "diamond-tall", "ibm_marrakesh": "circle",
+        "ibm_brisbane": "circle-open", "rigetti_ankaa_2": "hexagon", "rigetti_ankaa_3": "hexagon2",
         "iqm_sirius": "circle"
     }
     
@@ -704,7 +704,7 @@ with tab3:
     
     # Plot each 5q backend
     backend_order_5q = ["originq_wukong", "qasm_simulator", "iqm_emerald", "iqm_garnet", "iqm_sirius",
-                        "ibm_fez_5q", "ibm_marrakesh_5q", "ibm_brisbane_5q", 
+                        "ibm_fez", "ibm_marrakesh", "ibm_brisbane", 
                         "rigetti_ankaa_2", "rigetti_ankaa_3"]
     
     for backend_name in backend_order_5q:
@@ -716,7 +716,7 @@ with tab3:
             x=data["p_values"],
             y=data["r_values"],
             mode='lines+markers',
-            name=backend_name.replace("_5q", ""),
+            name=backend_name,
             marker=dict(
                 symbol=markers_5q.get(backend_name, "circle"),
                 size=8,
@@ -783,7 +783,7 @@ with tab3:
             continue
         data = results_5q[backend_name]
         stats_5q.append({
-            "Backend": backend_name.replace("_5q", ""),
+            "Backend": backend_name,
             "Qubits": data["qubits"],
             "Max r": f"{data['max_r']:.3f}",
             "Optimal p": data["optimal_p"],
@@ -804,22 +804,30 @@ with tab3:
     # Color and marker definitions for 100q
     colors_100q = {
         "ibm_boston": "#e41a1c", "ibm_marrakesh": "#ffed6f", "ibm_fez": "#b3de69",
-        "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada"
+        "ibm_torino-v1": "#fdb462", "ibm_torino-v0": "#fda462", "ibm_brisbane": "#bebada",
+        "ibm_sherbrooke": "#fb8072", "ibm_kyiv": "#d9d9d9", "ibm_nazca": "#80b1d3",
+        "ibm_kyoto": "#bc80bd", "ibm_osaka": "#ccebc5", "ibm_brussels": "#fccde5",
+        "ibm_strasbourg": "#ffffb3"
     }
     
     markers_100q = {
         "ibm_boston": "circle", "ibm_marrakesh": "circle-open", "ibm_fez": "diamond-tall",
-        "ibm_torino": "square", "ibm_brisbane": "diamond"
+        "ibm_torino-v1": "star", "ibm_torino-v0": "square", "ibm_brisbane": "diamond",
+        "ibm_sherbrooke": "triangle-left", "ibm_kyiv": "x", "ibm_nazca": "circle",
+        "ibm_kyoto": "cross", "ibm_osaka": "diamond", "ibm_brussels": "triangle-up",
+        "ibm_strasbourg": "diamond-open"
     }
     
     linestyles_100q = {
-        "ibm_torino": "dash", "ibm_fez": "dash"
+        "ibm_torino-v1": "dash", "ibm_torino-v0": "dash", "ibm_fez": "dash"
     }
     
     fig_100q = go.Figure()
     
     # Plot each 100q backend
-    backend_order_100q = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino", "ibm_brisbane"]
+    backend_order_100q = ["ibm_boston", "ibm_marrakesh", "ibm_fez", "ibm_torino-v1", 
+                         "ibm_torino-v0", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv",
+                         "ibm_nazca", "ibm_kyoto", "ibm_osaka", "ibm_brussels", "ibm_strasbourg"]
     
     for backend_name in backend_order_100q:
         if backend_name not in results_100q:
