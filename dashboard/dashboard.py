@@ -39,7 +39,7 @@ reduces circuit depth and improves performance on near-term quantum devices.
 - 🔗 **1D Chain Graphs**: 100-qubit comparisons across IBM Eagle and Heron processors
 
 **Reference:** For detailed methodology and results, see our paper:  
-[*Benchmarking of Quantum Processors with the Long Range QAOA*](https://arxiv.org/abs/2502.06471) (arXiv:2502.06471)
+[*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471) (arXiv:2502.06471)
 
 ---
 """)
