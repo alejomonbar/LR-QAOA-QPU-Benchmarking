@@ -571,11 +571,13 @@ with tab2:
         # 127q Eagle (shades of purple/lavender)
         "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
         "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
-        "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
+        "ibm_nazca": "#a89fcc", "ibm_osaka": "#bdb4d8", 
+        "ibm_sherbrooke": "#cab9e2", "ibm_strasbourg": "#d2cae4",
         # 133q Heron-r1 (shades of orange)
         "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
         # 156q Heron-r2 (various colors)
         "ibm_fez": "#b3de69", "ibm_fez-f": "#b3de69",
+        "ibm_marrakesh-f": "#ffed6f",
         "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
         "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
         # IQM devices
@@ -613,7 +615,7 @@ with tab2:
     backend_order_nl = [
         "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
         # 127q Eagle devices
-        "ibm_brisbane", "ibm_brussels", "ibm_kyiv", "ibm_kyoto", "ibm_osaka", "ibm_strasbourg",
+        "ibm_brisbane", "ibm_brussels", "ibm_kyiv", "ibm_kyoto", "ibm_nazca", "ibm_osaka", "ibm_sherbrooke", "ibm_strasbourg",
         # 133q Heron-r1 devices
         "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
         # 156q Heron-r2 devices
@@ -718,7 +720,8 @@ with tab2:
         # 127q Eagle (shades of purple/lavender)
         "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
         "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
-        "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
+        "ibm_nazca": "#a89fcc", "ibm_osaka": "#bdb4d8", 
+        "ibm_sherbrooke": "#cab9e2", "ibm_strasbourg": "#d2cae4",
         # 133q Heron-r1 (shades of orange)
         "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fb8072", "ibm_torino-f": "#ff7f00",
         # 156q Heron-r2
@@ -732,7 +735,8 @@ with tab2:
         # 127q devices - diamond variants
         "ibm_brisbane": "diamond", "ibm_brussels": "diamond-open",
         "ibm_kyiv": "diamond-tall", "ibm_kyoto": "diamond-wide",
-        "ibm_osaka": "diamond-cross", "ibm_strasbourg": "diamond",
+        "ibm_nazca": "diamond-tall-open", "ibm_osaka": "diamond-cross", 
+        "ibm_sherbrooke": "diamond-wide-open", "ibm_strasbourg": "diamond",
         # 133q and 156q devices
         "ibm_torino-v0": "circle", "ibm_torino-v1": "cross", "ibm_torino-f": "square",
         "ibm_fez": "triangle-up", "ibm_fez-f": "star",
