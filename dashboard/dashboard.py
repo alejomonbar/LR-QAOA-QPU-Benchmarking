@@ -179,14 +179,17 @@ def load_fc_results():
     
     r = defaultdict(dict)
     case = ""
+    debug_info = []
     
     for backend_name in backends:
         if backend_name not in nqs:
+            debug_info.append(f"⚠️ {backend_name} not in nqs configuration")
             continue
             
         for nq in nqs[backend_name]:
             try:
-                results = np.load(data_dir / backend_name / f"{nq}_FC.npy", allow_pickle=True).item()
+                file_path = data_dir / backend_name / f"{nq}_FC.npy"
+                results = np.load(file_path, allow_pickle=True).item()
                 postprocessing = results["postprocessing" + case]
                 postprocessing_random = results["random" + case]
                 shots = sum(list(results["samples"][results["Deltas"][0]][results["ps"][0]].values()))
@@ -221,8 +224,12 @@ def load_fc_results():
                 
                 if p_value < 0.001:  # 3σ level
                     r[backend_name][nq] = ((r_max_nq - (y1+y2))/(1-(y1+y2)))
+                    debug_info.append(f"✅ {backend_name} nq={nq}: r_eff={r[backend_name][nq]:.4f}, p-value={p_value:.6f}")
+                else:
+                    debug_info.append(f"❌ {backend_name} nq={nq}: Failed significance test (p-value={p_value:.6f} >= 0.001)")
                     
             except Exception as e:
+                debug_info.append(f"🔴 {backend_name} nq={nq}: Error - {str(e)}")
                 continue
     
     # Add HPC results for specific cases
@@ -250,10 +257,11 @@ def load_fc_results():
                     
                     r_max_nq = res_hpc[nq][0]["objective"]["r"]
                     r["qasm_simulator"][nq] = ((r_max_nq - (y1+y2))/(1-(y1+y2)))
-                except:
-                    pass
+                    debug_info.append(f"✅ qasm_simulator nq={nq}: r_eff={r['qasm_simulator'][nq]:.4f} (from HPC)")
+                except Exception as e:
+                    debug_info.append(f"🔴 qasm_simulator nq={nq}: Error loading HPC - {str(e)}")
     
-    return r, backends
+    return r, backends, debug_info
 
 
 # Create tabs
@@ -526,7 +534,19 @@ with tab3:
     Results are normalized against random sampling baseline (3σ threshold).
     """)
     
-    r_data, backends = load_fc_results()
+    r_data, backends, debug_info = load_fc_results()
+    
+    # Add debug expander
+    with st.expander("🔍 Debug Information - Data Loading Status"):
+        for info in debug_info:
+            if "✅" in info:
+                st.success(info)
+            elif "❌" in info:
+                st.warning(info)
+            elif "🔴" in info:
+                st.error(info)
+            else:
+                st.info(info)
     
     # Define colors and markers
     colors_map = {
