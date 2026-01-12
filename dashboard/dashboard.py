@@ -41,15 +41,23 @@ across 1D chains, native layouts, and fully connected topologies.
 """)
 
 # Function to load 1D chain results
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+@st.cache_data(ttl=600)  # Cache for 10 minutes
 def load_1d_chain_results():
     """Load 1D chain experiment results for 5q and 100q comparisons from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
     
     try:
         json_path = data_dir / "1d_chain_processed.json"
+        # Add file timestamp to force cache invalidation when file changes
+        file_mtime = json_path.stat().st_mtime
+        
         with open(json_path, 'r') as f:
             data = json.load(f)
+        
+        # Verify data structure
+        if not data.get("5q") and not data.get("100q"):
+            st.warning("⚠️ Loaded empty data structure")
+        
         return data
     except Exception as e:
         st.error(f"Error loading 1D chain data: {str(e)}")
@@ -676,6 +684,12 @@ with tab3:
     st.markdown("""
     Approximation ratio vs QAOA layers (p) for 1D chain graphs at different scales.
     """)
+    
+    # Add cache clear button in expander
+    with st.expander("🔧 Advanced Options"):
+        if st.button("Clear Cache & Reload Data"):
+            st.cache_data.clear()
+            st.rerun()
     
     chain_results = load_1d_chain_results()
     
