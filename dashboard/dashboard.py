@@ -596,33 +596,29 @@ with tab3:
     # Show QPU capabilities over time
     st.markdown("---")
     st.subheader("📅 QPU Capabilities Timeline")
-    st.markdown("Maximum qubit count per backend and when experiments were conducted (based on file creation date).")
+    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
     
-    # Collect max qubits and file dates for each backend
+    # Collect max qubits and file dates for each backend from JSON
     timeline_data = []
-    data_dir = Path(__file__).parent.parent / "Data"
     
     for backend_name in backends:
-        if backend_name in r_data and len(r_data[backend_name]) > 0:
-            nqs_list = sorted(r_data[backend_name].keys())
-            max_nq = max(nqs_list)
+        if backend_name in fc_data:
+            # Find the entry with maximum qubits
+            max_nq = 0
+            max_date = None
+            for nq_str, data in fc_data[backend_name].items():
+                nq = int(nq_str)
+                if nq > max_nq and data["statistics"]["significant"]:
+                    max_nq = nq
+                    if "file_created" in data:
+                        max_date = data["file_created"]
             
-            # Get file creation time for the max qubit experiment
-            file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
-            if file_path.exists():
+            if max_nq > 0 and max_date:
                 import datetime
-                file_stat = file_path.stat()
-                # Try to get creation time (st_birthtime on macOS/BSD, st_ctime on some systems)
-                if hasattr(file_stat, 'st_birthtime'):
-                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_birthtime)
-                else:
-                    # Fallback to st_ctime (change time on Unix, creation time on Windows)
-                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_ctime)
-                
                 timeline_data.append({
                     "backend": backend_name,
                     "max_qubits": max_nq,
-                    "date": creation_time
+                    "date": datetime.datetime.strptime(max_date, "%Y-%m-%d")
                 })
     
     if timeline_data:
@@ -671,20 +667,11 @@ with tab3:
             nqs_list = sorted(r_data[backend_name].keys())
             r_values = [r_data[backend_name][nq] for nq in nqs_list]
             
-            # Get creation date for max qubit experiment
+            # Get creation date for max qubit experiment from JSON
             max_nq = max(nqs_list)
-            file_path = data_dir / backend_name / f"{max_nq}_FC.npy"
             exp_date = "N/A"
-            if file_path.exists():
-                import datetime
-                file_stat = file_path.stat()
-                # Try to get creation time (st_birthtime on macOS/BSD, st_ctime on some systems)
-                if hasattr(file_stat, 'st_birthtime'):
-                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_birthtime)
-                else:
-                    # Fallback to st_ctime (change time on Unix, creation time on Windows)
-                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_ctime)
-                exp_date = creation_time.strftime("%Y-%m-%d")
+            if backend_name in fc_data and str(max_nq) in fc_data[backend_name]:
+                exp_date = fc_data[backend_name][str(max_nq)].get("file_created", "N/A")
             
             stats_data.append({
                 "Backend": backend_name,

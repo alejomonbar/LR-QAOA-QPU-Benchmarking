@@ -103,6 +103,15 @@ def process_fc_experiments():
                         yp = ypi
                         best_yp = max(ypi)
                 
+                # Get file creation date
+                import datetime
+                file_path = data_dir / backend_name / f"{nq}_FC.npy"
+                file_stat = file_path.stat()
+                if hasattr(file_stat, 'st_birthtime'):
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_birthtime)
+                else:
+                    creation_time = datetime.datetime.fromtimestamp(file_stat.st_ctime)
+                
                 # Store essential data including r vs p curve
                 fc_results[backend_name][str(nq)] = {
                     "r_eff": r_eff,
@@ -122,7 +131,8 @@ def process_fc_experiments():
                     "r_vs_p": {
                         "p_values": [int(p) for p in ps],
                         "r_values": [float(r) for r in yp]
-                    }
+                    },
+                    "file_created": creation_time.strftime("%Y-%m-%d")
                 }
                 
                 print(f"✓ {backend_name} nq={nq}: r_eff={r_eff:.4f}, p-value={p_value:.6f}")
