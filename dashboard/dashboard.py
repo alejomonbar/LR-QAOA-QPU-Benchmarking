@@ -9,7 +9,7 @@ import json
 # Set page configuration
 st.set_page_config(
     page_title="LR-QAOA QPU Benchmarking",
-    page_icon="🔬",
+    page_icon="LR",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -34,9 +34,9 @@ problem Hamiltonians. This method enables efficient implementation of optimizati
 improves performance on near-term quantum devices.
 
 **Key Features:**
-- 📊 **Fully Connected Graphs**: Up to 56 qubits tested across multiple QPUs
-- 🔷 **Native Layout Problems**: Hardware-native graph structures (up to 156 qubits)
-- 🔗 **1D Chain Graphs**: 100-qubit comparisons across IBM Eagle and Heron processors
+- **Fully Connected Graphs**: Up to 56 qubits tested across multiple QPUs
+- **Native Layout Problems**: Hardware-native graph structures (up to 156 qubits)
+- **1D Chain Graphs**: 100-qubit comparisons across IBM Eagle and Heron processors
 
 **Reference:** For detailed methodology and results, see our paper:  
 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471) (arXiv:2502.06471)
@@ -169,7 +169,7 @@ with tab1:
     }
 
     # Show QPU capabilities over time
-    st.subheader("📅 QPU Capabilities Timeline")
+    st.subheader("QPU Capabilities Timeline")
     st.markdown("Maximum qubit count per backend and when experiments were conducted.")
     
     # Collect max qubits and file dates for each backend from JSON
@@ -241,7 +241,7 @@ with tab1:
 
     
     # Add debug expander
-    with st.expander("🔍 Debug Information - Data Loading Status"):
+    with st.expander("Debug Information - Data Loading Status"):
         for info in debug_info:
             if "✅" in info:
                 st.success(info)
@@ -263,7 +263,7 @@ with tab1:
     
     # Main plot: Effective Approximation Ratio vs Number of Qubits
     st.markdown("---")
-    st.subheader("📊 Scalability Analysis")
+    st.subheader("Scalability Analysis")
     st.markdown("Effective approximation ratio across different qubit counts.")
     
     # Create Plotly figure
@@ -314,7 +314,7 @@ with tab1:
     
     # Add interactive plot for specific qubit count
     st.markdown("---")
-    st.subheader("📈 Approximation Ratio vs Circuit Depth")
+    st.subheader("Approximation Ratio vs Circuit Depth")
     st.markdown("Select a qubit count to see how different backends performed across circuit depths.")
     
     # Get all unique qubit counts across all backends
