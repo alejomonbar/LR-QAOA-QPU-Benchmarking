@@ -18,13 +18,15 @@ We evaluate this methodology using **three graph topologies**:
 - **Native Layout (NL)**
 - **Fully Connected (FC)**  
 
-These experiments were conducted on **24 QPUs** from **6 vendors**:  
+These experiments were conducted on **28 QPUs** from **7 vendors**:  
+✅ AQT  
 ✅ IBM  
 ✅ IQM  
 ✅ IonQ  
 ✅ Quantinuum  
 ✅ Rigetti  
-✅ OriginQ
+✅ OriginQ 
+
 
 ### **Key Findings**
 - The largest problem tested: **1D-chain with \( p = 10,000 \)** involving **990,000 2-qubit gates on `ibm_fez`**.
@@ -33,10 +35,50 @@ These experiments were conducted on **24 QPUs** from **6 vendors**:
 
 ---
 
+## 📂 **Repository Structure**
+
+```
+LR-QAOA-QPU-Benchmarking/
+├── 1D-Chain-Experiments.ipynb   # Experimental results for 1D-chain topology
+├── 1D-Chain-Figures.ipynb       # Visualizations and analysis for 1D-chain topology
+├── 1D-Chain-Origin-Quantum.ipynb # 1D-chain experiments on Origin Quantum QPU
+├── FC-Experiments.ipynb         # Experimental results for fully connected graphs
+├── FC-Figures.ipynb             # Figures and visualizations for FC experiments
+├── NL-Experiments.ipynb         # Experimental results for native layout graphs
+├── NL-Figures.ipynb             # Visualizations and analysis for native layout graphs
+├── Figures_sampling.ipynb       # Sampling-related figures and analysis
+├── generate_problems.ipynb      # Generate random graphs for FC, NL, and 1D-Chain experiments
+├── LR-QAOA-Benchmark.md         # Detailed benchmark protocol documentation
+├── paper-layouts-tested.png     # Diagram of QPU benchmarking layouts
+├── requirements.txt             # Required Python libraries
+├── LICENSE                      # License file
+├── README.md                    # This file
+├── Data/                        # Experimental data and results
+│   ├── problems_1DChain.json    # 1D-Chain problem definitions
+│   ├── NL-problems.npy          # Native layout problem definitions
+│   ├── WMC_FC.npy               # Fully connected problem data
+│   ├── qpu_benchmark_results.xlsx # Benchmark results summary
+│   ├── ibm_fez/                 # IBM QPU experiment data (also: ibm_torino, ibm_brisbane, etc.)
+│   ├── iqm_garnet/              # IQM QPU experiment data (also: iqm_spark, iqm_sirius, etc.)
+│   ├── ionq_aria_2/             # IonQ QPU experiment data (also: ionq_forte, etc.)
+│   ├── rigetti_ankaa_2/         # Rigetti QPU experiment data (also: rigetti_ankaa_3)
+│   ├── H1-1/                    # Quantinuum H1-1 experiment data (also: H2-1, H1-1E, H2-1E)
+│   ├── aqt_ibexq1/              # AQT QPU experiment data
+│   └── originq_wukong/          # OriginQ QPU experiment data
+└── Figures/                     # Generated figures and plots
+    ├── 1D-Chain/                # 1D-chain topology figures
+    ├── FC/                      # Fully connected graph figures
+    ├── NL/                      # Native layout figures
+    └── sampling/                # Sampling analysis figures
+```
+
+---
+
 ## 📑 **Table of Contents**
 ### **1D-Chain Experiments**
+- [1D-Chain-Experiments.ipynb](./1D-Chain-Experiments.ipynb) - Experimental results for 1D-chain topology.
 - [1D-Chain-Figures.ipynb](./1D-Chain-Figures.ipynb) - Visualizations and analysis for 1D-chain topology.
-- [1D-Chain-IBM-Experiments.ipynb](./1D-Chain-IBM-Experiments.ipynb) - Experimental results of 1D-chain on IBM QPUs.
+- [1D-Chain-Origin-Quantum.ipynb](./1D-Chain-Origin-Quantum.ipynb) - 1D-chain experiments on Origin Quantum QPU.
 
 ### **Fully Connected (FC) Experiments**
 - [FC-Experiments.ipynb](./FC-Experiments.ipynb) - Experimental results for fully connected graphs.
@@ -46,8 +88,9 @@ These experiments were conducted on **24 QPUs** from **6 vendors**:
 - [NL-Experiments.ipynb](./NL-Experiments.ipynb) - Experimental results for native layout graphs.
 - [NL-Figures.ipynb](./NL-Figures.ipynb) - Visualizations and analysis for native layout graphs.
 
-### **Random problems generator**
+### **Additional Notebooks**
 - [generate_problems.ipynb](./generate_problems.ipynb) - Generate the random graphs used for the FC, NL, and 1D-Chain experiments.
+- [Figures_sampling.ipynb](./Figures_sampling.ipynb) - Sampling-related figures and analysis.
   
 ### **Dependencies**
 - [requirements.txt](./requirements.txt) - Required Python libraries for running the notebooks.
