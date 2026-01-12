@@ -116,12 +116,35 @@ def load_fc_results():
 tab1, tab2, tab3 = st.tabs(["📊 Fully Connected", "🔷 Native Layout", "🔗 1D Chain"])
 
 # Tab 1: Fully Connected Experiments
-with tab3:
-    st.header("1D Chain Experiments - 100 Qubit Comparison")
+with tab1:
+    st.header("Fully Connected Graph Experiments")
+    st.markdown("""
+    Effective approximation ratio vs number of qubits for fully connected graphs.
+    Results are normalized against random sampling baseline (3σ threshold).
+    """)
+    
     r_data, backends, debug_info, fc_data = load_fc_results()
 
+    # Define colors and markers
+    colors_map = {
+        "aqt_ibexq1": "#e41a1c", "ibm_boston": "#e41a1c", "ionq_forte": "#8dd3c7",
+        "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada", "H1-1E": "#fb8072",
+        "qasm_simulator": "#80b1d3", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
+        "H2-1": "#fccde5", "ionq_aria_2": "#d9d9d9", "ionq_harmony": "#bc80bd",
+        "ionq_forte_enterprise": "#ccebc5", "ibm_marrakesh": "#ffed6f",
+        "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8"
+    }
+    
+    markers_map = {
+        "aqt_ibexq1": "diamond-open", "ibm_boston": "circle", "ionq_forte": "star",
+        "ibm_torino": "triangle-up", "ibm_brisbane": "diamond", "H1-1E": "cross",
+        "qasm_simulator": "circle", "H2-1E": "x", "ibm_fez": "diamond-open",
+        "H2-1": "triangle-right", "ionq_aria_2": "triangle-left", "ionq_harmony": "square",
+        "ibm_marrakesh": "circle-open", "ionq_forte_enterprise": "triangle-down",
+        "iqm_garnet": "square", "iqm_emerald": "triangle-up"
+    }
+
     # Show QPU capabilities over time
-    st.markdown("---")
     st.subheader("📅 QPU Capabilities Timeline")
     st.markdown("Maximum qubit count per backend and when experiments were conducted.")
     
@@ -214,24 +237,10 @@ with tab3:
             else:
                 st.write(f"✗ {backend}: No data")
     
-    # Define colors and markers
-    colors_map = {
-        "aqt_ibexq1": "#e41a1c", "ibm_boston": "#e41a1c", "ionq_forte": "#8dd3c7",
-        "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada", "H1-1E": "#fb8072",
-        "qasm_simulator": "#80b1d3", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
-        "H2-1": "#fccde5", "ionq_aria_2": "#d9d9d9", "ionq_harmony": "#bc80bd",
-        "ionq_forte_enterprise": "#ccebc5", "ibm_marrakesh": "#ffed6f",
-        "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8"
-    }
-    
-    markers_map = {
-        "aqt_ibexq1": "diamond-open", "ibm_boston": "circle", "ionq_forte": "star",
-        "ibm_torino": "triangle-up", "ibm_brisbane": "diamond", "H1-1E": "cross",
-        "qasm_simulator": "circle", "H2-1E": "x", "ibm_fez": "diamond-open",
-        "H2-1": "triangle-right", "ionq_aria_2": "triangle-left", "ionq_harmony": "square",
-        "ibm_marrakesh": "circle-open", "ionq_forte_enterprise": "triangle-down",
-        "iqm_garnet": "square", "iqm_emerald": "triangle-up"
-    }
+    # Main plot: Effective Approximation Ratio vs Number of Qubits
+    st.markdown("---")
+    st.subheader("📊 Scalability Analysis")
+    st.markdown("Effective approximation ratio across different qubit counts.")
     
     # Create Plotly figure
     fig = go.Figure()
@@ -558,11 +567,11 @@ with tab2:
 
 
 # Tab 3: 1D Chain Experiments
-with tab1:
-    st.header("Fully Connected Graph Experiments")
+with tab3:
+    st.header("1D Chain Experiments - 100 Qubit Comparison")
     st.markdown("""
-    Effective approximation ratio vs number of qubits for fully connected graphs.
-    Results are normalized against random sampling baseline (3σ threshold).
+    Approximation ratio vs QAOA layers (p) for 1D chain graphs with 100 qubits.
+    Comparing Eagle and Heron IBM QPUs with random baseline.
     """)
     
     chain_results = load_1d_chain_results()
