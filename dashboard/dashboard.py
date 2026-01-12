@@ -568,21 +568,34 @@ with tab2:
     
     # Color definitions for native layout
     colors_nl = {
-        "ibm_brisbane": "#bebada", "ibm_torino-v0": "#fdb462",
-        "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
+        # 127q Heron-r1 (shades of purple/lavender)
+        "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
+        "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
+        "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
+        # 133q Heron-r2 (shades of orange)
+        "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fdb462", "ibm_torino-f": "#fdb462",
+        # 156q Heron-r2/r3 (various colors)
         "ibm_fez": "#b3de69", "ibm_fez-f": "#b3de69",
         "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
         "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
+        # IQM devices
         "iqm_garnet": "#fb8072", "iqm_emerald": "#80b1d3",
+        # Rigetti
         "rigetti_ankaa_3": "#fccde5"
     }
     
     markers_nl = {
-        "ibm_brisbane": "diamond", "ibm_torino-v0": "circle",
-        "ibm_torino-v1": "cross", "ibm_torino-f": "square",
+        # 127q devices - diamond variants
+        "ibm_brisbane": "diamond", "ibm_brussels": "diamond-open",
+        "ibm_kyiv": "diamond-tall", "ibm_kyoto": "diamond-wide",
+        "ibm_osaka": "diamond-cross", "ibm_strasbourg": "diamond",
+        # 133q devices
+        "ibm_torino-v0": "circle", "ibm_torino-v1": "cross", "ibm_torino-f": "square",
+        # 156q devices
         "ibm_fez": "triangle-up", "ibm_fez-f": "star",
         "ibm_marrakesh-f": "circle-open", "ibm_aachen-f": "triangle-down",
         "ibm_kingston-f": "triangle-down", "ibm_boston-f": "circle",
+        # IQM and Rigetti
         "iqm_garnet": "diamond-open", "iqm_emerald": "circle",
         "rigetti_ankaa_3": "diamond-tall"
     }
@@ -599,7 +612,11 @@ with tab2:
     
     backend_order_nl = [
         "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
-        "ibm_brisbane", "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
+        # 127q Heron-r1 devices
+        "ibm_brisbane", "ibm_brussels", "ibm_kyiv", "ibm_kyoto", "ibm_osaka", "ibm_strasbourg",
+        # 133q Heron-r2 devices
+        "ibm_torino-v0", "ibm_torino-v1", "ibm_torino-f",
+        # 156q Heron-r2/r3 devices
         "ibm_fez", "ibm_fez-f", "ibm_marrakesh-f",
         "ibm_kingston-f", "ibm_aachen-f", "ibm_boston-f"
     ]
@@ -698,8 +715,13 @@ with tab2:
     
     # Enhanced color scheme for IBM devices
     colors_ibm = {
-        "ibm_brisbane": "#bebada", 
+        # 127q Heron-r1 (shades of purple/lavender)
+        "ibm_brisbane": "#bebada", "ibm_brussels": "#c8b8e0",
+        "ibm_kyiv": "#d4c4e6", "ibm_kyoto": "#e0d0ec",
+        "ibm_osaka": "#bdb4d8", "ibm_strasbourg": "#d2cae4",
+        # 133q Heron-r2 (shades of orange)
         "ibm_torino-v0": "#fdb462", "ibm_torino-v1": "#fb8072", "ibm_torino-f": "#ff7f00",
+        # 156q Heron-r2/r3
         "ibm_fez": "#b3de69", "ibm_fez-f": "#8dd3c7",
         "ibm_marrakesh-f": "#ffed6f", 
         "ibm_aachen-f": "#e41a1c", "ibm_kingston-f": "#377eb8", 
@@ -707,7 +729,11 @@ with tab2:
     }
     
     markers_ibm = {
-        "ibm_brisbane": "diamond", 
+        # 127q devices - diamond variants
+        "ibm_brisbane": "diamond", "ibm_brussels": "diamond-open",
+        "ibm_kyiv": "diamond-tall", "ibm_kyoto": "diamond-wide",
+        "ibm_osaka": "diamond-cross", "ibm_strasbourg": "diamond",
+        # 133q and 156q devices
         "ibm_torino-v0": "circle", "ibm_torino-v1": "cross", "ibm_torino-f": "square",
         "ibm_fez": "triangle-up", "ibm_fez-f": "star",
         "ibm_marrakesh-f": "circle-open", 
