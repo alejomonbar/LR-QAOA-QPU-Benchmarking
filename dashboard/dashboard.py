@@ -634,18 +634,15 @@ with tab3:
             fig_timeline.add_trace(go.Scatter(
                 x=[item["date"]],
                 y=[item["max_qubits"]],
-                mode='markers+text',
+                mode='markers',
                 name=item["backend"],
                 marker=dict(
                     symbol=markers_map.get(item["backend"], "circle"),
-                    size=15,
+                    size=12,
                     color=colors_map.get(item["backend"], "#808080"),
-                    line=dict(color='black', width=1)
+                    line=dict(color='white', width=2)
                 ),
-                text=[item["backend"]],
-                textposition="top center",
-                textfont=dict(size=10),
-                hovertemplate='<b>%{text}</b><br>' +
+                hovertemplate='<b>%{fullData.name}</b><br>' +
                               'Date: %{x|%Y-%m-%d}<br>' +
                               'Max Qubits: %{y}<br>' +
                               '<extra></extra>'
@@ -655,10 +652,19 @@ with tab3:
             xaxis_title="Experiment Date",
             yaxis_title="Maximum Number of Qubits",
             hovermode='closest',
-            height=500,
-            showlegend=False,
+            height=600,
+            showlegend=True,
+            legend=dict(
+                orientation="v",
+                yanchor="middle",
+                y=0.5,
+                xanchor="left",
+                x=1.02,
+                font=dict(size=10)
+            ),
             template="plotly_white",
-            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56])
+            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56]),
+            margin=dict(r=150)
         )
         
         st.plotly_chart(fig_timeline, use_container_width=True)
