@@ -547,6 +547,15 @@ with tab3:
                 st.error(info)
             else:
                 st.info(info)
+        
+        # Show what backends have data
+        st.write("---")
+        st.write("**Backends with loaded data:**")
+        for backend in backends:
+            if backend in r_data and len(r_data[backend]) > 0:
+                st.write(f"✓ {backend}: {len(r_data[backend])} datapoints - qubits: {sorted(r_data[backend].keys())}")
+            else:
+                st.write(f"✗ {backend}: No data")
     
     # Define colors and markers
     colors_map = {

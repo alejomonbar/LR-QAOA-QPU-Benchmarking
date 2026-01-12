@@ -1,0 +1,23 @@
+{
+  "experiment_type": "fully_connected",
+  "backends": [
+    "aqt_ibexq1",
+    "ibm_brisbane",
+    "ibm_fez",
+    "ibm_boston",
+    "H1-1E",
+    "qasm_simulator",
+    "H2-1E",
+    "H2-1",
+    "ionq_forte",
+    "ionq_aria_2",
+    "ionq_harmony",
+    "ibm_torino",
+    "ionq_forte_enterprise",
+    "ibm_marrakesh",
+    "iqm_garnet",
+    "iqm_emerald"
+  ],
+  "total_datapoints": 126,
+  "description": "Effective approximation ratios for fully connected graphs with 3-sigma statistical filtering"
+}

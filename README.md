@@ -9,7 +9,6 @@ In this work, we use the **Linear Ramp Quantum Approximate Optimization Algorith
 
 Scheme of the Quantum Processing Units (QPUs) benchmarking. (a) Graphs used for the benchmarking. In yellow is the 1D-Chain, in green is the native layout (NL), and in pink is the fully connected (FC) graph. (b) QAOA protocol consists of alternating layers of the problem Hamiltonian and the mixer Hamiltonian. $p$ represents the depth of the algorithm. (c) Schedule of the LR-QAOA algorithm, $\Delta_{\gamma, \beta}/p$ is the slope. (d) Expected results of LR-QAOA in terms of approximation ratio versus number of LR-QAOA layers. Black curves represent different levels of depolarizing noise strength.
 
-
 The benchmarking identifies the depth at which a **fully mixed state** is reached, meaning results become indistinguishable from those of a random sampler.
 
 ### **Tested Systems & Vendors**
