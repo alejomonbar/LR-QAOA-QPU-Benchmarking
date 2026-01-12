@@ -27,20 +27,15 @@ with col2:
 st.markdown("""
 ### Benchmarking Linear Ramp QAOA on Quantum Processing Units
 
-This dashboard presents comprehensive benchmarking results of the **Linear Ramp Quantum Approximate Optimization Algorithm (LR-QAOA)** 
-across multiple quantum processors from leading quantum computing providers including IBM, IonQ, Rigetti, IQM, and AQT.
+This dashboard uses LR-QAOA — a fixed-parameter, deterministic "Linear Ramp" variant of QAOA — to quantify a QPU's
+ability to preserve coherent signal as circuit depth increases and to identify when performance becomes
+statistically indistinguishable from random sampling. The protocol scales to large width and depth, enabling
+cross-platform comparisons of algorithmic performance.
 
-**What is LR-QAOA?** LR-QAOA is a variant of QAOA that uses a linear ramp scheduling approach for the mixing and 
-problem Hamiltonians. This method enables efficient implementation of optimization problems on quantum hardware and 
-improves performance on near-term quantum devices.
+We apply LR-QAOA across 24 processors from six vendors, testing problems up to 156 qubits and circuits up to 10,000 layers
+across 1D chains, native layouts, and fully connected topologies.
 
-**Key Features:**
-- **Fully Connected Graphs**: Up to 56 qubits tested across multiple QPUs
-- **Native Layout Problems**: Hardware-native graph structures (up to 156 qubits)
-- **1D Chain Graphs**: 100-qubit comparisons across IBM Eagle and Heron processors
-
-**Reference:** For detailed methodology and results, see our paper:  
-[*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471) (arXiv:2502.06471)
+**Reference:** [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
 
 ---
 """)
