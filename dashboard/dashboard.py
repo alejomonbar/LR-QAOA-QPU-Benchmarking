@@ -7,9 +7,11 @@ from collections import defaultdict
 import json
 
 # Set page configuration
+# Prefer using bundled logo as page icon when available
+logo_path = Path(__file__).parent / "Logo.png"
 st.set_page_config(
     page_title="LR-QAOA QPU Benchmarking",
-    page_icon="LR",
+    page_icon=str(logo_path) if logo_path.exists() else "LR",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -17,7 +19,6 @@ st.set_page_config(
 # Title and description with logo
 col1, col2 = st.columns([1, 10])
 with col1:
-    logo_path = Path(__file__).parent / "Logo.png"
     if logo_path.exists():
         st.image(str(logo_path), width=100, use_column_width=False)
 with col2:
