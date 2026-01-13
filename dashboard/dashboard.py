@@ -366,12 +366,12 @@ with st.sidebar:
             justify-content: center;
         ">
             <div style="
-                background: rgba(245, 247, 250, 0.75);
-                backdrop-filter: blur(8px);
+                background: rgba(245, 247, 250, 0.6);
+                backdrop-filter: blur(6px);
                 border-radius: 12px;
                 padding: 20px 30px;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                border: 1px solid rgba(102, 126, 234, 0.2);
+                border: 1px solid rgba(102, 126, 234, 0.15);
             ">
                 <h1 style="
                     text-align: center;
