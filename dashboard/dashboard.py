@@ -355,21 +355,22 @@ with st.sidebar:
     st.markdown(f"""
         <div style="
             background-image: url('https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/Logo.png');
-            background-size: 80%;
+            background-size: 70%;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 20px 20px;
+            padding: 60px 20px;
             border-radius: 12px;
             margin: 1rem 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 200px;
         ">
             <div style="
-                background: rgba(245, 247, 250, 0.6);
-                backdrop-filter: blur(6px);
+                background: rgba(245, 247, 250, 0.5);
+                backdrop-filter: blur(5px);
                 border-radius: 12px;
-                padding: 20px 30px;
+                padding: 15px 25px;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 border: 1px solid rgba(102, 126, 234, 0.15);
             ">
