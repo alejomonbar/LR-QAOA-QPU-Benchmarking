@@ -309,7 +309,7 @@ with st.sidebar:
     
     st.markdown("---")
     
-    st.caption("Developed by the Quantum Optimization Team")
+    st.caption("Alejandro Montanez-Barrera")
 
 # Create tabs with icons
 tab1, tab2, tab3 = st.tabs(["Fully Connected", "Native Layout", "1D Chain"])
