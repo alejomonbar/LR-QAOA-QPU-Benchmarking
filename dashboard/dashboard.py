@@ -334,7 +334,7 @@ with tab1:
     colors_map = {
         "aqt_ibexq1": "#e41a1c", "ibm_boston": "#e41a1c", "ionq_forte": "#8dd3c7",
         "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada", "H1-1E": "#fb8072",
-        "qasm_simulator": "#2E8B57", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
+        "qasm_simulator": "#8A2BE2", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
         "H2-1": "#fccde5", "ionq_aria_2": "#d9d9d9", "ionq_harmony": "#bc80bd",
         "ionq_forte_enterprise": "#ccebc5", "ibm_marrakesh": "#ffed6f",
         "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8"
