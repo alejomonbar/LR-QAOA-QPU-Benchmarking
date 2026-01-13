@@ -390,6 +390,9 @@ with tab1:
         
         def get_vendor_name(backend_name):
             """Extract vendor from backend name"""
+            # Special case for qasm_simulator - it's not a vendor
+            if backend_name == "qasm_simulator":
+                return "simulator"
             for vendor in vendor_colors:
                 if backend_name.lower().startswith(vendor):
                     return vendor
