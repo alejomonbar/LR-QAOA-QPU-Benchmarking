@@ -399,6 +399,9 @@ with tab1:
         
         def get_vendor_color(backend_name):
             """Extract vendor from backend name and return color"""
+            # Special case for qasm_simulator
+            if backend_name == "qasm_simulator":
+                return "#8A2BE2"  # Blue violet - matches FC tab color
             vendor = get_vendor_name(backend_name)
             return vendor_colors.get(vendor, "#808080")
         
