@@ -377,10 +377,31 @@ with tab1:
                 })
     
     if timeline_data:
+        # Define vendor color palette
+        vendor_colors = {
+            "aqt": "#FF6B35",      # Orange-red
+            "ibm": "#4A90E2",      # Blue
+            "ionq": "#7B68EE",     # Medium slate blue
+            "quantinuum": "#50C878", # Emerald green
+            "iqm": "#E63946",      # Red
+            "rigetti": "#9B59B6",  # Purple
+            "originq": "#F39C12"   # Orange
+        }
+        
+        def get_vendor_color(backend_name):
+            """Extract vendor from backend name and return color"""
+            for vendor in vendor_colors:
+                if backend_name.lower().startswith(vendor):
+                    return vendor_colors[vendor]
+                if vendor in backend_name.lower().replace("_", "").replace("-", ""):
+                    return vendor_colors[vendor]
+            return "#808080"  # Gray fallback
+        
         # Create timeline plot
         fig_timeline = go.Figure()
         
         for item in timeline_data:
+            vendor_color = get_vendor_color(item["backend"])
             fig_timeline.add_trace(go.Scatter(
                 x=[item["date"]],
                 y=[item["max_qubits"]],
@@ -389,8 +410,8 @@ with tab1:
                 marker=dict(
                     symbol=markers_map.get(item["backend"], "circle"),
                     size=14,
-                    color=colors_map.get(item["backend"], "#808080"),
-                    line=dict(color='black', width=2)
+                    color=vendor_color,
+                    line=dict(color='white', width=2)
                 ),
                 hovertemplate='<b>%{fullData.name}</b><br>' +
                               'Date: %{x|%Y-%m-%d}<br>' +
