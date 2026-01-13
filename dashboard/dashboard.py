@@ -282,7 +282,7 @@ with st.sidebar:
     st.markdown("""
     ### Key Features
     
-    - � **Up to 156 qubits** tested per device
+    - 🔬 **QPUs with up to 156 qubits** tested
     - 📈 **Up to 10,000 QAOA layers** in depth scaling
     - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
     - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL)
@@ -305,8 +305,6 @@ with st.sidebar:
     if insights:
         st.markdown(f"- **{insights['qpus']}** quantum processors tested")
         st.markdown(f"- **{insights['vendors']}** vendors ({insights['vendor_list']})")
-        if insights['max_depth'] > 0:
-            st.markdown(f"- Largest experiment: **p={insights['max_depth']}**")
     else:
         # Fallback to hardcoded values if dynamic loading fails
         st.markdown("- **18** quantum processors tested")
@@ -317,14 +315,14 @@ with st.sidebar:
     st.caption("Developed by the Quantum Optimization Team")
 
 # Create tabs with icons
-tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 1D Chain"])
+tab1, tab2, tab3 = st.tabs(["Fully Connected", "Native Layout", "1D Chain"])
 
 # Tab 1: Fully Connected Experiments
 with tab1:
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/FC-logo.png" width="80">
-            <h1 style="margin: 0;">Fully Connected Graph Experiments</h1>
+        <div style="display: flex; align-items: center; gap: 20px; padding: 20px 0;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/FC-logo.png" width="80" style="border-radius: 10px;">
+            <h1 style="margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">Fully Connected Graph Experiments</h1>
         </div>
     """, unsafe_allow_html=True)
     
@@ -646,9 +644,9 @@ with tab1:
 # Tab 2: Native Layout Experiments
 with tab2:
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/NL-logo.png" width="80">
-            <h1 style="margin: 0;">Native Layout Experiments</h1>
+        <div style="display: flex; align-items: center; gap: 20px; padding: 20px 0;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/NL-logo.png" width="80" style="border-radius: 10px;">
+            <h1 style="margin: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">Native Layout Experiments</h1>
         </div>
     """, unsafe_allow_html=True)
     
@@ -959,9 +957,9 @@ with tab2:
 # Tab 3: 1D Chain Experiments
 with tab3:
     st.markdown("""
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/1D-logo.png" width="80">
-            <h1 style="margin: 0;">1D Chain Experiments</h1>
+        <div style="display: flex; align-items: center; gap: 20px; padding: 20px 0;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/1D-logo.png" width="80" style="border-radius: 10px;">
+            <h1 style="margin: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">1D Chain Experiments</h1>
         </div>
     """, unsafe_allow_html=True)
     
