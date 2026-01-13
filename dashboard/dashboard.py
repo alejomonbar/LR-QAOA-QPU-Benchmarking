@@ -244,13 +244,6 @@ st.markdown("""
         background: linear-gradient(90deg, transparent, #dee2e6, transparent);
     }
     
-    [data-testid="stSidebar"] img {
-        background: transparent !important;
-        border-radius: 8px;
-        padding: 0.5rem 0;
-        filter: brightness(0) saturate(100%) invert(29%) sepia(53%) saturate(1567%) hue-rotate(225deg) brightness(95%) contrast(91%);
-    }
-    
     [data-testid="stSidebar"] a {
         color: #667eea;
         font-weight: 500;
@@ -372,11 +365,11 @@ with st.sidebar:
         ">LR-QAOA QPU Benchmarking</h1>
     """, unsafe_allow_html=True)
     
-    # Logo below title - centered and smaller
-    if logo_path.exists():
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.image(str(logo_path), use_column_width=True)
+    # Logo removed temporarily - needs transparent background version
+    # if logo_path.exists():
+    #     col1, col2, col3 = st.columns([1, 2, 1])
+    #     with col2:
+    #         st.image(str(logo_path), use_column_width=True)
     
     st.markdown("---")
     
