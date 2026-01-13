@@ -122,7 +122,7 @@ def compute_dataset_insights():
             vendor_map = {
                 "ibm": "IBM", "ionq": "IonQ", "iqm": "IQM", 
                 "h1": "Quantinuum", "h2": "Quantinuum", 
-                "aqt": "AQT", "rigetti": "Rigetti"
+                "aqt": "AQT", "rigetti": "Rigetti", "origin": "OriginQ"
             }
             
             def get_vendor(name):
@@ -166,6 +166,19 @@ def compute_dataset_insights():
                     ps = entries.get("p_values", [])
                     if ps:
                         max_depth = max(max_depth, max(ps))
+
+            # 3. Process 1D Data
+            one_d_path = data_dir / "1d_chain_processed.json"
+            if one_d_path.exists():
+                with open(one_d_path, "r") as f:
+                    one_d_data = json.load(f)
+                for q_key in ["5q", "100q"]:
+                    q_data = one_d_data.get(q_key, {})
+                    for b_name in q_data.keys():
+                        if "simulator" in b_name.lower():
+                            continue
+                        unique_qpus.add(get_base_name(b_name))
+                        vendors.add(get_vendor(b_name))
 
             if not unique_qpus:
                 return None
@@ -269,10 +282,10 @@ with st.sidebar:
     st.markdown("""
     ### Key Features
     
-    - 🔬 **24 processors** from 6 vendors
-    - 📊 **Up to 156 qubits**
-    - 📈 **Up to 10,000 layers**
+    - � **Up to 156 qubits** tested per device
+    - 📈 **Up to 10,000 QAOA layers** in depth scaling
     - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
+    - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL)
     """)
     
     st.markdown("---")
@@ -672,9 +685,9 @@ with tab2:
         "ibm_marrakesh-f": "#ffed6f", "ibm_aachen-f": "#e41a1c",
         "ibm_kingston-f": "#377eb8", "ibm_boston-f": "#984ea3",
         # IQM devices
-        "iqm_garnet": "#fb8072", "iqm_emerald": "#80b1d3",
-        # Rigetti
-        "rigetti_ankaa_3": "#fccde5"
+        "iqm_garnet": "#fb8072", "iqm_emerald": "#80b1d3", "iqm_emerald_NL": "#377eb8",
+        # Rigetti and IonQ and OriginQ
+        "rigetti_ankaa_3": "#fccde5", "ionq_forte_enterprise": "#ccebc5", "originq_wukong": "#ffed6f"
     }
     
     markers_nl = {
@@ -688,9 +701,10 @@ with tab2:
         "ibm_fez": "triangle-up", "ibm_fez-f": "star",
         "ibm_marrakesh-f": "circle-open", "ibm_aachen-f": "triangle-down",
         "ibm_kingston-f": "triangle-down", "ibm_boston-f": "circle",
-        # IQM and Rigetti
-        "iqm_garnet": "diamond-open", "iqm_emerald": "circle",
-        "rigetti_ankaa_3": "diamond-tall"
+        # IQM, Rigetti, IonQ, OriginQ
+        "iqm_garnet": "diamond-open", "iqm_emerald": "circle", "iqm_emerald_NL": "triangle-up",
+        "rigetti_ankaa_3": "diamond-tall", "ionq_forte_enterprise": "triangle-down",
+        "originq_wukong": "star"
     }
     
     linestyles_nl = {
@@ -704,7 +718,7 @@ with tab2:
     fig_nl = go.Figure()
     
     backend_order_nl = [
-        "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald",
+        "iqm_garnet", "rigetti_ankaa_3", "iqm_emerald", "iqm_emerald_NL", "ionq_forte_enterprise", "originq_wukong",
         # 127q Eagle devices
         "ibm_brisbane", "ibm_brussels", "ibm_kyiv", "ibm_kyoto", "ibm_nazca", "ibm_osaka", "ibm_sherbrooke", "ibm_strasbourg",
         # 133q Heron-r1 devices
