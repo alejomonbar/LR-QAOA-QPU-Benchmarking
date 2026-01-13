@@ -358,7 +358,7 @@ with st.sidebar:
             background-size: 80%;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 80px 20px;
+            padding: 40px 20px;
             border-radius: 12px;
             margin: 1rem 0;
             display: flex;
