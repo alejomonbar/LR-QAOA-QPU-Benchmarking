@@ -427,8 +427,8 @@ with st.sidebar:
     st.markdown("""
     ### Reference
 
-    J. A. Montanez-Barrera, Kristel Michielsen, David E. Bernal Neira (2025).  
-    [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
+    [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)  
+    J. A. Montanez-Barrera, Kristel Michielsen, David E. Bernal Neira (2025)
     """)
     
     st.markdown("---")
