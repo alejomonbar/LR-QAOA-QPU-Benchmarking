@@ -361,19 +361,30 @@ with st.sidebar:
             padding: 60px 20px;
             border-radius: 12px;
             margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         ">
-            <h1 style="
-                text-align: center;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                font-weight: 700;
-                font-size: 1.8rem;
-                margin: 0;
-                letter-spacing: -0.3px;
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-            ">LR-QAOA QPU Benchmarking</h1>
+            <div style="
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 12px;
+                padding: 20px 30px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                border: 2px solid rgba(102, 126, 234, 0.3);
+            ">
+                <h1 style="
+                    text-align: center;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    font-weight: 700;
+                    font-size: 1.8rem;
+                    margin: 0;
+                    letter-spacing: -0.3px;
+                ">LR-QAOA QPU Benchmarking</h1>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
