@@ -274,16 +274,33 @@ st.markdown("""
 
 # Main content area with title
 st.markdown("""
-    <h1 style="
-        text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 700;
-        font-size: 3rem;
+    <div style="
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 20px;
+        padding: 40px 30px;
         margin-bottom: 2rem;
-    ">LR-QAOA QPU Benchmarking Results</h1>
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    ">
+        <h1 style="
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: -0.5px;
+        ">LR-QAOA QPU Benchmarking Results</h1>
+        <p style="
+            text-align: center;
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-top: 12px;
+            margin-bottom: 0;
+        ">Large-scale quantum processor performance evaluation</p>
+    </div>
 """, unsafe_allow_html=True)
 
 # Sidebar with description and summary
