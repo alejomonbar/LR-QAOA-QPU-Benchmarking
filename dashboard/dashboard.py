@@ -299,9 +299,12 @@ tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 
 
 # Tab 1: Fully Connected Experiments
 with tab1:
-    if fc_logo.exists():
-        st.image(str(fc_logo), width=200)
-    st.header("Fully Connected Graph Experiments")
+    st.markdown("""
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/FC-logo.png" width="80">
+            <h1 style="margin: 0;">Fully Connected Graph Experiments</h1>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     Effective approximation ratio vs number of qubits for fully connected graphs.
@@ -620,9 +623,12 @@ with tab1:
 
 # Tab 2: Native Layout Experiments
 with tab2:
-    if nl_logo.exists():
-        st.image(str(nl_logo), width=200)
-    st.header("Native Layout Experiments")
+    st.markdown("""
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/NL-logo.png" width="80">
+            <h1 style="margin: 0;">Native Layout Experiments</h1>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
@@ -929,9 +935,12 @@ with tab2:
 
 # Tab 3: 1D Chain Experiments
 with tab3:
-    if one_d_logo.exists():
-        st.image(str(one_d_logo), width=200)
-    st.header("1D Chain Experiments")
+    st.markdown("""
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <img src="https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/1D-logo.png" width="80">
+            <h1 style="margin: 0;">1D Chain Experiments</h1>
+        </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
     Approximation ratio vs QAOA layers (p) for 1D chain graphs at different scales.
