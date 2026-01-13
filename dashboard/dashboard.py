@@ -102,6 +102,30 @@ with st.sidebar:
     
     st.markdown("---")
     
+    # Dataset facts in sidebar
+    st.markdown("### 📈 Dataset Insights")
+    try:
+        # Load FC data to compute facts
+        from collections import defaultdict
+        _r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
+        
+        # Compute facts
+        num_qpus = len(_fc_data_tmp)
+        vendors = set(backend.split("_")[0] for backend in _fc_data_tmp.keys())
+        max_depth = max((max(data["p_values"]) for data in _fc_data_tmp.values()), default=0)
+        quantinuum_backends = [b for b in _fc_data_tmp.keys() if b.startswith("quantinuum_")]
+        
+        st.markdown(f"- **{num_qpus}** quantum processors tested")
+        st.markdown(f"- **{len(vendors)}** vendors: {', '.join(sorted(vendors))}")
+        if max_depth:
+            st.markdown(f"- Max depth: **{max_depth}** QAOA layers")
+        if quantinuum_backends:
+            st.markdown(f"- Includes **{len(quantinuum_backends)}** Quantinuum systems")
+    except:
+        pass
+    
+    st.markdown("---")
+    
     st.caption("Developed by the Quantum Optimization Team")
 
 # Main content area with title
@@ -265,15 +289,6 @@ def compute_fc_interesting_facts(fc_data: dict) -> list[str]:
         facts.append(f"Note: {', '.join(sorted(quantinuum_backends))} are Quantinuum systems")
     return facts
 
-
-# Compact dataset snapshot (derived from the same processed JSON used by plots)
-_r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
-_facts = compute_fc_interesting_facts(_fc_data_tmp)
-if _facts:
-    st.subheader("Interesting facts (from the plotted data)")
-    st.caption("Quick snapshot from the processed dataset currently loaded by this dashboard.")
-    st.markdown("\n".join([f"- {fact}" for fact in _facts]))
-    st.markdown("---")
 
 # Create tabs with icons
 tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 1D Chain"])
