@@ -248,7 +248,7 @@ st.markdown("""
         background: transparent !important;
         border-radius: 8px;
         padding: 0.5rem 0;
-        mix-blend-mode: multiply;
+        filter: brightness(0) saturate(100%) invert(29%) sepia(53%) saturate(1567%) hue-rotate(225deg) brightness(95%) contrast(91%);
     }
     
     [data-testid="stSidebar"] a {
