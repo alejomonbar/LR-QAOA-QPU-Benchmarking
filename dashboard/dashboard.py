@@ -365,11 +365,11 @@ with st.sidebar:
         ">LR-QAOA QPU Benchmarking</h1>
     """, unsafe_allow_html=True)
     
-    # Logo removed temporarily - needs transparent background version
-    # if logo_path.exists():
-    #     col1, col2, col3 = st.columns([1, 2, 1])
-    #     with col2:
-    #         st.image(str(logo_path), use_column_width=True)
+    # Logo below title - centered and smaller
+    if logo_path.exists():
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.image(str(logo_path), use_column_width=True)
     
     st.markdown("---")
     
