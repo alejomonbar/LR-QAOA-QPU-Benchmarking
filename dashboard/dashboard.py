@@ -379,13 +379,13 @@ with tab1:
     if timeline_data:
         # Define vendor color palette
         vendor_colors = {
-            "aqt": "#FF6B35",      # Orange-red
-            "ibm": "#4A90E2",      # Blue
-            "ionq": "#7B68EE",     # Medium slate blue
-            "quantinuum": "#50C878", # Emerald green
-            "iqm": "#E63946",      # Red
-            "rigetti": "#9B59B6",  # Purple
-            "originq": "#F39C12"   # Orange
+            "aqt": "#FF4500",      # Vibrant orange-red
+            "ibm": "#00A8E1",      # Bright cyan-blue
+            "ionq": "#9D4EDD",     # Vivid purple
+            "quantinuum": "#06D6A0", # Bright teal-green
+            "iqm": "#EF476F",      # Hot pink-red
+            "rigetti": "#7209B7",  # Deep vibrant purple
+            "originq": "#FFB627"   # Golden yellow
         }
         
         def get_vendor_color(backend_name):
@@ -411,7 +411,7 @@ with tab1:
                     symbol=markers_map.get(item["backend"], "circle"),
                     size=14,
                     color=vendor_color,
-                    line=dict(color='white', width=2)
+                    line=dict(color='black', width=2)
                 ),
                 hovertemplate='<b>%{fullData.name}</b><br>' +
                               'Date: %{x|%Y-%m-%d}<br>' +
