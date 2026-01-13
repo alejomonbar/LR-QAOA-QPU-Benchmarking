@@ -296,7 +296,7 @@ with st.sidebar:
     - 📊 **QPUs with up to 156 qubits** tested
     - 📈 **Up to 10,000 QAOA layers** in depth scaling
     - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
-    - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL)
+    - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL/1D)
     """)
     
     st.markdown("---")
