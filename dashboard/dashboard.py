@@ -334,7 +334,7 @@ with tab1:
     colors_map = {
         "aqt_ibexq1": "#e41a1c", "ibm_boston": "#e41a1c", "ionq_forte": "#8dd3c7",
         "ibm_torino": "#fdb462", "ibm_brisbane": "#bebada", "H1-1E": "#fb8072",
-        "qasm_simulator": "#80b1d3", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
+        "qasm_simulator": "#2E8B57", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
         "H2-1": "#fccde5", "ionq_aria_2": "#d9d9d9", "ionq_harmony": "#bc80bd",
         "ionq_forte_enterprise": "#ccebc5", "ibm_marrakesh": "#ffed6f",
         "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8"
@@ -402,8 +402,17 @@ with tab1:
             vendor = get_vendor_name(backend_name)
             return vendor_colors.get(vendor, "#808080")
         
-        # Sort timeline data by vendor then by backend name
-        timeline_data_sorted = sorted(timeline_data, key=lambda x: (get_vendor_name(x["backend"]), x["backend"]))
+        # Calculate max qubits per vendor for sorting
+        vendor_max_qubits = {}
+        for item in timeline_data:
+            vendor = get_vendor_name(item["backend"])
+            if vendor not in vendor_max_qubits:
+                vendor_max_qubits[vendor] = item["max_qubits"]
+            else:
+                vendor_max_qubits[vendor] = max(vendor_max_qubits[vendor], item["max_qubits"])
+        
+        # Sort timeline data by vendor's max qubits (descending), then by backend name
+        timeline_data_sorted = sorted(timeline_data, key=lambda x: (-vendor_max_qubits.get(get_vendor_name(x["backend"]), 0), x["backend"]))
         
         # Create timeline plot
         fig_timeline = go.Figure()
