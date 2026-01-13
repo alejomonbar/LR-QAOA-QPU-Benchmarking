@@ -256,7 +256,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Main content area with title
-st.title("📊 Benchmarking Results")
+st.markdown("""
+    <h1 style="
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 3rem;
+        margin-bottom: 2rem;
+    ">LR-QAOA QPU Benchmarking Results</h1>
+""", unsafe_allow_html=True)
 
 # Sidebar with description and summary
 with st.sidebar:
