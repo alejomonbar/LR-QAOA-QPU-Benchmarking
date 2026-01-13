@@ -300,7 +300,7 @@ tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 
 # Tab 1: Fully Connected Experiments
 with tab1:
     if fc_logo.exists():
-        st.image(str(fc_logo), width=350)
+        st.image(str(fc_logo), width=200)
     st.header("Fully Connected Graph Experiments")
     
     st.markdown("""
@@ -621,7 +621,7 @@ with tab1:
 # Tab 2: Native Layout Experiments
 with tab2:
     if nl_logo.exists():
-        st.image(str(nl_logo), width=350)
+        st.image(str(nl_logo), width=200)
     st.header("Native Layout Experiments")
     
     st.markdown("""
@@ -930,7 +930,7 @@ with tab2:
 # Tab 3: 1D Chain Experiments
 with tab3:
     if one_d_logo.exists():
-        st.image(str(one_d_logo), width=350)
+        st.image(str(one_d_logo), width=200)
     st.header("1D Chain Experiments")
     
     st.markdown("""
