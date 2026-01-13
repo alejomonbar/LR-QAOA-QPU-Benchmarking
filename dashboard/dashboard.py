@@ -426,14 +426,15 @@ with st.sidebar:
     
     st.markdown("""
     ### Reference
-    
-    📄 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
+
+    J. A. Montanez-Barrera, Kristel Michielsen, David E. Bernal Neira (2025).  
+    [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
     """)
     
     st.markdown("---")
 
     st.caption("Developed by Alejandro Montanez-Barrera")
-    st.caption("Institute for Advanced Simulation (IAS), Jülich Supercomputing Centre (JSC), Forschungszentrum Jülich")
+    st.caption("Jülich Supercomputing Centre (JSC), Forschungszentrum Jülich")
     st.caption("Website: [alejomonbar.github.io](https://alejomonbar.github.io)")
     st.caption("LR-QAOA • Quantum optimization • QPU benchmarking")
 
