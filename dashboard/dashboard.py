@@ -7,38 +7,105 @@ from collections import defaultdict
 import json
 
 # Set page configuration
-# Prefer using bundled logo as page icon when available
 logo_path = Path(__file__).parent / "Logo.png"
 st.set_page_config(
     page_title="LR-QAOA QPU Benchmarking",
-    page_icon=str(logo_path) if logo_path.exists() else "LR",
+    page_icon=str(logo_path) if logo_path.exists() else "🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Title and description with logo
-col1, col2 = st.columns([1, 10])
-with col1:
-    if logo_path.exists():
-        st.image(str(logo_path), width=100, use_column_width=False)
-with col2:
-    st.title("LR-QAOA QPU Benchmarking Dashboard")
-
+# Custom CSS for improved tab styling
 st.markdown("""
-### Benchmarking Linear Ramp QAOA on Quantum Processing Units
+<style>
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: #f8f9fa;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        background-color: white;
+        border-radius: 6px;
+        padding: 0px 24px;
+        font-weight: 500;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #1f77b4 !important;
+        color: white !important;
+        border: 1px solid #1f77b4 !important;
+    }
+    
+    /* Main content styling */
+    .main .block-container {
+        padding-top: 2rem;
+        max-width: 100%;
+    }
+    
+    /* Card-like sections */
+    div[data-testid="stExpander"] {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 4px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-This dashboard uses LR-QAOA — a fixed-parameter, deterministic "Linear Ramp" variant of QAOA — to quantify a QPU's
-ability to preserve coherent signal as circuit depth increases and to identify when performance becomes
-statistically indistinguishable from random sampling. The protocol scales to large width and depth, enabling
-cross-platform comparisons of algorithmic performance.
+# Sidebar with description and summary
+with st.sidebar:
+    # Logo at top
+    if logo_path.exists():
+        st.image(str(logo_path), use_column_width=True)
+    
+    st.title("LR-QAOA QPU Benchmarking")
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### About
+    
+    This dashboard benchmarks **Linear Ramp QAOA (LR-QAOA)** — a fixed-parameter, deterministic variant of QAOA 
+    that quantifies a QPU's ability to preserve coherent signal as circuit depth increases.
+    
+    The protocol scales to large width and depth, enabling cross-platform comparisons of algorithmic performance.
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### Key Features
+    
+    - 🔬 **24 processors** from 6 vendors
+    - 📊 **Up to 156 qubits**
+    - 📈 **Up to 10,000 layers**
+    - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### Reference
+    
+    📄 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
+    """)
+    
+    st.markdown("---")
+    
+    st.caption("Developed by the Quantum Optimization Team")
 
-We apply LR-QAOA across 24 processors from six vendors, testing problems up to 156 qubits and circuits up to 10,000 layers
-across 1D chains, native layouts, and fully connected topologies.
-
-**Reference:** [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
-
----
-""")
+# Main content area with title
+st.title("📊 Benchmarking Results")
 
 # Function to load 1D chain results
 @st.cache_data(ttl=600)  # Cache for 10 minutes
@@ -208,19 +275,12 @@ if _facts:
     st.markdown("\n".join([f"- {fact}" for fact in _facts]))
     st.markdown("---")
 
-# Create tabs
-tab1, tab2, tab3 = st.tabs(["Fully Connected", "Native Layout", "1D Chain"])
+# Create tabs with icons
+tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 1D Chain"])
 
 # Tab 1: Fully Connected Experiments
 with tab1:
-    # Add logo for FC experiments
-    col_logo, col_header = st.columns([1, 10])
-    with col_logo:
-        fc_logo_path = Path(__file__).parent / "FC-logo.png"
-        if fc_logo_path.exists():
-            st.image(str(fc_logo_path), width=120, use_column_width=False)
-    with col_header:
-        st.header("Fully Connected Graph Experiments")
+    st.header("Fully Connected Graph Experiments")
     
     st.markdown("""
     Effective approximation ratio vs number of qubits for fully connected graphs.
@@ -539,14 +599,7 @@ with tab1:
 
 # Tab 2: Native Layout Experiments
 with tab2:
-    # Add logo for NL experiments
-    col_logo, col_header = st.columns([1, 10])
-    with col_logo:
-        nl_logo_path = Path(__file__).parent / "NL-logo.png"
-        if nl_logo_path.exists():
-            st.image(str(nl_logo_path), width=120, use_column_width=False)
-    with col_header:
-        st.header("Native Layout Experiments")
+    st.header("Native Layout Experiments")
     
     st.markdown("""
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
@@ -853,14 +906,7 @@ with tab2:
 
 # Tab 3: 1D Chain Experiments
 with tab3:
-    # Add logo for 1D Chain experiments
-    col_logo, col_header = st.columns([1, 10])
-    with col_logo:
-        chain_logo_path = Path(__file__).parent / "1D-logo.png"
-        if chain_logo_path.exists():
-            st.image(str(chain_logo_path), width=120, use_column_width=False)
-    with col_header:
-        st.header("1D Chain Experiments")
+    st.header("1D Chain Experiments")
     
     st.markdown("""
     Approximation ratio vs QAOA layers (p) for 1D chain graphs at different scales.
