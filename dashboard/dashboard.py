@@ -279,10 +279,21 @@ with st.sidebar:
     
     st.markdown("---")
     
-    st.markdown("""
+    # Get dataset insights
+    insights = compute_dataset_insights()
+    
+    if insights:
+        vendors_text = f"{insights['vendors']} vendors ({insights['vendor_list']})"
+        qpus_text = f"{insights['qpus']} quantum processors"
+    else:
+        vendors_text = "7 vendors (AQT, IBM, IonQ, IQM, OriginQ, Quantinuum, Rigetti)"
+        qpus_text = "29 quantum processors"
+    
+    st.markdown(f"""
     ### Key Features
     
-    - 🔬 **QPUs with up to 156 qubits** tested
+    - 🔬 **{qpus_text}** from **{vendors_text}**
+    - 📊 **QPUs with up to 156 qubits** tested
     - 📈 **Up to 10,000 QAOA layers** in depth scaling
     - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
     - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL)
@@ -295,20 +306,6 @@ with st.sidebar:
     
     📄 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
     """)
-    
-    st.markdown("---")
-    
-    # Dataset facts in sidebar
-    st.markdown("### 📈 Dataset Insights")
-    insights = compute_dataset_insights()
-    
-    if insights:
-        st.markdown(f"- **{insights['qpus']}** quantum processors tested")
-        st.markdown(f"- **{insights['vendors']}** vendors ({insights['vendor_list']})")
-    else:
-        # Fallback to hardcoded values if dynamic loading fails
-        st.markdown("- **18** quantum processors tested")
-        st.markdown("- **5** vendors (IBM, IonQ, Quantinuum, IQM, AQT)")
     
     st.markdown("---")
     
