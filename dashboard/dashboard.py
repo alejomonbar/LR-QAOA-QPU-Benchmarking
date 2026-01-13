@@ -6,135 +6,6 @@ from pathlib import Path
 from collections import defaultdict
 import json
 
-# Set page configuration
-logo_path = Path(__file__).parent / "Logo.png"
-fc_logo = Path(__file__).parent / "FC-logo.png"
-nl_logo = Path(__file__).parent / "NL-logo.png"
-one_d_logo = Path(__file__).parent / "1D-logo.png"
-
-st.set_page_config(
-    page_title="LR-QAOA QPU Benchmarking",
-    page_icon=str(logo_path) if logo_path.exists() else "🔬",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# Custom CSS for improved tab styling
-st.markdown("""
-<style>
-    /* Sidebar styling */
-    [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
-    }
-    
-    /* Tab styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 8px;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        background-color: white;
-        border-radius: 6px;
-        padding: 0px 24px;
-        font-weight: 500;
-        border: 1px solid #e0e0e0;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background-color: #1f77b4 !important;
-        color: white !important;
-        border: 1px solid #1f77b4 !important;
-    }
-    
-    /* Main content styling */
-    .main .block-container {
-        padding-top: 2rem;
-        max-width: 100%;
-    }
-    
-    /* Card-like sections */
-    div[data-testid="stExpander"] {
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 4px;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Sidebar with description and summary
-with st.sidebar:
-    # Logo at top
-    if logo_path.exists():
-        st.image(str(logo_path), use_column_width=True)
-    
-    st.title("LR-QAOA QPU Benchmarking")
-    
-    st.markdown("---")
-    
-    st.markdown("""
-    ### About
-    
-    This dashboard benchmarks **Linear Ramp QAOA (LR-QAOA)** — a fixed-parameter, deterministic variant of QAOA 
-    that quantifies a QPU's ability to preserve coherent signal as circuit depth increases.
-    
-    The protocol scales to large width and depth, enabling cross-platform comparisons of algorithmic performance.
-    """)
-    
-    st.markdown("---")
-    
-    st.markdown("""
-    ### Key Features
-    
-    - 🔬 **24 processors** from 6 vendors
-    - 📊 **Up to 156 qubits**
-    - 📈 **Up to 10,000 layers**
-    - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
-    """)
-    
-    st.markdown("---")
-    
-    st.markdown("""
-    ### Reference
-    
-    📄 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
-    """)
-    
-    st.markdown("---")
-    
-    # Dataset facts in sidebar
-    st.markdown("### 📈 Dataset Insights")
-    try:
-        # Load FC data to compute facts
-        from collections import defaultdict
-        _r_tmp, _backends_tmp, _debug_tmp, _fc_data_tmp = load_fc_results()
-        
-        # Compute facts
-        num_qpus = len(_fc_data_tmp)
-        vendors = set(backend.split("_")[0] for backend in _fc_data_tmp.keys())
-        max_depth = max((max(data["p_values"]) for data in _fc_data_tmp.values()), default=0)
-        quantinuum_backends = [b for b in _fc_data_tmp.keys() if b.startswith("quantinuum_")]
-        
-        st.markdown(f"- **{num_qpus}** quantum processors tested")
-        st.markdown(f"- **{len(vendors)}** vendors: {', '.join(sorted(vendors))}")
-        if max_depth:
-            st.markdown(f"- Max depth: **{max_depth}** QAOA layers")
-        if quantinuum_backends:
-            st.markdown(f"- Includes **{len(quantinuum_backends)}** Quantinuum systems")
-    except:
-        pass
-    
-    st.markdown("---")
-    
-    st.caption("Developed by the Quantum Optimization Team")
-
-# Main content area with title
-st.title("📊 Benchmarking Results")
-
 # Function to load 1D chain results
 @st.cache_data(ttl=600)  # Cache for 10 minutes
 def load_1d_chain_results():
@@ -235,64 +106,202 @@ def load_fc_results():
     return r, backends, debug_info, fc_data
 
 
-def compute_fc_interesting_facts(fc_data: dict) -> list[str]:
-    """Compute compact dataset statistics from processed FC data"""
-    if not fc_data:
-        return []
-
-    # Vendor mapping
-    vendor_map = {
-        "ibm_brisbane": "IBM", "ibm_fez": "IBM", "ibm_boston": "IBM", "ibm_torino": "IBM", "ibm_marrakesh": "IBM",
-        "ionq_forte": "IonQ", "ionq_aria_2": "IonQ", "ionq_harmony": "IonQ", "ionq_forte_enterprise": "IonQ",
-        "iqm_garnet": "IQM", "iqm_emerald": "IQM",
-        "H1-1E": "Quantinuum", "H2-1": "Quantinuum", "H2-1E": "Quantinuum",
-        "aqt_ibexq1": "AQT",
-        "qasm_simulator": "Simulator"
-    }
-
-    num_qpus = 0
-    max_depth = 0
-    vendors = set()
-    quantinuum_backends = []
-
-    for backend_name, backend_entries in fc_data.items():
-        if not isinstance(backend_entries, dict):
-            continue
-        
-        # Count QPUs (exclude simulator)
-        if backend_name != "qasm_simulator":
-            num_qpus += 1
-        
-        # Track vendors
-        vendor = vendor_map.get(backend_name, "Other")
-        if vendor != "Simulator":
-            vendors.add(vendor)
-        
-        # Track Quantinuum backends
-        if vendor == "Quantinuum":
-            quantinuum_backends.append(backend_name)
-        
-        # Find max depth
-        for nq_str, record in backend_entries.items():
-            if not isinstance(record, dict):
-                continue
+def compute_dataset_insights():
+    """Compute combined statistics from all processed datasets"""
+    # Use st.cache_data for speed
+    @st.cache_data(ttl=600)
+    def _get_stats():
+        try:
+            # Current file is in dashboard/, Data/ is in root
+            data_dir = Path(__file__).parent.parent / "Data"
             
-            r_vs_p = record.get("r_vs_p") or {}
-            p_values = r_vs_p.get("p_values") or []
-            if p_values:
-                max_p = max(p_values)
-                if max_p > max_depth:
-                    max_depth = max_p
+            unique_qpus = set()
+            vendors = set()
+            max_depth = 0
+            
+            vendor_map = {
+                "ibm": "IBM", "ionq": "IonQ", "iqm": "IQM", 
+                "h1": "Quantinuum", "h2": "Quantinuum", 
+                "aqt": "AQT", "rigetti": "Rigetti"
+            }
+            
+            def get_vendor(name):
+                name_lower = name.lower()
+                for k, v in vendor_map.items():
+                    if k in name_lower:
+                        return v
+                return "Other"
 
-    facts = []
-    facts.append(f"Quantum processors tested: {num_qpus}")
-    facts.append(f"Vendors represented: {len(vendors)} ({', '.join(sorted(vendors))})")
-    if max_depth > 0:
-        facts.append(f"Largest experiment depth: {max_depth} QAOA layers")
-    if quantinuum_backends:
-        facts.append(f"Note: {', '.join(sorted(quantinuum_backends))} are Quantinuum systems")
-    return facts
+            def get_base_name(name):
+                return name.replace("-f", "").replace("-v0", "").replace("-v1", "").replace("_NL", "")
 
+            # 1. Process FC Data
+            fc_path = data_dir / "fc_processed.json"
+            if fc_path.exists():
+                with open(fc_path, "r") as f:
+                    fc_data = json.load(f)
+                for b_name, entries in fc_data.items():
+                    if b_name == "qasm_simulator" or not isinstance(entries, dict):
+                        continue
+                    unique_qpus.add(get_base_name(b_name))
+                    vendors.add(get_vendor(b_name))
+                    for nq_data in entries.values():
+                        if isinstance(nq_data, dict):
+                            r_vs_p = nq_data.get("r_vs_p", {})
+                            if isinstance(r_vs_p, dict) and r_vs_p:
+                                ps = r_vs_p.get("p_values", [])
+                                if ps:
+                                    max_depth = max(max_depth, max(ps))
+
+            # 2. Process NL Data
+            nl_path = data_dir / "native_layout_processed.json"
+            if nl_path.exists():
+                with open(nl_path, "r") as f:
+                    nl_data = json.load(f)
+                for b_name, entries in nl_data.items():
+                    if "simulator" in b_name.lower() or not isinstance(entries, dict):
+                        continue
+                    unique_qpus.add(get_base_name(b_name))
+                    vendors.add(get_vendor(b_name))
+                    ps = entries.get("p_values", [])
+                    if ps:
+                        max_depth = max(max_depth, max(ps))
+
+            if not unique_qpus:
+                return None
+                
+            return {
+                "qpus": len(unique_qpus),
+                "vendors": len(vendors),
+                "vendor_list": ", ".join(sorted(vendors)),
+                "max_depth": max_depth
+            }
+        except Exception:
+            return None
+            
+    return _get_stats()
+
+
+# Set page configuration
+logo_path = Path(__file__).parent / "Logo.png"
+fc_logo = Path(__file__).parent / "FC-logo.png"
+nl_logo = Path(__file__).parent / "NL-logo.png"
+one_d_logo = Path(__file__).parent / "1D-logo.png"
+
+st.set_page_config(
+    page_title="LR-QAOA QPU Benchmarking",
+    page_icon=str(logo_path) if logo_path.exists() else "🔬",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS for improved tab styling
+st.markdown("""
+<style>
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: #f8f9fa;
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        background-color: white;
+        border-radius: 6px;
+        padding: 0px 24px;
+        font-weight: 500;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background-color: #1f77b4 !important;
+        color: white !important;
+        border: 1px solid #1f77b4 !important;
+    }
+    
+    /* Main content styling */
+    .main .block-container {
+        padding-top: 2rem;
+        max-width: 100%;
+    }
+    
+    /* Card-like sections */
+    div[data-testid="stExpander"] {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 4px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Main content area with title
+st.title("📊 Benchmarking Results")
+
+# Sidebar with description and summary
+with st.sidebar:
+    # Logo at top
+    if logo_path.exists():
+        st.image(str(logo_path), use_column_width=True)
+    
+    st.title("LR-QAOA QPU Benchmarking")
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### About
+    
+    This dashboard benchmarks **Linear Ramp QAOA (LR-QAOA)** — a fixed-parameter, deterministic variant of QAOA 
+    that quantifies a QPU's ability to preserve coherent signal as circuit depth increases.
+    
+    The protocol scales to large width and depth, enabling cross-platform comparisons of algorithmic performance.
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### Key Features
+    
+    - 🔬 **24 processors** from 6 vendors
+    - 📊 **Up to 156 qubits**
+    - 📈 **Up to 10,000 layers**
+    - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
+    """)
+    
+    st.markdown("---")
+    
+    st.markdown("""
+    ### Reference
+    
+    📄 [*Evaluating the performance of quantum processing units at large width and depth*](https://arxiv.org/abs/2502.06471)
+    """)
+    
+    st.markdown("---")
+    
+    # Dataset facts in sidebar
+    st.markdown("### 📈 Dataset Insights")
+    insights = compute_dataset_insights()
+    
+    if insights:
+        st.markdown(f"- **{insights['qpus']}** quantum processors tested")
+        st.markdown(f"- **{insights['vendors']}** vendors ({insights['vendor_list']})")
+        if insights['max_depth'] > 0:
+            st.markdown(f"- Largest experiment: **p={insights['max_depth']}**")
+    else:
+        # Fallback to hardcoded values if dynamic loading fails
+        st.markdown("- **18** quantum processors tested")
+        st.markdown("- **5** vendors (IBM, IonQ, Quantinuum, IQM, AQT)")
+    
+    st.markdown("---")
+    
+    st.caption("Developed by the Quantum Optimization Team")
 
 # Create tabs with icons
 tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 1D Chain"])

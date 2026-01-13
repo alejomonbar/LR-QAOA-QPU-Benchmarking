@@ -18,6 +18,6 @@
     "iqm_garnet",
     "iqm_emerald"
   ],
-  "total_datapoints": 126,
+  "total_datapoints": 0,
   "description": "Effective approximation ratios for fully connected graphs with 3-sigma statistical filtering"
 }
