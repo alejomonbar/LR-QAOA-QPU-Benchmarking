@@ -216,27 +216,44 @@ st.markdown("""
         background-color: #f8f9fa;
     }
     
-    /* Tab styling */
+    /* Tab styling - centered and evenly distributed */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 12px;
         background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 8px;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
     .stTabs [data-baseweb="tab"] {
-        height: 50px;
+        flex: 1;
+        height: 55px;
         background-color: white;
-        border-radius: 6px;
-        padding: 0px 24px;
-        font-weight: 500;
-        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0px 32px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: #1f77b4 !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
-        border: 1px solid #1f77b4 !important;
+        border: 2px solid #667eea !important;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4) !important;
     }
     
     /* Main content styling */
