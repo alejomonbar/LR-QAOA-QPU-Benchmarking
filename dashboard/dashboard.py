@@ -401,7 +401,7 @@ with tab1:
             """Extract vendor from backend name and return color"""
             # Special case for qasm_simulator
             if backend_name == "qasm_simulator":
-                return "#708090"  # Slate gray - distinct from all vendor colors
+                return "#FFD700"  # Gold/yellow - distinct from all vendor colors
             vendor = get_vendor_name(backend_name)
             return vendor_colors.get(vendor, "#808080")
         
