@@ -8,6 +8,10 @@ import json
 
 # Set page configuration
 logo_path = Path(__file__).parent / "Logo.png"
+fc_logo = Path(__file__).parent / "FC-logo.png"
+nl_logo = Path(__file__).parent / "NL-logo.png"
+one_d_logo = Path(__file__).parent / "1D-logo.png"
+
 st.set_page_config(
     page_title="LR-QAOA QPU Benchmarking",
     page_icon=str(logo_path) if logo_path.exists() else "🔬",
@@ -295,6 +299,8 @@ tab1, tab2, tab3 = st.tabs(["🔗 Fully Connected", "🌐 Native Layout", "🔗 
 
 # Tab 1: Fully Connected Experiments
 with tab1:
+    if fc_logo.exists():
+        st.image(str(fc_logo), width=350)
     st.header("Fully Connected Graph Experiments")
     
     st.markdown("""
@@ -614,6 +620,8 @@ with tab1:
 
 # Tab 2: Native Layout Experiments
 with tab2:
+    if nl_logo.exists():
+        st.image(str(nl_logo), width=350)
     st.header("Native Layout Experiments")
     
     st.markdown("""
@@ -921,6 +929,8 @@ with tab2:
 
 # Tab 3: 1D Chain Experiments
 with tab3:
+    if one_d_logo.exists():
+        st.image(str(one_d_logo), width=350)
     st.header("1D Chain Experiments")
     
     st.markdown("""
