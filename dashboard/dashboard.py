@@ -417,9 +417,33 @@ with tab1:
         # Sort timeline data by vendor's max qubits (descending), then by backend name
         timeline_data_sorted = sorted(timeline_data, key=lambda x: (-vendor_max_qubits.get(get_vendor_name(x["backend"]), 0), x["backend"]))
         
+        # Group data by vendor for connecting lines
+        vendor_groups = {}
+        for item in timeline_data_sorted:
+            vendor = get_vendor_name(item["backend"])
+            if vendor not in vendor_groups:
+                vendor_groups[vendor] = []
+            vendor_groups[vendor].append(item)
+        
         # Create timeline plot
         fig_timeline = go.Figure()
         
+        # Add subtle connecting lines for each vendor
+        for vendor, items in vendor_groups.items():
+            if len(items) > 1:  # Only add line if vendor has multiple devices
+                items_sorted = sorted(items, key=lambda x: x["date"])
+                vendor_color = get_vendor_color(items[0]["backend"])
+                fig_timeline.add_trace(go.Scatter(
+                    x=[item["date"] for item in items_sorted],
+                    y=[item["max_qubits"] for item in items_sorted],
+                    mode='lines',
+                    line=dict(color=vendor_color, width=1, dash='dot'),
+                    opacity=0.3,
+                    showlegend=False,
+                    hoverinfo='skip'
+                ))
+        
+        # Add markers for each backend
         for item in timeline_data_sorted:
             vendor_color = get_vendor_color(item["backend"])
             fig_timeline.add_trace(go.Scatter(
