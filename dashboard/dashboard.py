@@ -520,27 +520,6 @@ with tab1:
     
 
     
-    # Add debug expander
-    with st.expander("Debug Information - Data Loading Status"):
-        for info in debug_info:
-            if info.startswith("OK "):
-                st.success(info)
-            elif info.startswith("WARN "):
-                st.warning(info)
-            elif info.startswith("ERR "):
-                st.error(info)
-            else:
-                st.info(info)
-        
-        # Show what backends have data
-        st.write("---")
-        st.write("**Backends with loaded data:**")
-        for backend in backends:
-            if backend in r_data and len(r_data[backend]) > 0:
-                st.write(f"✓ {backend}: {len(r_data[backend])} datapoints - qubits: {sorted(r_data[backend].keys())}")
-            else:
-                st.write(f"✗ {backend}: No data")
-    
     # Main plot: Effective Approximation Ratio vs Number of Qubits
     st.markdown("---")
     st.subheader("Scalability Analysis")
@@ -750,12 +729,6 @@ with tab2:
     Approximation ratio vs QAOA layers for hardware-native graph topologies.
     Testing large-scale IBM Eagle and Heron processors with native connectivity.
     """)
-    
-    # Add cache clear button in expander
-    with st.expander("🔧 Advanced Options"):
-        if st.button("Clear Cache & Reload Data", key="nl_clear_cache"):
-            st.cache_data.clear()
-            st.rerun()
     
     nl_data = load_nl_results()
     
@@ -1062,12 +1035,6 @@ with tab3:
     st.markdown("""
     Approximation ratio vs QAOA layers (p) for 1D chain graphs at different scales.
     """)
-    
-    # Add cache clear button in expander
-    with st.expander("🔧 Advanced Options"):
-        if st.button("Clear Cache & Reload Data"):
-            st.cache_data.clear()
-            st.rerun()
     
     chain_results = load_1d_chain_results()
     
