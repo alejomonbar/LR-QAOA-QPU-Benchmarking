@@ -355,7 +355,7 @@ with st.sidebar:
     st.markdown(f"""
         <div style="
             background-image: url('https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/Logo.png');
-            background-size: 70%;
+            background-size: 85%;
             background-position: center;
             background-repeat: no-repeat;
             padding: 60px 20px;
@@ -370,7 +370,7 @@ with st.sidebar:
                 background: rgba(245, 247, 250, 0.5);
                 backdrop-filter: blur(5px);
                 border-radius: 12px;
-                padding: 15px 25px;
+                padding: 8px 25px;
                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                 border: 1px solid rgba(102, 126, 234, 0.15);
             ">
