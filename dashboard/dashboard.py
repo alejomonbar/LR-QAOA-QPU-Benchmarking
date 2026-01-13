@@ -388,19 +388,27 @@ with tab1:
             "originq": "#FFB627"   # Golden yellow
         }
         
-        def get_vendor_color(backend_name):
-            """Extract vendor from backend name and return color"""
+        def get_vendor_name(backend_name):
+            """Extract vendor from backend name"""
             for vendor in vendor_colors:
                 if backend_name.lower().startswith(vendor):
-                    return vendor_colors[vendor]
+                    return vendor
                 if vendor in backend_name.lower().replace("_", "").replace("-", ""):
-                    return vendor_colors[vendor]
-            return "#808080"  # Gray fallback
+                    return vendor
+            return "other"
+        
+        def get_vendor_color(backend_name):
+            """Extract vendor from backend name and return color"""
+            vendor = get_vendor_name(backend_name)
+            return vendor_colors.get(vendor, "#808080")
+        
+        # Sort timeline data by vendor then by backend name
+        timeline_data_sorted = sorted(timeline_data, key=lambda x: (get_vendor_name(x["backend"]), x["backend"]))
         
         # Create timeline plot
         fig_timeline = go.Figure()
         
-        for item in timeline_data:
+        for item in timeline_data_sorted:
             vendor_color = get_vendor_color(item["backend"])
             fig_timeline.add_trace(go.Scatter(
                 x=[item["date"]],
