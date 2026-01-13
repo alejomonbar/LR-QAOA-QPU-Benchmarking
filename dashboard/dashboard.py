@@ -248,6 +248,7 @@ st.markdown("""
         background: transparent !important;
         border-radius: 8px;
         padding: 0.5rem 0;
+        mix-blend-mode: multiply;
     }
     
     [data-testid="stSidebar"] a {
