@@ -351,25 +351,31 @@ st.markdown("""
 # Sidebar with description and summary
 with st.sidebar:
     # Title first
-    st.markdown("""
-        <h1 style="
-            text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-            font-size: 1.8rem;
-            margin: 1.5rem 0 1rem 0;
-            letter-spacing: -0.3px;
-        ">LR-QAOA QPU Benchmarking</h1>
+    # Title first with logo as background
+    st.markdown(f"""
+        <div style="
+            background-image: url('https://raw.githubusercontent.com/alejomonbar/LR-QAOA-QPU-Benchmarking/main/dashboard/Logo.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 60px 20px;
+            border-radius: 12px;
+            margin: 1rem 0;
+        ">
+            <h1 style="
+                text-align: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-weight: 700;
+                font-size: 1.8rem;
+                margin: 0;
+                letter-spacing: -0.3px;
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            ">LR-QAOA QPU Benchmarking</h1>
+        </div>
     """, unsafe_allow_html=True)
-    
-    # Logo below title - centered and smaller
-    if logo_path.exists():
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.image(str(logo_path), use_column_width=True)
     
     st.markdown("---")
     
