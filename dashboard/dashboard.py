@@ -440,7 +440,7 @@ with tab1:
                     x=[item["date"] for item in items_sorted],
                     y=[item["max_qubits"] for item in items_sorted],
                     mode='lines',
-                    line=dict(color=vendor_color, width=1, dash='dot'),
+                    line=dict(color=vendor_color, width=1.5, dash='dot'),
                     opacity=0.3,
                     showlegend=False,
                     hoverinfo='skip'
