@@ -321,6 +321,8 @@ with st.sidebar:
     st.markdown("---")
 
     st.caption("Developed by Alejandro Montanez-Barrera")
+    st.caption("Institute for Advanced Simulation (IAS), Jülich Supercomputing Centre (JSC), Forschungszentrum Jülich")
+    st.caption("Website: [alejomonbar.github.io](https://alejomonbar.github.io)")
     st.caption("LR-QAOA • Quantum optimization • QPU benchmarking")
 
 # Create tabs with icons
