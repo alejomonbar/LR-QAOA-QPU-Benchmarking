@@ -211,9 +211,54 @@ st.set_page_config(
 # Custom CSS for improved tab styling
 st.markdown("""
 <style>
-    /* Sidebar styling */
+    /* Sidebar styling - enhanced */
     [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
+        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+        border-right: 2px solid #dee2e6;
+    }
+    
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 2rem;
+    }
+    
+    /* Sidebar section styling */
+    [data-testid="stSidebar"] .element-container {
+        background-color: transparent;
+    }
+    
+    [data-testid="stSidebar"] h3 {
+        color: #495057;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        padding: 8px 12px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    [data-testid="stSidebar"] hr {
+        margin: 1.5rem 0;
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+    }
+    
+    [data-testid="stSidebar"] a {
+        color: #667eea;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    [data-testid="stSidebar"] a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+    
+    [data-testid="stSidebar"] .stMarkdown {
+        font-size: 0.95rem;
+        line-height: 1.6;
     }
     
     /* Tab styling - centered and evenly distributed */
@@ -309,7 +354,19 @@ with st.sidebar:
     if logo_path.exists():
         st.image(str(logo_path), use_column_width=True)
     
-    st.title("LR-QAOA QPU Benchmarking")
+    st.markdown("""
+        <h1 style="
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 1rem 0;
+            letter-spacing: -0.3px;
+        ">LR-QAOA QPU Benchmarking</h1>
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     
