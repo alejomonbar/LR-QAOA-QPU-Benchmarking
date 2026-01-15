@@ -478,7 +478,7 @@ with tab1:
 
     # Show QPU capabilities over time
     st.subheader("QPU Capabilities Timeline")
-    st.markdown("Maximum qubit count per backend and when experiments were conducted.")
+    st.markdown("Maximum qubit count per backend that passed the fully connected test, and when those experiments were conducted.")
     
     # Collect max qubits and file dates for each backend from JSON
     timeline_data = []
