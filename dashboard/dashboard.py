@@ -64,7 +64,8 @@ def load_fc_results():
         "aqt_ibexq1", "ibm_brisbane", "ibm_fez", "ibm_boston",
         "H1-1E", "qasm_simulator", "H2-1E", "H2-1",
         "ionq_forte", "ionq_aria_2", "ionq_harmony", "ibm_torino",
-        "ionq_forte_enterprise", "ibm_marrakesh", "iqm_garnet", "iqm_emerald"
+        "ionq_forte_enterprise", "ibm_marrakesh", "iqm_garnet", "iqm_emerald",
+        "quantinuum_helios_1"
     ]
     
     r = defaultdict(dict)
@@ -464,7 +465,8 @@ with tab1:
         "qasm_simulator": "#8A2BE2", "H2-1E": "#fdb462", "ibm_fez": "#b3de69",
         "H2-1": "#fccde5", "ionq_aria_2": "#d9d9d9", "ionq_harmony": "#bc80bd",
         "ionq_forte_enterprise": "#ccebc5", "ibm_marrakesh": "#ffed6f",
-        "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8"
+        "iqm_garnet": "#b3de69", "iqm_emerald": "#377eb8",
+        "quantinuum_helios_1": "#06D6A0"
     }
     
     markers_map = {
@@ -473,7 +475,8 @@ with tab1:
         "qasm_simulator": "circle", "H2-1E": "x", "ibm_fez": "diamond-open",
         "H2-1": "triangle-right", "ionq_aria_2": "triangle-left", "ionq_harmony": "square",
         "ibm_marrakesh": "circle-open", "ionq_forte_enterprise": "triangle-down",
-        "iqm_garnet": "square", "iqm_emerald": "triangle-up"
+        "iqm_garnet": "square", "iqm_emerald": "triangle-up",
+        "quantinuum_helios_1": "circle"
     }
 
     # Show QPU capabilities over time
