@@ -16,8 +16,9 @@
     "ionq_forte_enterprise",
     "ibm_marrakesh",
     "iqm_garnet",
-    "iqm_emerald"
+    "iqm_emerald",
+    "quantinuum_helios_1"
   ],
-  "total_datapoints": 0,
+  "total_datapoints": 129,
   "description": "Effective approximation ratios for fully connected graphs with 3-sigma statistical filtering"
 }

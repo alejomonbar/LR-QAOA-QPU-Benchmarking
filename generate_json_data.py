@@ -30,14 +30,16 @@ def process_fc_experiments():
         "ionq_forte_enterprise": [5,7,10,13,15,17,20,23,25,27,28,29,30],
         "ibm_marrakesh": [10,15,17,20],
         "iqm_emerald": [5,7,10,12,15],
-        "aqt_ibexq1": [5,6,7,10,12]
+        "aqt_ibexq1": [5,6,7,10,12],
+        "quantinuum_helios_1": [50,75,85]
     }
     
     backends = [
         "aqt_ibexq1", "ibm_brisbane", "ibm_fez", "ibm_boston",
         "H1-1E", "qasm_simulator", "H2-1E", "H2-1",
         "ionq_forte", "ionq_aria_2", "ionq_harmony", "ibm_torino",
-        "ionq_forte_enterprise", "ibm_marrakesh", "iqm_garnet", "iqm_emerald"
+        "ionq_forte_enterprise", "ibm_marrakesh", "iqm_garnet", "iqm_emerald",
+        "quantinuum_helios_1"
     ]
     
     # Load HPC results
