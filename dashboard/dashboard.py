@@ -55,7 +55,7 @@ def load_nl_results():
 
 
 # Function to load fully connected results
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+@st.cache_data(ttl=60)  # Cache for 60 seconds
 def load_fc_results():
     """Load fully connected experiment results from JSON"""
     data_dir = Path(__file__).parent.parent / "Data"
@@ -457,6 +457,14 @@ with tab1:
     """)
     
     r_data, backends, debug_info, fc_data = load_fc_results()
+    
+    # Debug: Show loaded backends
+    with st.expander("🔍 Debug: Loaded Data"):
+        st.write(f"**Backends in config:** {len(backends)}")
+        st.write(f"**Backends with data:** {list(fc_data.keys())}")
+        st.write(f"**Quantinuum Helios-1 in data:** {'quantinuum_helios_1' in fc_data}")
+        if 'quantinuum_helios_1' in fc_data:
+            st.write(f"**Helios-1 qubit counts:** {list(fc_data['quantinuum_helios_1'].keys())}")
 
     # Define colors and markers
     colors_map = {
