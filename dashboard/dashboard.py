@@ -611,7 +611,7 @@ with tab1:
                 font=dict(size=10)
             ),
             template="plotly_white",
-            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56]),
+            yaxis=dict(tickvals=[5, 10, 15, 20, 25, 30, 40, 50, 56, 75, 85]),
             margin=dict(r=150)
         )
         
@@ -654,7 +654,7 @@ with tab1:
         xaxis_title="Number of Qubits",
         yaxis_title="Effective Approximation Ratio (r_eff)",
         yaxis_type="log",
-        xaxis=dict(tickvals=[5,10,15,20,25,30,40,50,56]),
+        xaxis=dict(tickvals=[5,10,15,20,25,30,40,50,56,75,85]),
         yaxis=dict(tickvals=[0.01, 0.1, 1], ticktext=["0.01", "0.1", "1"]),
         hovermode='closest',
         height=600,
