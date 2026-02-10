@@ -209,6 +209,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Google Analytics integration
+st.markdown("""
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+""", unsafe_allow_html=True)
+
 # Custom CSS for improved tab styling
 st.markdown("""
 <style>
@@ -420,7 +432,6 @@ with st.sidebar:
     - 📊 **QPUs with up to 156 qubits** tested
     - 📈 **Up to 10,000 QAOA layers** in depth scaling
     - 🌐 **3 topologies**: 1D chains, native layouts, fully connected
-    - 🏆 **Best performers**: Quantinuum H1-1E (FC), IBM Boston (NL/1D)
     """)
     
     st.markdown("---")
@@ -435,7 +446,6 @@ with st.sidebar:
     st.markdown("---")
 
     st.caption("Developed by Alejandro Montanez-Barrera")
-    st.caption("Jülich Supercomputing Centre (JSC), Forschungszentrum Jülich")
     st.caption("Website: [alejomonbar.github.io](https://alejomonbar.github.io)")
     st.caption("LR-QAOA • Quantum optimization • QPU benchmarking")
 
@@ -531,7 +541,7 @@ with tab1:
                     return vendor
                 if vendor in backend_name.lower().replace("_", "").replace("-", ""):
                     return vendor
-            return "other"
+            return ""
         
         def get_vendor_color(backend_name):
             """Extract vendor from backend name and return color"""
