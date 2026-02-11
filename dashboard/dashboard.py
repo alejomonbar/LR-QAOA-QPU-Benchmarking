@@ -210,16 +210,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Google Analytics integration using components
-GA_TRACKING_ID = "G-SK72N3Q0R5"
-components.html(f"""
+# Google Analytics integration
+components.html("""
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SK72N3Q0R5"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
+  function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', '{GA_TRACKING_ID}');
+
+  gtag('config', 'G-SK72N3Q0R5');
 </script>
 """, height=0)
 
