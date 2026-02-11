@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
@@ -209,17 +210,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Google Analytics integration
-st.markdown("""
+# Google Analytics integration using components
+GA_TRACKING_ID = "G-SK72N3Q0R5"
+components.html(f"""
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag(){{dataLayer.push(arguments);}}
   gtag('js', new Date());
-  gtag('config', 'G-SK72N3Q0R5');
+  gtag('config', '{GA_TRACKING_ID}');
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 # Custom CSS for improved tab styling
 st.markdown("""
