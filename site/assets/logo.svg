@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Hexagon tile as in the graph panel of the paper figure; inside, r vs p:
+       rises in the effective LR-QAOA region (salmon), then noise pulls it back to random (teal). -->
+  <path d="M16 1 29.4 8.75V24.25L16 32 2.6 24.25V8.75Z" fill="#0b3a5d" stroke="#2c6a9a" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M6.5 23.5C7.6 16 9 10 11.2 10V23.5Z" fill="#ef8a74"/>
+  <path d="M11.2 10C14 10 16.5 17 26 21.8V23.5H11.2Z" fill="#7fd6c1"/>
+  <path d="M5.5 23.5H27" stroke="#ffffff" stroke-opacity=".55" stroke-width="1" stroke-linecap="round"/>
+  <path d="M6.5 23.5C7.6 16 9 10 11.2 10C14 10 16.5 17 26 21.8" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

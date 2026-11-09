@@ -63,7 +63,7 @@ h3 { font-size: 17px; line-height: 1.3; font-weight: 600; }
 .site-head { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
 .site-head .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none !important; font-size: 17px; white-space: nowrap; }
-.brand svg { width: 28px; height: 28px; flex: none; }
+.brand img { width: 30px; height: 30px; flex: none; }
 .brand b { font-weight: 600; }
 .nav { display: flex; gap: 22px; margin-left: auto; font-size: 15px; }
 .nav a { color: var(--muted); }
