@@ -34,6 +34,24 @@ These experiments were conducted on **28 QPUs** from **7 vendors**:
 
 ---
 
+## 🌐 **Website**
+
+Live results: **https://alejomonbar.github.io/LR-QAOA-QPU-Benchmarking/** (static site in [`site/`](./site), published by [GitHub Actions](./.github/workflows/site.yml)).
+
+**Publishing a new result** takes no code changes:
+
+1. Save the run as `Data/<backend>/<N>_<FC|1D|NL>.npy` (the usual dict with `postprocessing`, `random`, `ps`, `Deltas`, …).
+2. If the backend is new, add a line for it under `devices` in [`Data/registry.json`](./Data/registry.json) (name, vendor, modality). Without it, the build guesses the metadata and prints a warning.
+3. Commit and push to `main`. The workflow runs [`scripts/build_site_data.py`](./scripts/build_site_data.py), which finds every result file, computes the random baseline, pass/fail and gate counts, and redeploys the page. A result's date is `results["date"]` (`"YYYY-MM-DD"`) if the file stores one, otherwise the date the file was first committed.
+
+Files with other names (variants, repeated runs) are only published when listed under `extra_files` in the registry. To preview locally:
+
+```bash
+python scripts/build_site_data.py && python -m http.server -d site 8000   # open http://localhost:8000
+```
+
+---
+
 ## 📂 **Repository Structure**
 
 ```

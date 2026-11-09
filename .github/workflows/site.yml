@@ -1,0 +1,53 @@
+# Rebuilds and publishes the website (site/) to GitHub Pages whenever results,
+# the site, or the build script change on main. One-time setup:
+#   GitHub repo → Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Publish website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Data/**"
+      - "site/**"
+      - "scripts/build_site_data.py"
+      - "scripts/requirements-site.txt"
+      - ".github/workflows/site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # full history: result dates come from when each file was first committed
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: scripts/requirements-site.txt
+      - run: pip install -r scripts/requirements-site.txt
+      - name: Process results into site/data/results.json
+        run: python scripts/build_site_data.py
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

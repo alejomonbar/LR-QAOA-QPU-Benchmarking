@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LR-QAOA QPU Benchmark</title>
+<meta name="description" content="Benchmarking quantum processing units at large width and depth with the linear-ramp QAOA protocol. Results update automatically from the public data repository.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b3a5d'/%3E%3Cpath d='M6 25 26 7' stroke='%237fc4ff' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M6 7 26 25' stroke='%23b9d25f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SK72N3Q0R5"></script>
+<script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-SK72N3Q0R5');</script>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="LR-QAOA QPU Benchmark, home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--brand-solid)"/><path d="M6 25 26 7" stroke="#7fc4ff" stroke-width="3" stroke-linecap="round"/><path d="M6 7 26 25" stroke="#b9d25f" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>LR-QAOA <b>QPU Benchmark</b></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#fc">Fully connected</a>
+      <a href="#nl">Native layout</a>
+      <a href="#chain">1D chain</a>
+      <a href="#method" class="opt">Method</a>
+      <a href="#data" class="opt">Data</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle dark mode"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Open benchmark · updated with every new result</p>
+        <h1>How far can today's quantum processors go before their output is no better than random?</h1>
+        <p class="lede">We run the <b>linear-ramp QAOA</b> (LR-QAOA), a fixed-parameter protocol, on weighted MaxCut problems of growing width (qubits) and depth (layers <i>p</i>). A run passes when its approximation ratio stays above random sampling by more than 3σ. The same test works on every vendor, on three graph types.</p>
+        <div class="btns">
+          <a class="btn solid" href="https://arxiv.org/abs/2502.06471">Read the paper</a>
+          <a class="btn" href="https://github.com/alejomonbar/LR-QAOA-QPU-Benchmarking">Data &amp; code</a>
+          <a class="btn" href="#cite">Cite</a>
+        </div>
+      </div>
+      <div class="figures" aria-live="polite">
+        <div class="fig"><b id="kQpu">–</b><span>QPUs benchmarked</span></div>
+        <div class="fig"><b id="kVendor">–</b><span>vendors</span></div>
+        <div class="fig"><b id="kFc">–</b><span id="kFcLbl">largest fully connected problem above random</span></div>
+        <div class="fig"><b id="kGates">–</b><span id="kGatesLbl">2-qubit gates in the deepest run above random</span></div>
+        <div class="src" id="kSrc">Loading results…</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="latest">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Latest results</h2>
+        <p>Newest first. New result files in the repository show up here automatically.</p>
+      </div>
+      <ol class="feed" id="feed"></ol>
+    </div>
+  </section>
+
+  <section class="section" id="fc">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Fully connected graphs</h2>
+        <p>Every qubit interacts with every other one, so devices without all-to-all connectivity need a SWAP network. This is the hardest of the three tests.</p>
+      </div>
+      <div class="grid-2">
+        <article class="panel">
+          <div class="panel-head"><h3>Largest problem above random</h3><span>Qubits, per QPU</span></div>
+          <div class="toolbar"><label class="check"><input type="checkbox" id="fcEmu"> include emulators</label></div>
+          <div class="lb" id="lb" role="list"></div>
+          <div class="legend" id="lbLegend"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><h3>Effective approximation ratio vs problem size</h3><span>r<sub>eff</sub> = 0 is the random +3σ threshold</span></div>
+          <div class="chips" id="fcChips" aria-label="Highlight devices"></div>
+          <div class="chart" id="fcChart"></div>
+          <div class="legend" id="fcLegend"></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="nl">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Native layout</h2>
+        <p>The problem graph matches the device's own coupling map, so no SWAPs are needed and the full chip is used at once.</p>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><h3>Approximation ratio vs number of LR-QAOA layers</h3><span>Pick up to three runs to compare; dashed line: random +3σ of the first pick</span></div>
+        <div class="chips" id="nlChips"></div>
+        <div class="chart tall" id="nlChart"></div>
+        <div class="legend" id="nlLegend"></div>
+      </article>
+      <div class="table-wrap"><table class="data" id="nlTable"></table></div>
+    </div>
+  </section>
+
+  <section class="section" id="chain">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>1D chain</h2>
+        <p>A line of qubits with nearest-neighbour couplings: the easiest graph to map, so it probes the greatest depth.</p>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><h3>Approximation ratio vs number of LR-QAOA layers</h3><span>Pick a chain length, then up to three runs</span></div>
+        <div class="seg" id="chainSize" role="tablist" aria-label="Chain length"></div>
+        <div class="chips" id="chainChips"></div>
+        <div class="chart tall" id="chainChart"></div>
+        <div class="legend" id="chainLegend"></div>
+      </article>
+      <div class="table-wrap"><table class="data" id="chainTable"></table></div>
+    </div>
+  </section>
+
+  <section class="section alt" id="method">
+    <div class="wrap method">
+      <div class="sec-head"><h2>Method</h2></div>
+      <figure class="figure">
+        <img src="assets/paper-layouts-tested.png" width="1400" height="448" alt="Benchmark scheme: the three graph types (1D chain, native layout, fully connected), the QAOA circuit, the linear-ramp schedule and the expected approximation ratio versus layers under depolarising noise." loading="lazy">
+        <figcaption>(a) Graphs used: 1D chain (yellow), native layout (green), fully connected (pink). (b) QAOA layers. (c) Linear-ramp schedule. (d) Expected <i>r</i> versus <i>p</i> for increasing depolarising noise.</figcaption>
+      </figure>
+      <div class="grid-2 prose">
+        <div>
+          <p>LR-QAOA fixes the QAOA angles to a linear ramp: γ rises and β falls over <i>p</i> layers, with slope Δ/<i>p</i>. No classical optimisation loop is needed, so the protocol runs the same way on any device and at any size.</p>
+          <p>In a noiseless device the approximation ratio <i>r</i> grows with <i>p</i>. Noise eventually wins: <i>r</i> peaks and decays towards the value of a uniformly random sampler, the fully mixed state.</p>
+          <p>Results are grouped by graph type because routing cost differs: a fully connected graph needs SWAP networks on fixed-coupling chips, while 1D chains and native layouts map directly.</p>
+        </div>
+        <div>
+          <dl>
+            <dt>Approximation ratio <i>r</i></dt><dd>Mean cut value of the sampled bitstrings divided by the optimal cut.</dd>
+            <dt>Random baseline</dt><dd>Mean and 3σ spread of <i>r</i> for the same number of uniformly random bitstrings, bootstrapped from stored random samples.</dd>
+            <dt>Above random</dt><dd>The best <i>r</i> exceeds the random mean with one-sided p-value &lt; 10<sup>−3</sup>.</dd>
+            <dt>Effective ratio <i>r</i><sub>eff</sub></dt><dd>(<i>r</i> − threshold) / (1 − threshold), with threshold = random mean + 3σ. Positive values clear the 3σ band.</dd>
+            <dt>2-qubit gates</dt><dd><i>p</i> × number of graph edges (logical ZZ interactions, before SWAP routing).</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="data">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Data &amp; contributing</h2>
+        <p>Every number on this page is computed from the raw result files in the repository on each push. Nothing here is typed in by hand.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Add a result</h3>
+          <p>Save the experiment as <code>Data/&lt;backend&gt;/&lt;N&gt;_&lt;FC|1D|NL&gt;.npy</code>, with its <code>postprocessing</code> and <code>random</code> entries, and push to <code>main</code>. The page rebuilds within a few minutes.</p>
+        </div>
+        <div class="card">
+          <h3>Download</h3>
+          <p>All processed runs, one JSON file: <a href="data/results.json" download>results.json</a>. Raw <code>.npy</code> files and notebooks are on <a href="https://github.com/alejomonbar/LR-QAOA-QPU-Benchmarking">GitHub</a>.</p>
+        </div>
+        <div class="card">
+          <h3>Awaiting post-processing</h3>
+          <ul class="pending" id="pending"><li>None</li></ul>
+        </div>
+      </div>
+      <div class="cite" id="cite">
+        <h3>Cite</h3>
+<pre><code>@misc{montanezbarrera2025evaluating,
+    title={Evaluating the performance of quantum processing units at large width and depth},
+    author={J. A. Montanez-Barrera and Kristel Michielsen and David E. Bernal Neira},
+    year={2025},
+    eprint={2502.06471},
+    archivePrefix={arXiv},
+    primaryClass={quant-ph}
+}</code></pre>
+        <button class="btn small" type="button" id="copyCite">Copy BibTeX</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <span id="buildInfo"></span>
+    <span><a href="https://github.com/alejomonbar/LR-QAOA-QPU-Benchmarking/blob/main/LICENSE">MIT licence</a> · <a href="https://arxiv.org/abs/2502.06471">arXiv:2502.06471</a></span>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
