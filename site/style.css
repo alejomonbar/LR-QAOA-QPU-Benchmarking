@@ -151,6 +151,16 @@ h3 { font-size: 17px; line-height: 1.3; font-weight: 600; }
 .legend i.dot { width: 9px; height: 9px; border-radius: 50%; }
 .legend i.hollow { width: 9px; height: 9px; border-radius: 50%; background: transparent !important; border: 2px solid var(--muted); }
 
+/* timeline */
+#tlChart { height: 340px; }
+.chart .step { fill: none; stroke: var(--brand); stroke-width: 2; stroke-linejoin: round; }
+.chart .stepfill { fill: var(--brand); opacity: .07; }
+.chart .total { fill: var(--ink); font-size: 13px; font-weight: 600; paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+.chart .vlabel { fill: var(--ink); font-size: 12px; paint-order: stroke; stroke: var(--card); stroke-width: 4px; stroke-linejoin: round; }
+.legend.firsts { border-top: 1px solid var(--line); padding-top: 8px; }
+.legend.firsts b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+.legend i.ring { width: 12px; height: 12px; border-radius: 50%; background: transparent; border: 1.5px solid var(--ink); }
+
 /* leaderboard (HTML bars) */
 .lb { display: grid; gap: 4px; }
 .lb-row { display: grid; grid-template-columns: 150px 1fr; align-items: center; gap: 10px; font-size: 13.5px; cursor: default; border-radius: 4px; padding: 1px 0; }

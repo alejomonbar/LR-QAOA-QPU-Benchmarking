@@ -187,9 +187,9 @@
     const gatesTip = (r, p) => (r.edges ? `<br><span class="k">2-qubit gates at p=${p}:</span> ${fInt(p * r.edges)}` : "");
 
     /* key figures */
-    const qpus = new Set(qpuRuns.map((r) => r.device));
-    $("#kQpu").textContent = qpus.size;
-    $("#kVendor").textContent = new Set([...qpus].map((d) => DEV[d].vendor)).size;
+    const timeline = renderTimeline();
+    $("#kQpu").textContent = timeline.length;
+    $("#kVendor").textContent = new Set(timeline.map((it) => it.v.vendor)).size;
     const fcBest = qpuRuns.filter((r) => r.topology === "FC" && r.passes).sort((a, b) => b.nq - a.nq)[0];
     if (fcBest) { $("#kFc").textContent = fcBest.nq + " q"; $("#kFcLbl").textContent = `largest fully connected problem above random (${dev(fcBest).name})`; }
     const deep = qpuRuns.filter((r) => r.gates_at_deepest).sort((a, b) => b.gates_at_deepest - a.gates_at_deepest)[0];
@@ -221,6 +221,89 @@
 
     renderFC(); renderCurves("nl", RUNS.filter((r) => r.topology === "NL" && isQpu(r)));
     renderChain();
+
+    /* ---------- timeline: QPUs by date of first benchmark ---------- */
+    function renderTimeline() {
+      const firstRun = {};
+      qpuRuns.forEach((r) => { if (!firstRun[r.device] || r.date < firstRun[r.device]) firstRun[r.device] = r.date; });
+      const items = Object.entries(DEV)
+        .filter(([k, v]) => v.kind === "qpu" && (v.first_benchmarked || firstRun[k]))
+        .map(([k, v]) => ({ k, v, date: v.first_benchmarked || firstRun[k], approx: !!(v.first_benchmarked && v.first_approx) }))
+        .sort((a, b) => a.date.localeCompare(b.date) || a.v.name.localeCompare(b.v.name));
+      if (!items.length) return items;
+      const t = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
+      const fWhen = (it) => (it.approx ? `~${MONTHS[+it.date.slice(5, 7) - 1]} ${it.date.slice(0, 4)}` : fDate(it.date));
+      const modColor = (v) => (v.modality === "trapped ion" ? "var(--ion)" : "var(--sc)");
+      const tested = (k) => {
+        const lines = ["FC", "NL", "1D"].map((tp) => {
+          const rs = qpuRuns.filter((r) => r.device === k && r.topology === tp);
+          if (!rs.length) return "";
+          const ns = rs.map((r) => r.nq), lo = Math.min(...ns), hi = Math.max(...ns), pass = rs.filter((r) => r.passes);
+          const size = lo === hi ? `${lo} q` : `${lo}–${hi} q`;
+          const res = tp === "FC" ? (pass.length ? `above random up to ${Math.max(...pass.map((r) => r.nq))} q` : "none above random")
+            : `best r ${f3(Math.max(...rs.map((r) => r.best.r)))}`;
+          return `<br><span class="k">${TOPO[tp]}:</span> ${size}, ${res}`;
+        }).join("");
+        return lines || `<br><span class="k">No processed runs on this site yet</span>`;
+      };
+      const seen = new Set();
+      items.forEach((it) => { it.first = !seen.has(it.v.vendor); seen.add(it.v.vendor); });
+
+      const host = $("#tlChart");
+      const draw = () => {
+        host.innerHTML = "";
+        const W = host.clientWidth, H = host.clientHeight;
+        if (!W || !H) return;
+        const m = { t: 18, r: 20, b: 30, l: 40 }, DAY = 864e5;
+        const x0 = t(items[0].date) - 30 * DAY, x1 = t(data.generated.slice(0, 10)) + 20 * DAY;
+        const yt = niceTicks(0, items.length, 4), yMax = Math.max(yt[yt.length - 1], items.length);
+        const X = (v) => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+        const Y = (v) => H - m.b - (v / yMax) * (H - m.t - m.b);
+        const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `Cumulative number of QPUs benchmarked with LR-QAOA: ${items.length} QPUs since ${fDate(items[0].date)}` }, host);
+        const grid = el("g", { class: "grid" }, svg), axis = el("g", { class: "axis" }, svg);
+        yt.forEach((v) => {
+          el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }, grid);
+          el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, axis).textContent = v;
+        });
+        for (let y = +items[0].date.slice(0, 4); y <= new Date(x1).getUTCFullYear(); y++) {
+          [[0, String(y)], [6, W > 560 ? "Jul" : ""]].forEach(([mo, lab]) => {
+            const v = Date.UTC(y, mo, 1);
+            if (v < x0 || v > x1) return;
+            el("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b }, grid);
+            if (lab) el("text", { x: X(v), y: H - m.b + 18, "text-anchor": "middle" }, axis).textContent = lab;
+          });
+        }
+        let d = `M${X(t(items[0].date)).toFixed(1)},${Y(0).toFixed(1)}`;
+        items.forEach((it, i) => { d += `H${X(t(it.date)).toFixed(1)}V${Y(i + 1).toFixed(1)}`; });
+        d += `H${X(x1).toFixed(1)}`;
+        el("path", { class: "stepfill", d: d + `V${Y(0)}Z` }, svg);
+        el("path", { class: "step", d }, svg);
+        const hit = [];
+        items.forEach((it, i) => {
+          const cx = X(t(it.date)), cy = Y(i + 1);
+          if (it.first) el("circle", { cx, cy, r: 8, fill: "none", stroke: "var(--ink)", "stroke-width": 1.3 }, svg);
+          el("circle", { cx, cy, r: 4.5, fill: modColor(it.v), stroke: "var(--card)", "stroke-width": 2 }, svg);
+          hit.push({ cx, cy, it, i });
+        });
+        el("text", { class: "total", x: W - m.r, y: Y(items.length) - 10, "text-anchor": "end" }, svg).textContent = `${items.length} QPUs`;
+        const ring = el("circle", { r: 9, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5, visibility: "hidden" }, svg);
+        svg.addEventListener("pointermove", (ev) => {
+          const b = svg.getBoundingClientRect(), mx = (ev.clientX - b.left) * W / b.width, my = (ev.clientY - b.top) * H / b.height;
+          let best = null, bd = 22 * 22;
+          hit.forEach((h) => { const dd = (h.cx - mx) ** 2 + (h.cy - my) ** 2; if (dd < bd) { bd = dd; best = h; } });
+          if (!best) { ring.setAttribute("visibility", "hidden"); hideTip(); return; }
+          ring.setAttribute("cx", best.cx); ring.setAttribute("cy", best.cy); ring.setAttribute("visibility", "visible");
+          const v = best.it.v;
+          showTip(`<b>${esc(v.name)}</b>${v.qubits ? ` · ${v.qubits} qubits` : ""}<br><span class="k">First benchmarked:</span> ${fWhen(best.it)}${best.it.first ? ` · ${esc(v.vendor)}'s first QPU here` : ""}<br><span class="k">QPU #${best.i + 1}</span> · ${esc(v.modality)}${tested(best.it.k)}`, ev.clientX, ev.clientY);
+        });
+        svg.addEventListener("pointerleave", () => { ring.setAttribute("visibility", "hidden"); hideTip(); });
+      };
+      draw();
+      autoRedraw(host, draw);
+      $("#tlLegend").innerHTML = `<span><i class="dot" style="background:var(--sc)"></i>superconducting</span><span><i class="dot" style="background:var(--ion)"></i>trapped ion</span><span><i class="ring"></i>vendor's first QPU</span><span>~ approximate date</span>`;
+      $("#tlFirsts").innerHTML = items.filter((it) => it.first).map((it) => `<span><b>${esc(it.v.vendor)}</b>${fWhen(it)}</span>`).join("");
+      return items;
+    }
 
     /* ---------- fully connected ---------- */
     function renderFC() {

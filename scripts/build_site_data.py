@@ -267,6 +267,10 @@ def main() -> int:
         print(f"  ✓ {rel:52s} {topology:2s} N={nq:<4d} best r={run['best']['r']:.3f} @p={run['best']['p']:<5d} {flag}")
 
     used = {r["device"] for r in runs} | {p["device"] for p in pending}
+    for k, meta in devices_meta.items():  # benchmarked devices without processed runs still go on the timeline
+        if meta.get("first_benchmarked") and k not in devices:
+            devices[k] = {**guess_device(k), **meta}
+            used.add(k)
     try:
         commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, text=True).strip()
     except Exception:

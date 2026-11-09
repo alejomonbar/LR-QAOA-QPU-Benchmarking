@@ -18,6 +18,7 @@
       <span>LR-QAOA <b>QPU Benchmark</b></span>
     </a>
     <nav class="nav" aria-label="Sections">
+      <a href="#timeline" class="opt">Timeline</a>
       <a href="#fc">Fully connected</a>
       <a href="#nl">Native layout</a>
       <a href="#chain">1D chain</a>
@@ -48,6 +49,20 @@
         <div class="fig"><b id="kGates">–</b><span id="kGatesLbl">2-qubit gates in the deepest run above random</span></div>
         <div class="src" id="kSrc">Loading results…</div>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="timeline">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>QPUs benchmarked over time</h2>
+        <p>Each dot is a QPU, placed at the date of its first LR-QAOA benchmark; the line counts them. A ring marks each vendor's first QPU. Hover a dot for what was tested.</p>
+      </div>
+      <article class="panel">
+        <div class="chart" id="tlChart"></div>
+        <div class="legend" id="tlLegend"></div>
+        <div class="legend firsts" id="tlFirsts"></div>
+      </article>
     </div>
   </section>
 
