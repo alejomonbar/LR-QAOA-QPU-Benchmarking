@@ -72,11 +72,31 @@ def file_date(path: Path, git_dates: dict[str, str], overrides: dict[str, str]) 
 
 
 # --------------------------------------------------------------------------- loading
-class _Stub:
-    """Stand-in for classes from SDKs that are not installed (pytket, qiskit, ...).
+def _make_stub(*args, **kwargs):
+    return _Stub()
+
+
+class _StubMeta(type):
+    def __getattr__(cls, name):  # e.g. pickled classmethods such as Environment.make_new_configured_env
+        if name.startswith("__"):
+            raise AttributeError(name)
+        return _make_stub
+
+
+class _Stub(metaclass=_StubMeta):
+    """Stand-in for classes from SDKs that are not installed (pytket, docplex, qiskit, ...).
     Only plain numeric fields are needed here, so their contents are ignored."""
     def __init__(self, *args, **kwargs): pass
     def __setstate__(self, state): pass
+    def __setitem__(self, key, value): pass
+    def __call__(self, *args, **kwargs): return _Stub()
+    def append(self, item): pass
+    def extend(self, items): pass
+
+    def __getattr__(self, name):
+        if name.startswith("__"):
+            raise AttributeError(name)
+        return _make_stub
 
 
 class _TolerantUnpickler(pickle.Unpickler):
