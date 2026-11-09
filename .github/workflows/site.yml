@@ -19,9 +19,11 @@ permissions:
   pages: write
   id-token: write
 
+# Queue deploys instead of cancelling: a cancelled run can leave an older version live
+# (e.g. re-running an old failed run cancelled the deploy of a newer commit).
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
