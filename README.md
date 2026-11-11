@@ -50,6 +50,8 @@ Files with other names (variants, repeated runs) are only published when listed 
 python scripts/build_site_data.py && python -m http.server -d site 8000   # open http://localhost:8000
 ```
 
+The *Time per fully connected layer* section reads [`Data/layer_times.json`](./Data/layer_times.json). CI does not regenerate it; run [`scripts/layer_times.py`](./scripts/layer_times.py) by hand when calibrations or vendor numbers change (it needs the IBM Quantum account for live backends, or `--offline`), then commit the file. Each line is labelled *computed* (IBM: compiled and scheduled with calibrated gate durations) or *estimate* (from vendor-published timings, with the source).
+
 ---
 
 ## ▶️ **Running a benchmark**
@@ -121,7 +123,7 @@ LR-QAOA-QPU-Benchmarking/
 ├── Data/                   # Problem banks, results (Data/<backend>/<N>_<TOPO>.npy), registry.json
 ├── Figures/                # Figures made by the notebooks
 ├── site/                   # Website (built from Data/ by scripts/build_site_data.py)
-├── scripts/                # Website data builder
+├── scripts/                # Website data builder; layer_times.py for the layer-time section
 ├── LR-QAOA-Benchmark.md    # Detailed benchmark protocol documentation
 └── requirements.txt        # Python environment used for the paper
 ```
