@@ -40,6 +40,8 @@ jobs:
       - run: pip install -r scripts/requirements-site.txt
       - name: Process results into site/data/results.json
         run: python scripts/build_site_data.py
+      - name: Stamp asset links with the commit, so browsers never mix old and new files
+        run: sed -i "s/?v=dev/?v=${GITHUB_SHA::7}/g" site/index.html
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

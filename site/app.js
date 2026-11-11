@@ -219,8 +219,16 @@
     /* pending */
     if (data.pending.length) $("#pending").innerHTML = data.pending.map((p) => `<li><code>${esc(p.file.replace(/^Data\//, ""))}</code></li>`).join("");
 
-    renderFC(); renderNL();
-    renderChain();
+    /* each section on its own: one failing section must not blank the others */
+    [["#fc", renderFC], ["#nl", renderNL], ["#chain", renderChain]].forEach(([sel, fn]) => {
+      try { fn(); } catch (err) {
+        console.error(err);
+        const note = document.createElement("p");
+        note.className = "note";
+        note.textContent = "This section could not be drawn. Reload the page (Shift + reload) to fetch the latest version.";
+        $(sel + " .wrap").appendChild(note);
+      }
+    });
 
     /* ---------- timeline: QPUs by date of first benchmark ---------- */
     function renderTimeline() {
