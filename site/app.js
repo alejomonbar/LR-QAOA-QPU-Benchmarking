@@ -81,7 +81,8 @@
         el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }, grid);
         el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, axis).textContent = cfg.yFmt ? cfg.yFmt(v) : v.toFixed(2);
       });
-      const xt = cfg.xLog ? logTicks(x0 * 1.15, x1 / 1.15) : niceTicks(x0, x1, Math.max(3, Math.round((W - m.l - m.r) / 80)));
+      let xt = cfg.xLog ? logTicks(x0 * 1.15, x1 / 1.15) : niceTicks(x0, x1, Math.max(3, Math.round((W - m.l - m.r) / 80)));
+      if (cfg.xInteger) xt = xt.filter((v) => Number.isInteger(v));
       xt.forEach((v) => {
         el("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b }, grid);
         el("text", { x: X(v), y: H - m.b + 17, "text-anchor": "middle" }, axis).textContent = fInt(v);
@@ -123,11 +124,15 @@
         const h = nearest(ev);
         if (!h) { ring.setAttribute("visibility", "hidden"); hideTip(); svg.style.cursor = ""; return; }
         ring.setAttribute("cx", h.cx); ring.setAttribute("cy", h.cy); ring.setAttribute("visibility", "visible");
-        svg.style.cursor = cfg.onPick ? "pointer" : "";
+        svg.style.cursor = cfg.onPick || cfg.onPoint ? "pointer" : "";
         showTip(cfg.tip(h.s, h.p), ev.clientX, ev.clientY);
       });
       svg.addEventListener("pointerleave", () => { ring.setAttribute("visibility", "hidden"); hideTip(); });
-      if (cfg.onPick) svg.addEventListener("click", (ev) => { const h = nearest(ev); if (h) cfg.onPick(h.s.key); });
+      svg.addEventListener("click", (ev) => {
+        const h = nearest(ev);
+        if (!h) return;
+        if (cfg.onPoint) { ev.stopPropagation(); hideTip(); cfg.onPoint(h.s, h.p, ev); } else if (cfg.onPick) cfg.onPick(h.s.key);
+      });
     };
     draw();
     return draw;
@@ -218,6 +223,15 @@
 
     /* pending */
     if (data.pending.length) $("#pending").innerHTML = data.pending.map((p) => `<li><code>${esc(p.file.replace(/^Data\//, ""))}</code></li>`).join("");
+
+    /* shareable link to one run's detail popup: #run=<device>/<file stem>, e.g. #run=ibm_chicago/37_FC */
+    const openFromHash = () => {
+      const m = decodeURIComponent(location.hash).match(/^#run=(.+)$/);
+      const run = m && RUNS.find((r) => r.id === m[1]);
+      if (run) showDetail(run, "var(--s1)", innerWidth / 2 - 180, innerHeight / 2);
+    };
+    addEventListener("hashchange", openFromHash);
+    setTimeout(openFromHash, 0);
 
     /* each section on its own: one failing section must not blank the others */
     [["#fc", renderFC], ["#nl", renderNL], ["#chain", renderChain]].forEach(([sel, fn]) => {
@@ -313,6 +327,52 @@
       return items;
     }
 
+    /* ---------- detail popup: r_eff vs p for one run (every parallel section) ---------- */
+    const pop = $("#pop");
+    const closeDetail = () => { if (!pop.hidden) { pop.hidden = true; hideTip(); } };
+    $("#popClose").addEventListener("click", closeDetail);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
+    document.addEventListener("pointerdown", (e) => { if (!pop.contains(e.target)) closeDetail(); });
+    addEventListener("scroll", closeDetail, { passive: true });
+
+    function showDetail(run, color, cx, cy) {
+      const thr = run.random ? run.random.threshold : null;
+      const val = (r) => (thr == null ? r : (r - thr) / (1 - thr));
+      const curves = run.r_sections || [run.r];
+      let best = curves.findIndex((c) => c.every((v, i) => v == null || Math.abs(v - run.r[i]) < 1e-4));
+      if (best < 0) best = 0;
+      const series = curves.map((c, k) => ({
+        key: `s${k}`, label: run.r_sections ? `Section ${k + 1}` : runLabel(run), color: k === best ? color : null,
+        pts: run.p.map((p, i) => (c[i] == null ? null : { x: Math.max(p, 1), y: val(c[i]), r: c[i], hollow: thr != null && val(c[i]) <= 0, run }))
+          .filter(Boolean),
+      }));
+      const nSec = curves.length;
+      $("#popTitle").textContent = `${runLabel(run)} · ${run.nq} qubits`;
+      $("#popSub").innerHTML = `${TOPO[run.topology]} · ${nSec} section${nSec > 1 ? "s" : ""} × ${fInt(run.shots)} shots · ${fDate(run.date)} · ${status(run)}`;
+      $("#popLegend").innerHTML = `<span><i style="background:${color}"></i>${nSec > 1 ? `best section (${best + 1})` : "this run"}</span>`
+        + (nSec > 1 ? `<span><i style="background:var(--ctx)"></i>other sections</span>` : "")
+        + (thr != null ? `<span><i class="hollow"></i>below random + 3σ</span>` : "");
+      $("#popFoot").textContent = thr != null
+        ? `r_eff = (r − t) / (1 − t), with t = random + 3σ = ${f3(thr)}. Above 0: better than random sampling by more than 3σ.`
+        : "No random baseline stored for this run.";
+      pop.hidden = false;
+      const w = pop.offsetWidth, h = pop.offsetHeight;
+      let left = cx + 18 + w > innerWidth - 8 ? cx - w - 18 : cx + 18;
+      if (innerWidth < 560) left = (innerWidth - w) / 2;
+      pop.style.left = Math.max(8, left) + "px";
+      pop.style.top = Math.max(8, Math.min(innerHeight - h - 8, cy - h / 2)) + "px";
+      const ps = run.p.map((p) => Math.max(p, 1)), wide = Math.max(...ps) / Math.min(...ps) >= 8;
+      lineChart($("#popChart"), {
+        series, xLog: wide, xInteger: !wide, ctxDots: true,
+        xLabel: "LR-QAOA layers p", yLabel: thr != null ? "r_eff" : "r",
+        refs: thr != null ? [{ y: 0, label: "random + 3σ" }] : [],
+        aria: `r_eff versus layers for ${runLabel(run)} at ${run.nq} qubits`,
+        tip: (sr, pt) => `<b>${esc(sr.label)}</b> · p = ${fInt(pt.x)}<br><span class="k">r =</span> ${f3(pt.r)}`
+          + (thr != null ? ` · <span class="k">r<sub>eff</sub> =</span> ${f3(pt.y)}<br>${pt.y > 0 ? '<span class="st ok">✓ above random + 3σ</span>' : '<span class="st no">✗ below random + 3σ</span>'}` : ""),
+      });
+      $("#popClose").focus({ preventScroll: true });
+    }
+
     /* ---------- fully connected ---------- */
     function renderFC() {
       const emuBox = $("#fcEmu");
@@ -337,9 +397,16 @@
           div.innerHTML = `<span class="lb-name">${esc(meta.name)}</span><span class="lb-track">${row.n ? `<span class="lb-bar" style="width:${(row.n / maxN) * 82}%;background:${col}"></span>` : ""}<span class="lb-val">${row.n ? row.n + " qubits" : "none above random"}</span></span>`;
           const r = row.pass;
           const html = `<b>${esc(meta.name)}</b>${meta.kind !== "qpu" ? " (emulator)" : ""}<br>` + (r
-            ? `<span class="k">Largest N above random:</span> ${r.nq}<br><span class="k">Best r:</span> ${f3(r.best.r)} at p = ${r.best.p}<br><span class="k">r<sub>eff</sub>:</span> ${f3(r.r_eff)}${gatesTip(r, r.best.p)}<br><span class="k">Shots:</span> ${fInt(r.shots)} · ${fDate(r.date)}`
+            ? `<span class="k">Largest N above random:</span> ${r.nq}<br><span class="k">Best r:</span> ${f3(r.best.r)} at p = ${r.best.p}<br><span class="k">r<sub>eff</sub>:</span> ${f3(r.r_eff)}${gatesTip(r, r.best.p)}<br><span class="k">Shots:</span> ${fInt(r.shots)} · ${fDate(r.date)}<br><span class="k">Click for r<sub>eff</sub> vs p</span>`
             : `No size above random. Sizes tried: ${row.rs.map((x) => x.nq).sort((a, b) => a - b).join(", ")}`);
           div.addEventListener("pointermove", (ev) => showTip(html, ev.clientX, ev.clientY));
+          const target = row.pass || [...row.rs].sort((a, b) => b.nq - a.nq)[0];
+          const open = (x, y) => { hideTip(); showDetail(target, col, x, y); };
+          div.tabIndex = 0;
+          div.addEventListener("click", (ev) => { ev.stopPropagation(); open(ev.clientX, ev.clientY); });
+          div.addEventListener("keydown", (ev) => {
+            if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); const b = div.getBoundingClientRect(); open(b.right, b.top + b.height / 2); }
+          });
           div.addEventListener("pointerleave", hideTip);
           lb.appendChild(div);
         });
@@ -360,7 +427,7 @@
           const fn = () => lineChart(host, {
             series, xLabel: "Problem size N (qubits)", yLabel: "Effective approximation ratio r_eff",
             refs: [{ y: 0, label: "random + 3σ" }], aria: "Effective approximation ratio versus number of qubits, fully connected graphs",
-            onPick: (k) => picker.toggle(k),
+            onPoint: (sr, pt, ev) => showDetail(pt.run, picker.color(sr.key) || "var(--s1)", ev.clientX, ev.clientY),
             tip: (s, p) => `<b>${esc(s.label)}</b> · N = ${p.x}<br><span class="k">r<sub>eff</sub>:</span> ${f3(p.y)} · ${status(p.run)}<br><span class="k">Best r:</span> ${f3(p.run.best.r)} at p = ${p.run.best.p}${gatesTip(p.run, p.run.best.p)}<br><span class="k">Shots:</span> ${fInt(p.run.shots)} · ${fDate(p.run.date)}`,
           });
           fn(); host._redraw = fn;

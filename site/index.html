@@ -90,7 +90,7 @@
           <div class="legend" id="lbLegend"></div>
         </article>
         <article class="panel">
-          <div class="panel-head"><h3>Effective approximation ratio vs problem size</h3><span>r<sub>eff</sub> = 0 is the random +3σ threshold</span></div>
+          <div class="panel-head"><h3>Effective approximation ratio vs problem size</h3><span>r<sub>eff</sub> = 0 is the random +3σ threshold · click a point for r<sub>eff</sub> vs p</span></div>
           <div class="chips" id="fcChips" aria-label="Highlight devices"></div>
           <div class="chart" id="fcChart"></div>
           <div class="legend" id="fcLegend"></div>
@@ -198,6 +198,14 @@
 </footer>
 
 <div class="tip" id="tip" role="tooltip" hidden></div>
+<div class="pop" id="pop" role="dialog" aria-labelledby="popTitle" hidden>
+  <button class="pop-x" type="button" id="popClose" aria-label="Close">×</button>
+  <h4 id="popTitle"></h4>
+  <div class="pop-sub" id="popSub"></div>
+  <div class="chart pop-chart" id="popChart"></div>
+  <div class="legend" id="popLegend"></div>
+  <div class="pop-foot" id="popFoot"></div>
+</div>
 <script src="app.js?v=dev"></script>
 </body>
 </html>

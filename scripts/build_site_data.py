@@ -143,6 +143,18 @@ def r_curve(post_delta: dict) -> tuple[list[int], list[float]]:
     return [int(p) for p in ps], best_curve
 
 
+def section_curves(post_delta: dict) -> dict[int, dict[int, float]]:
+    """{section: {p: r}} for files with several parallel sections (empty otherwise)."""
+    ps = list(post_delta.keys())
+    first = post_delta[ps[0]]
+    if not isinstance(first, dict) or "r" in first:
+        return {}
+    out = {}
+    for s in sorted(k for k in first.keys() if isinstance(k, (int, np.integer))):
+        out[int(s)] = {int(p): float(post_delta[p][s]["r"]) for p in ps if s in post_delta[p]}
+    return out if len(out) > 1 else {}
+
+
 def random_baseline(random: dict, shots: int) -> dict | None:
     """Mean and 3-sigma spread of the approximation ratio of `shots` uniformly random
     bitstrings, bootstrapped from the stored random samples (same method as the paper)."""
@@ -197,6 +209,7 @@ def analyse(path: Path, nq: int, topology: str, delta_override=None, merge: list
         rs += [r for p, r in zip(m_ps, m_rs) if p not in known]
     order = np.argsort(ps)
     ps, rs = [ps[i] for i in order], [rs[i] for i in order]
+    per_section = section_curves(post[delta])
     shots = shots_of(results, delta, list(post[delta].keys())[0])
     base = random_baseline(results.get("random"), shots)
     edges = edges_of(results, nq, topology)
@@ -210,6 +223,9 @@ def analyse(path: Path, nq: int, topology: str, delta_override=None, merge: list
         "best": {"p": ps[i_best], "r": round(rs[i_best], 6)},
         "random": {k: round(v, 6) for k, v in base.items()} if base else None,
     }
+    if per_section:  # every parallel copy of the problem, aligned with "p" (None where missing)
+        run["sections"] = len(per_section)
+        run["r_sections"] = [[round(c[p], 5) if p in c else None for p in ps] for c in per_section.values()]
     if base:
         above = [p for p, r in zip(ps, rs) if r > base["threshold"]]
         run["deepest_p_above_random"] = max(above) if above else None
