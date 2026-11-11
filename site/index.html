@@ -103,14 +103,10 @@
     <div class="wrap">
       <div class="sec-head">
         <h2>Native layout</h2>
-        <p>The problem graph matches the device's own coupling map, so no SWAPs are needed and the full chip is used at once.</p>
+        <p>The problem graph matches the device's own coupling map, so no SWAPs are needed and the full chip is used at once. Heavy-hex and square-lattice chips are shown apart: their problem graphs differ in connectivity (2–3 versus up to 4 neighbours per qubit), so their curves are not directly comparable.</p>
       </div>
-      <article class="panel">
-        <div class="panel-head"><h3>Approximation ratio vs number of LR-QAOA layers</h3><span>Pick up to three runs to compare; dashed line: random +3σ of the first pick</span></div>
-        <div class="chips" id="nlChips"></div>
-        <div class="chart tall" id="nlChart"></div>
-        <div class="legend" id="nlLegend"></div>
-      </article>
+      <div class="grid-2" id="nlPanels"></div>
+      <p class="note">Approximation ratio vs number of LR-QAOA layers. Pick up to three runs per chart; dashed line: random + 3σ of the first pick.</p>
       <div class="table-wrap"><table class="data" id="nlTable"></table></div>
     </div>
   </section>

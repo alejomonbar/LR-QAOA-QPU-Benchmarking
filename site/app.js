@@ -219,7 +219,7 @@
     /* pending */
     if (data.pending.length) $("#pending").innerHTML = data.pending.map((p) => `<li><code>${esc(p.file.replace(/^Data\//, ""))}</code></li>`).join("");
 
-    renderFC(); renderCurves("nl", RUNS.filter((r) => r.topology === "NL" && isQpu(r)));
+    renderFC(); renderNL();
     renderChain();
 
     /* ---------- timeline: QPUs by date of first benchmark ---------- */
@@ -365,12 +365,12 @@
     }
 
     /* ---------- r vs p curves (native layout, 1D chain) ---------- */
-    function renderCurves(prefix, runs, keepPicker) {
+    function renderCurves(prefix, runs, keepPicker, opts = {}) {
       const picker = keepPicker || Picker(() => draw());
       const byId = Object.fromEntries(runs.map((r) => [r.id, r]));
       picker.keepOnly((k) => !!byId[k]);
       if (!picker.keys().length) picker.set([...runs].sort((a, b) => b.best.r - a.best.r).slice(0, 3).map((r) => r.id));
-      const items = [...runs].sort((a, b) => runLabel(a).localeCompare(runLabel(b))).map((r) => ({ key: r.id, label: runLabel(r) + (prefix === "nl" ? ` · ${r.nq} q` : "") }));
+      const items = [...runs].sort((a, b) => runLabel(a).localeCompare(runLabel(b))).map((r) => ({ key: r.id, label: runLabel(r) + (opts.showQubits ? ` · ${r.nq} q` : "") }));
       const host = $(`#${prefix}Chart`);
       function draw() {
         renderChips($(`#${prefix}Chips`), items, picker);
@@ -388,18 +388,58 @@
           tip: (s, pt) => `<b>${esc(s.label)}</b> · ${pt.run.nq} qubits<br><span class="k">p =</span> ${fInt(pt.x)} · <span class="k">r =</span> ${f3(pt.y)}${pt.run.random ? `<br><span class="k">random + 3σ:</span> ${f3(pt.run.random.threshold)} ${pt.y > pt.run.random.threshold ? '<span class="st ok">✓ above</span>' : '<span class="st no">✗ below</span>'}` : ""}${gatesTip(pt.run, pt.x)}<br><span class="k">Added</span> ${fDate(pt.run.date)}`,
         });
         fn(); host._redraw = fn;
-        renderTable(prefix, runs, picker);
+        if (opts.table) opts.table(); else renderTable($(`#${prefix}Table`), [{ runs, picker }]);
       }
       if (!host._observed) { autoRedraw(host, () => host._redraw && host._redraw()); host._observed = true; }
       draw();
       return picker;
     }
 
-    function renderTable(prefix, runs, picker) {
-      const rows = [...runs].sort((a, b) => b.best.r - a.best.r);
-      $(`#${prefix}Table`).innerHTML = `<thead><tr><th>Device</th><th>Qubits</th><th>Best r</th><th>at p</th><th>Deepest p above random</th><th>2-qubit gates there</th><th>Shots</th><th>Added</th></tr></thead><tbody>`
-        + rows.map((r) => `<tr class="${picker.has(r.id) ? "sel" : ""}" data-k="${esc(r.id)}"><td>${picker.has(r.id) ? `<i style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:${picker.color(r.id)}"></i>` : ""}${esc(runLabel(r))}</td><td>${r.nq}</td><td>${f3(r.best.r)}</td><td>${fInt(r.best.p)}</td><td>${r.random ? (r.deepest_p_above_random ? fInt(r.deepest_p_above_random) : "none") : "–"}</td><td>${fInt(r.gates_at_deepest)}</td><td>${fInt(r.shots)}</td><td>${fDate(r.date)}</td></tr>`).join("") + "</tbody>";
-      $(`#${prefix}Table`).querySelectorAll("tbody tr").forEach((tr) => { tr.style.cursor = "pointer"; tr.addEventListener("click", () => picker.toggle(tr.dataset.k)); });
+    /* groups: [{ runs, picker, label? }] — one table; a row click toggles the run in its own chart */
+    function renderTable(table, groups, showGroup = false) {
+      const rows = groups.flatMap((g) => g.runs.map((r) => ({ r, g }))).sort((a, b) => b.r.best.r - a.r.best.r);
+      const owner = {};
+      table.innerHTML = `<thead><tr><th>Device</th>${showGroup ? "<th>Lattice</th>" : ""}<th>Qubits</th><th>Best r</th><th>at p</th><th>Deepest p above random</th><th>2-qubit gates there</th><th>Shots</th><th>Added</th></tr></thead><tbody>`
+        + rows.map(({ r, g }) => {
+          owner[r.id] = g.picker;
+          const on = g.picker && g.picker.has(r.id);
+          return `<tr class="${on ? "sel" : ""}" data-k="${esc(r.id)}"><td>${on ? `<i style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:${g.picker.color(r.id)}"></i>` : ""}${esc(runLabel(r))}</td>${showGroup ? `<td>${esc(g.label)}</td>` : ""}<td>${r.nq}</td><td>${f3(r.best.r)}</td><td>${fInt(r.best.p)}</td><td>${r.random ? (r.deepest_p_above_random ? fInt(r.deepest_p_above_random) : "none") : "–"}</td><td>${fInt(r.gates_at_deepest)}</td><td>${fInt(r.shots)}</td><td>${fDate(r.date)}</td></tr>`;
+        }).join("") + "</tbody>";
+      table.querySelectorAll("tbody tr").forEach((tr) => {
+        tr.style.cursor = "pointer";
+        tr.addEventListener("click", () => owner[tr.dataset.k] && owner[tr.dataset.k].toggle(tr.dataset.k));
+      });
+    }
+
+    /* ---------- native layout: one chart per lattice, side by side ---------- */
+    function renderNL() {
+      const LATTICES = {
+        "heavy-hex": { title: "Heavy-hex lattice", note: "2–3 neighbours per qubit" },
+        square: { title: "Square lattice", note: "up to 4 neighbours per qubit" },
+        other: { title: "Other topologies", note: "" },
+      };
+      const byLattice = {};
+      RUNS.filter((r) => r.topology === "NL" && isQpu(r)).forEach((r) => {
+        const l = LATTICES[dev(r).lattice] ? dev(r).lattice : "other";
+        (byLattice[l] = byLattice[l] || []).push(r);
+      });
+      const groups = Object.keys(LATTICES).filter((l) => byLattice[l]).map((l, i) => ({
+        prefix: `nl${i}`, runs: byLattice[l], label: LATTICES[l].title,
+        vendors: [...new Set(byLattice[l].map((r) => dev(r).vendor))].join(", "), note: LATTICES[l].note,
+      }));
+      const box = $("#nlPanels");
+      box.classList.toggle("single", groups.length === 1);
+      box.innerHTML = groups.map((g) => `<article class="panel">
+          <div class="panel-head"><h3>${esc(g.label)}</h3><span>${esc(g.vendors)}${g.note ? ` · ${esc(g.note)}` : ""}</span></div>
+          <div class="chips" id="${g.prefix}Chips"></div>
+          <div class="chart tall" id="${g.prefix}Chart"></div>
+          <div class="legend" id="${g.prefix}Legend"></div>
+        </article>`).join("");
+      let ready = false;
+      const table = () => { if (ready) renderTable($("#nlTable"), groups, true); };
+      groups.forEach((g) => { g.picker = renderCurves(g.prefix, g.runs, null, { table, showQubits: true }); });
+      ready = true;
+      table();
     }
 
     /* ---------- 1D chain: one chart per chain length ---------- */
