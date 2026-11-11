@@ -1,0 +1,22 @@
+# Fully connected problems on an IBM QPU through a 1D SWAP network; each problem is
+# copied onto every free stretch of the qubit line and the copies run in parallel.
+#
+# A list of sizes runs a sweep: all sizes go in ONE job (one queue wait), and each size
+# gets its own results file, Data/ibm_pittsburgh/<N>_FC.npy.
+#   python -m lrqaoa run configs/ibm_fc.toml --dry-run          # check depth / gate counts first
+#   python -m lrqaoa run configs/ibm_fc.toml --skip-existing    # only sizes not measured yet
+backend = "ibm_pittsburgh"
+topology = "FC"
+nq = [5, 7, 10, 12, 15, 17, 18, 20, 22, 25, 27, 30]
+ps = [3, 4, 5]
+shots = 1000
+
+# Ramp slope: one list for every size (deltas = [0.3]), or per size as below.
+# Sizes not listed use the paper default (0.63 up to 17 nodes, 0.3 up to 45, then 0.2).
+[deltas]
+"18" = [0.3]
+"20" = [0.3]
+
+[provider]
+kind = "ibm"
+service = "mcm-primitives"   # name of the saved QiskitRuntimeService account (omit for the default)

@@ -1,0 +1,12 @@
+# IonQ through Amazon Braket (AWS credentials in the environment). All-to-all, so the
+# circuit uses direct RZZ gates with no SWAPs. Braket charges per task and per shot.
+backend = "ionq_forte_enterprise"
+topology = "FC"
+nq = 28
+ps = [3, 4, 5]
+deltas = [0.3]
+shots = 100
+
+[provider]
+kind = "braket"
+device = "Forte Enterprise 1"

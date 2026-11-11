@@ -1,0 +1,6 @@
+# Quick local check, no account needed:  python -m lrqaoa run configs/simulator_fc.toml --tag _test
+backend = "qasm_simulator"
+topology = "FC"
+nq = 10
+ps = [3, 5, 10, 20]
+shots = 1000

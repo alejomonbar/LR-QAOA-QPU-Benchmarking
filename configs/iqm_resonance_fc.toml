@@ -1,0 +1,12 @@
+# IQM Resonance (needs `pip install qiskit-iqm` and the token in RESONANCE_API_TOKEN).
+backend = "iqm_emerald"
+topology = "FC"
+nq = 10
+ps = [3, 4, 5]
+deltas = [0.63]
+fractional_gates = false
+
+[provider]
+kind = "iqm"
+url = "https://cocos.resonance.meetiqm.com/emerald"
+token_env = "RESONANCE_API_TOKEN"

@@ -43,6 +43,11 @@ VENDOR_PREFIXES = {
 }
 
 
+def data_rel(path: Path) -> str:
+    """'Data/<backend>/<file>', also when the data folder is somewhere else (tests)."""
+    return "Data/" + path.relative_to(DATA).as_posix()
+
+
 # --------------------------------------------------------------------------- dates
 def git_first_added_dates() -> dict[str, str]:
     """Map repo-relative path -> date the file first appeared in git history (YYYY-MM-DD)."""
@@ -63,7 +68,7 @@ def git_first_added_dates() -> dict[str, str]:
 
 
 def file_date(path: Path, git_dates: dict[str, str], overrides: dict[str, str]) -> tuple[str, str]:
-    rel = path.relative_to(ROOT).as_posix()
+    rel = data_rel(path)
     if rel in overrides:
         return overrides[rel], "registry"
     if rel in git_dates:
@@ -231,9 +236,12 @@ def guess_device(backend: str) -> dict:
 
 
 def main() -> int:
+    global DATA
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "site" / "data" / "results.json"))
+    ap.add_argument("--data-dir", default=str(DATA))
     args = ap.parse_args()
+    DATA = Path(args.data_dir).resolve()
 
     registry = json.loads((DATA / "registry.json").read_text())
     devices_meta = registry.get("devices", {})
@@ -261,7 +269,7 @@ def main() -> int:
 
     runs, pending, devices, warned = [], [], {}, set()
     for f, backend, nq, topology, variant, delta in jobs:
-        rel = f.relative_to(ROOT).as_posix()
+        rel = data_rel(f)
         if backend not in devices_meta and backend not in warned:
             print(f"! {backend} is not in Data/registry.json; guessing its metadata", file=sys.stderr)
             warned.add(backend)

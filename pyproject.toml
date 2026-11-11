@@ -1,0 +1,25 @@
+[project]
+name = "lrqaoa"
+version = "0.1.0"
+description = "LR-QAOA benchmark of quantum processing units at large width and depth"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0", "scipy>=1.11", "networkx>=3.1", "qiskit>=2.0", "qiskit-aer>=0.17"]
+
+[project.optional-dependencies]
+ibm = ["qiskit-ibm-runtime>=0.40"]
+braket = ["qiskit-braket-provider>=0.12", "amazon-braket-sdk"]
+iqm = ["qiskit-iqm"]
+quantinuum = ["qnexus", "guppylang"]
+solver = ["docplex", "cplex"]   # only to create new FC / NL problem instances
+test = ["pytest", "qiskit-ibm-runtime>=0.40"]
+
+[tool.setuptools]
+packages = ["lrqaoa"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests", "."]
+addopts = "-p no:cacheprovider"
+filterwarnings = ["ignore::DeprecationWarning"]

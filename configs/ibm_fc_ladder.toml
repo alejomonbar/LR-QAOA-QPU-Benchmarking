@@ -1,0 +1,13 @@
+# Fully connected problem on a square-lattice IBM device (Nighthawk) using 2 x m ladders:
+# ~17% shallower than the 1D SWAP network, up to 24 nodes on a 12 x 10 lattice.
+backend = "ibm_phoenix"
+topology = "FC"
+nq = 18
+ps = [3, 5, 7]
+deltas = [0.3]
+strategy = "ladder"
+tag = "_ladder"              # keeps it apart from the SWAP-network file 18_FC.npy
+
+[provider]
+kind = "ibm"
+service = "mcm-primitives"

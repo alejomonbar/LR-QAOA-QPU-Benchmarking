@@ -1,0 +1,11 @@
+# Rigetti Cepheus through Amazon Braket.
+backend = "rigetti_cepheus_1_108q"
+topology = "1D"
+nq = 50
+ps = [3, 5, 10]
+deltas = [1.0]
+fractional_gates = false
+
+[provider]
+kind = "braket"
+device = "Cepheus-1-108Q"

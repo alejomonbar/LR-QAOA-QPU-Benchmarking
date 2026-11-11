@@ -1,0 +1,14 @@
+# Quantinuum Helios through Nexus (run `qnx.login()` once). Guppy program, all-to-all.
+# Set emulate = true to run small sizes on the local Guppy emulator first.
+backend = "quantinuum_helios_1"
+topology = "FC"
+nq = 95
+ps = [3]
+deltas = [0.2]
+shots = 10
+
+[provider]
+kind = "quantinuum"
+system = "Helios-1"
+project = "Helios-Samples"
+max_cost = 300               # HQC cap for the job
