@@ -22,6 +22,7 @@
       <a href="#fc">Fully connected</a>
       <a href="#nl">Native layout</a>
       <a href="#chain">1D chain</a>
+      <a href="#speed" class="opt">Layer time</a>
       <a href="#method" class="opt">Method</a>
       <a href="#data" class="opt">Data</a>
     </nav>
@@ -128,7 +129,37 @@
     </div>
   </section>
 
-  <section class="section alt" id="method">
+  <section class="section alt" id="speed">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Time per fully connected layer</h2>
+        <p>How long a processor takes to apply one LR-QAOA layer, the N(N−1)/2 couplings plus the mixer, on an N-node fully connected problem. IBM chips do it with a SWAP network in about N steps, so the time grows roughly linearly with N. Trapped-ion devices need no SWAPs but apply only a few pairs at a time, so their time grows close to N². Solid lines are computed; dashed lines are estimates, with the source of each in the table.</p>
+      </div>
+      <div class="grid-2 lt-grid">
+        <article class="panel">
+          <div class="panel-head"><h3>One layer vs problem size</h3><span>Log scale · hover a point for details</span></div>
+          <div class="chart tall" id="ltChart"></div>
+          <div class="legend" id="ltLegend"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><h3>By provider</h3><span>One layer at N = 20</span></div>
+          <div class="table-wrap lt-wrap"><table class="data lt" id="ltProv"></table></div>
+          <p class="note lt-key" id="ltKey"></p>
+        </article>
+      </div>
+      <details class="lt-more">
+        <summary>Show each processor</summary>
+        <div class="table-wrap"><table class="data lt" id="ltRows"></table></div>
+      </details>
+      <ul class="lt-notes">
+        <li><b>Estimates are not like for like.</b> The Helios-1 line includes ion transport and cooling, which take 52 of the 55 ms of each round at 98 qubits. The IonQ and AQT lines count gate time only, so they are lower bounds.</li>
+        <li><b>Layer time is not job time.</b> Every shot also pays reset and readout: about 0.15–1 ms on the ion devices, and a 250 µs default repetition delay on IBM.</li>
+        <li id="ltUpdated"></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="method">
     <div class="wrap method">
       <div class="sec-head"><h2>Method</h2></div>
       <figure class="figure">
@@ -154,7 +185,7 @@
     </div>
   </section>
 
-  <section class="section" id="data">
+  <section class="section alt" id="data">
     <div class="wrap">
       <div class="sec-head">
         <h2>Data &amp; contributing</h2>

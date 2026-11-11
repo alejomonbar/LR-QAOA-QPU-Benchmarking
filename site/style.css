@@ -18,6 +18,8 @@
   --accent: #b9d25f;
   /* series: validated reference palette, first three slots (all-pairs safe) */
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  /* layer-time section: the full reference palette, one slot per processor line */
+  --c4: #eda100; --c5: #e87ba4; --c6: #008300; --c7: #6250d6; --c8: #e34948;
   --ctx: #c9d0d6;              /* context (unselected) lines */
   --sc: #2a78d6;               /* superconducting */
   --ion: #eb6834;              /* trapped ion */
@@ -32,6 +34,7 @@
     --line: #26333f; --grid: #1d2934; --brand: #9cc9f0; --brand-solid: #12355a; --link: #6cb6f0;
     --hero: #08182a; --hero-2: #0f2c4a;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --ctx: #34414d; --sc: #3987e5; --ion: #d95926;
+    --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
     --good: #4cc27a; --bad: #f07167;
     color-scheme: dark;
   }
@@ -41,6 +44,7 @@
   --line: #26333f; --grid: #1d2934; --brand: #9cc9f0; --brand-solid: #12355a; --link: #6cb6f0;
   --hero: #08182a; --hero-2: #0f2c4a;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --ctx: #34414d; --sc: #3987e5; --ion: #d95926;
+  --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
   --good: #4cc27a; --bad: #f07167;
   color-scheme: dark;
 }
@@ -184,6 +188,29 @@ table.data th { font-weight: 600; font-size: 12.5px; color: var(--muted); backgr
 table.data th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 table.data tr:last-child td { border-bottom: 0; }
 table.data tr.sel td { background: color-mix(in srgb, var(--s1) 8%, transparent); }
+
+/* layer time */
+.lt-grid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); }
+@media (max-width: 960px) { .lt-grid { grid-template-columns: 1fr; } }
+.lt-wrap { margin-top: 0; }
+table.data.lt { font-size: 13.5px; }
+table.data.lt th, table.data.lt td { padding: 7px 8px; }
+table.data.lt td.l, table.data.lt th.l { text-align: left; }
+table.data.lt td.nm { white-space: normal; }
+table.data.lt td.meth { white-space: normal; min-width: 240px; text-align: left; font-size: 13px; color: var(--muted); }
+table.data.lt th { position: static; }
+.lt .sw { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; }
+.tag { display: inline-block; font-size: 11.5px; font-weight: 600; line-height: 1.5; padding: 0 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); margin-right: 6px; white-space: nowrap; }
+.tag.est { border-style: dashed; color: var(--ink); }
+.tag.none { border-style: dotted; color: var(--faint); font-weight: 500; }
+.lt-key { line-height: 2; }
+.legend i.dash { height: 0; background: none !important; border-top: 2px dashed; border-radius: 0; }
+.legend i.area { height: 9px; border-radius: 2px; opacity: .45; }
+.lt-more { margin-top: 16px; }
+.lt-more summary { cursor: pointer; color: var(--link); font-size: 15px; width: fit-content; }
+.lt-more .table-wrap { margin-top: 10px; max-height: none; }
+.lt-notes { margin: 18px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14.5px; color: var(--muted); max-width: 90ch; }
+.lt-notes b { color: var(--ink); font-weight: 600; }
 
 /* method */
 .prose p { margin: 0 0 14px; max-width: 64ch; }

@@ -1,0 +1,1012 @@
+{
+ "updated": "2026-11-11",
+ "series": [
+  {
+   "key": "eagle",
+   "label": "IBM Eagle",
+   "provider": "IBM",
+   "status": "computed",
+   "covers": [
+    "ibm_brisbane",
+    "ibm_brussels",
+    "ibm_kyiv",
+    "ibm_kyoto",
+    "ibm_nazca",
+    "ibm_osaka",
+    "ibm_sherbrooke",
+    "ibm_strasbourg"
+   ],
+   "gate": "ECR",
+   "t2q_ns": [
+    660
+   ],
+   "method": "SWAP network along the device's longest 1D chain, compiled and scheduled with calibrated gate durations",
+   "source": "ibm_brisbane: qiskit calibration snapshot",
+   "members": [
+    {
+     "device": "ibm_brisbane",
+     "source": "qiskit calibration snapshot",
+     "gate": "ECR",
+     "t2q_ns": 660,
+     "chain": 109,
+     "points": [
+      [
+       5,
+       10.86
+      ],
+      [
+       10,
+       21.66
+      ],
+      [
+       15,
+       32.46
+      ],
+      [
+       20,
+       43.26
+      ],
+      [
+       25,
+       54.06
+      ],
+      [
+       30,
+       64.86
+      ],
+      [
+       40,
+       86.46
+      ],
+      [
+       50,
+       108.06
+      ],
+      [
+       60,
+       129.66
+      ],
+      [
+       70,
+       151.26
+      ],
+      [
+       80,
+       187.2
+      ],
+      [
+       90,
+       210.6
+      ],
+      [
+       100,
+       234.0
+      ],
+      [
+       109,
+       254.88
+      ]
+     ]
+    }
+   ],
+   "points": [
+    [
+     5,
+     10.86
+    ],
+    [
+     10,
+     21.66
+    ],
+    [
+     15,
+     32.46
+    ],
+    [
+     20,
+     43.26
+    ],
+    [
+     25,
+     54.06
+    ],
+    [
+     30,
+     64.86
+    ],
+    [
+     40,
+     86.46
+    ],
+    [
+     50,
+     108.06
+    ],
+    [
+     60,
+     129.66
+    ],
+    [
+     70,
+     151.26
+    ],
+    [
+     80,
+     187.2
+    ],
+    [
+     90,
+     210.6
+    ],
+    [
+     100,
+     234.0
+    ],
+    [
+     109,
+     254.88
+    ]
+   ],
+   "short": "calibrations"
+  },
+  {
+   "key": "heron",
+   "label": "IBM Heron r1–r3",
+   "provider": "IBM",
+   "status": "computed",
+   "covers": [
+    "ibm_torino",
+    "ibm_aachen",
+    "ibm_boston",
+    "ibm_fez",
+    "ibm_kingston",
+    "ibm_marrakesh",
+    "ibm_pittsburgh"
+   ],
+   "gate": "CZ",
+   "t2q_ns": [
+    68
+   ],
+   "method": "SWAP network along the device's longest 1D chain, compiled and scheduled with calibrated gate durations",
+   "source": "ibm_torino: qiskit calibration snapshot; ibm_fez: live calibration, 2026-11-11; ibm_boston: live calibration, 2026-11-11",
+   "members": [
+    {
+     "device": "ibm_torino",
+     "source": "qiskit calibration snapshot",
+     "gate": "CZ",
+     "t2q_ns": 68,
+     "chain": 112,
+     "points": [
+      [
+       5,
+       1.532
+      ],
+      [
+       10,
+       3.032
+      ],
+      [
+       15,
+       4.532
+      ],
+      [
+       20,
+       7.556
+      ],
+      [
+       25,
+       9.44
+      ],
+      [
+       30,
+       11.732
+      ],
+      [
+       40,
+       15.632
+      ],
+      [
+       50,
+       19.532
+      ],
+      [
+       60,
+       26.672
+      ],
+      [
+       70,
+       31.112
+      ],
+      [
+       80,
+       35.552
+      ],
+      [
+       90,
+       39.992
+      ],
+      [
+       100,
+       44.432
+      ],
+      [
+       110,
+       48.872
+      ],
+      [
+       112,
+       61.824
+      ]
+     ]
+    },
+    {
+     "device": "ibm_fez",
+     "source": "live calibration, 2026-11-11",
+     "gate": "CZ",
+     "t2q_ns": 68,
+     "chain": 129,
+     "points": [
+      [
+       5,
+       1.404
+      ],
+      [
+       10,
+       2.784
+      ],
+      [
+       15,
+       4.164
+      ],
+      [
+       20,
+       5.544
+      ],
+      [
+       25,
+       6.924
+      ],
+      [
+       30,
+       8.304
+      ],
+      [
+       40,
+       11.064
+      ],
+      [
+       50,
+       13.824
+      ],
+      [
+       60,
+       19.416
+      ],
+      [
+       70,
+       22.656
+      ],
+      [
+       80,
+       25.896
+      ],
+      [
+       90,
+       29.136
+      ],
+      [
+       100,
+       32.376
+      ],
+      [
+       110,
+       35.616
+      ],
+      [
+       120,
+       38.856
+      ],
+      [
+       129,
+       41.82
+      ]
+     ]
+    },
+    {
+     "device": "ibm_boston",
+     "source": "live calibration, 2026-11-11",
+     "gate": "CZ",
+     "t2q_ns": 68,
+     "chain": 129,
+     "points": [
+      [
+       5,
+       1.652
+      ],
+      [
+       10,
+       3.332
+      ],
+      [
+       15,
+       4.952
+      ],
+      [
+       20,
+       6.632
+      ],
+      [
+       25,
+       8.252
+      ],
+      [
+       30,
+       9.932
+      ],
+      [
+       40,
+       13.232
+      ],
+      [
+       50,
+       16.532
+      ],
+      [
+       60,
+       19.832
+      ],
+      [
+       70,
+       23.132
+      ],
+      [
+       80,
+       26.432
+      ],
+      [
+       90,
+       29.732
+      ],
+      [
+       100,
+       33.032
+      ],
+      [
+       110,
+       36.332
+      ],
+      [
+       120,
+       41.072
+      ],
+      [
+       129,
+       46.412
+      ]
+     ]
+    }
+   ],
+   "lo": [
+    [
+     5,
+     1.404
+    ],
+    [
+     10,
+     2.784
+    ],
+    [
+     15,
+     4.164
+    ],
+    [
+     20,
+     5.544
+    ],
+    [
+     25,
+     6.924
+    ],
+    [
+     30,
+     8.304
+    ],
+    [
+     40,
+     11.064
+    ],
+    [
+     50,
+     13.824
+    ],
+    [
+     60,
+     19.416
+    ],
+    [
+     70,
+     22.656
+    ],
+    [
+     80,
+     25.896
+    ],
+    [
+     90,
+     29.136
+    ],
+    [
+     100,
+     32.376
+    ],
+    [
+     110,
+     35.616
+    ],
+    [
+     120,
+     38.856
+    ],
+    [
+     129,
+     41.82
+    ]
+   ],
+   "hi": [
+    [
+     5,
+     1.652
+    ],
+    [
+     10,
+     3.332
+    ],
+    [
+     15,
+     4.952
+    ],
+    [
+     20,
+     7.556
+    ],
+    [
+     25,
+     9.44
+    ],
+    [
+     30,
+     11.732
+    ],
+    [
+     40,
+     15.632
+    ],
+    [
+     50,
+     19.532
+    ],
+    [
+     60,
+     26.672
+    ],
+    [
+     70,
+     31.112
+    ],
+    [
+     80,
+     35.552
+    ],
+    [
+     90,
+     39.992
+    ],
+    [
+     100,
+     44.432
+    ],
+    [
+     110,
+     48.872
+    ],
+    [
+     120,
+     41.072
+    ],
+    [
+     129,
+     46.412
+    ]
+   ],
+   "points": [
+    [
+     5,
+     1.523
+    ],
+    [
+     10,
+     3.046
+    ],
+    [
+     15,
+     4.541
+    ],
+    [
+     20,
+     6.472
+    ],
+    [
+     25,
+     8.085
+    ],
+    [
+     30,
+     9.87
+    ],
+    [
+     40,
+     13.151
+    ],
+    [
+     50,
+     16.432
+    ],
+    [
+     60,
+     22.757
+    ],
+    [
+     70,
+     26.549
+    ],
+    [
+     80,
+     30.342
+    ],
+    [
+     90,
+     34.135
+    ],
+    [
+     100,
+     37.928
+    ],
+    [
+     110,
+     41.721
+    ],
+    [
+     120,
+     39.949
+    ],
+    [
+     129,
+     44.056
+    ]
+   ],
+   "short": "calibrations"
+  },
+  {
+   "key": "nighthawk",
+   "label": "IBM Nighthawk",
+   "provider": "IBM",
+   "status": "computed",
+   "covers": [
+    "ibm_chicago",
+    "ibm_miami",
+    "ibm_phoenix"
+   ],
+   "gate": "CZ",
+   "t2q_ns": [
+    68
+   ],
+   "method": "SWAP network along the device's longest 1D chain, compiled and scheduled with calibrated gate durations",
+   "source": "ibm_chicago: live calibration, 2026-11-11",
+   "members": [
+    {
+     "device": "ibm_chicago",
+     "source": "live calibration, 2026-11-11",
+     "gate": "CZ",
+     "t2q_ns": 68,
+     "chain": 120,
+     "points": [
+      [
+       5,
+       1.532
+      ],
+      [
+       10,
+       3.332
+      ],
+      [
+       15,
+       4.952
+      ],
+      [
+       20,
+       6.632
+      ],
+      [
+       25,
+       8.252
+      ],
+      [
+       30,
+       9.932
+      ],
+      [
+       40,
+       13.948
+      ],
+      [
+       50,
+       18.032
+      ],
+      [
+       60,
+       21.632
+      ],
+      [
+       70,
+       25.232
+      ],
+      [
+       80,
+       32.624
+      ],
+      [
+       90,
+       39.272
+      ],
+      [
+       100,
+       43.632
+      ],
+      [
+       110,
+       47.992
+      ],
+      [
+       120,
+       52.352
+      ]
+     ]
+    }
+   ],
+   "points": [
+    [
+     5,
+     1.532
+    ],
+    [
+     10,
+     3.332
+    ],
+    [
+     15,
+     4.952
+    ],
+    [
+     20,
+     6.632
+    ],
+    [
+     25,
+     8.252
+    ],
+    [
+     30,
+     9.932
+    ],
+    [
+     40,
+     13.948
+    ],
+    [
+     50,
+     18.032
+    ],
+    [
+     60,
+     21.632
+    ],
+    [
+     70,
+     25.232
+    ],
+    [
+     80,
+     32.624
+    ],
+    [
+     90,
+     39.272
+    ],
+    [
+     100,
+     43.632
+    ],
+    [
+     110,
+     47.992
+    ],
+    [
+     120,
+     52.352
+    ]
+   ],
+   "short": "calibrations"
+  },
+  {
+   "key": "helios",
+   "label": "Quantinuum Helios-1",
+   "provider": "Quantinuum",
+   "status": "estimate",
+   "covers": [
+    "quantinuum_helios_1"
+   ],
+   "gate": "RZZ",
+   "t2q_ns": [
+    70000
+   ],
+   "method": "(N−1) round-robin rounds × the measured depth-1 time of a fully dense random layer; includes transport, cooling and batching through the 8 logic zones (⌈N/16⌉ batches per round)",
+   "source": "Quantinuum Helios paper, arXiv:2511.05465, Fig. 4b (control-system simulator)",
+   "url": "https://arxiv.org/abs/2511.05465",
+   "points": [
+    [
+     16,
+     178050.0
+    ],
+    [
+     20,
+     344850.0
+    ],
+    [
+     24,
+     448960.0
+    ],
+    [
+     28,
+     527040.0
+    ],
+    [
+     32,
+     602020.0
+    ],
+    [
+     36,
+     907900.0
+    ],
+    [
+     40,
+     1045980.0
+    ],
+    [
+     44,
+     1149820.0
+    ],
+    [
+     48,
+     1242210.0
+    ],
+    [
+     52,
+     1698810.0
+    ],
+    [
+     56,
+     1861200.0
+    ],
+    [
+     60,
+     2024880.0
+    ],
+    [
+     64,
+     2178540.0
+    ],
+    [
+     68,
+     2728240.0
+    ],
+    [
+     72,
+     2979160.0
+    ],
+    [
+     76,
+     3174750.0
+    ],
+    [
+     80,
+     3383570.0
+    ],
+    [
+     84,
+     4103520.0
+    ],
+    [
+     88,
+     4361310.0
+    ],
+    [
+     92,
+     4585490.0
+    ],
+    [
+     96,
+     4864000.0
+    ],
+    [
+     98,
+     5345670.0
+    ]
+   ],
+   "short": "arXiv:2511.05465"
+  },
+  {
+   "key": "ionq_aria_2",
+   "label": "IonQ Aria",
+   "provider": "IonQ",
+   "status": "estimate",
+   "covers": [
+    "ionq_aria_2"
+   ],
+   "gate": "MS",
+   "t2q_ns": [
+    600000
+   ],
+   "method": "N(N−1)/2 two-qubit and N single-qubit gates one after another; gate time only (lower bound)",
+   "source": "vendor gate durations in the Amazon Braket device properties",
+   "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
+   "points": [
+    [
+     5,
+     6675.0
+    ],
+    [
+     10,
+     28350.0
+    ],
+    [
+     15,
+     65025.0
+    ],
+    [
+     20,
+     116700.0
+    ],
+    [
+     25,
+     183375.0
+    ]
+   ],
+   "short": "Braket"
+  },
+  {
+   "key": "ionq_forte",
+   "label": "IonQ Forte",
+   "provider": "IonQ",
+   "status": "estimate",
+   "covers": [
+    "ionq_forte"
+   ],
+   "gate": "MS",
+   "t2q_ns": [
+    970000
+   ],
+   "method": "N(N−1)/2 two-qubit and N single-qubit gates one after another; gate time only (lower bound)",
+   "source": "vendor gate durations in the Amazon Braket device properties",
+   "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
+   "points": [
+    [
+     5,
+     10350.0
+    ],
+    [
+     10,
+     44950.0
+    ],
+    [
+     15,
+     103800.0
+    ],
+    [
+     20,
+     186900.0
+    ],
+    [
+     25,
+     294250.0
+    ],
+    [
+     30,
+     425850.0
+    ],
+    [
+     36,
+     615780.0
+    ]
+   ],
+   "short": "Braket"
+  },
+  {
+   "key": "ionq_forte_enterprise",
+   "label": "IonQ Forte Enterprise",
+   "provider": "IonQ",
+   "status": "estimate",
+   "covers": [
+    "ionq_forte_enterprise"
+   ],
+   "gate": "MS",
+   "t2q_ns": [
+    650000
+   ],
+   "method": "N(N−1)/2 two-qubit and N single-qubit gates one after another; gate time only (lower bound)",
+   "source": "vendor gate durations in the Amazon Braket device properties",
+   "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
+   "points": [
+    [
+     5,
+     6815.0
+    ],
+    [
+     10,
+     29880.0
+    ],
+    [
+     15,
+     69195.0
+    ],
+    [
+     20,
+     124760.0
+    ],
+    [
+     25,
+     196575.0
+    ],
+    [
+     30,
+     284640.0
+    ],
+    [
+     36,
+     411768.0
+    ]
+   ],
+   "short": "Braket"
+  },
+  {
+   "key": "aqt_ibexq1",
+   "label": "AQT IBEX Q1",
+   "provider": "AQT",
+   "status": "estimate",
+   "covers": [
+    "aqt_ibexq1"
+   ],
+   "gate": "MS",
+   "t2q_ns": [
+    335000
+   ],
+   "method": "N(N−1)/2 two-qubit and N single-qubit gates one after another; gate time only (lower bound)",
+   "source": "vendor gate durations in the Amazon Braket device properties",
+   "url": "https://docs.aws.amazon.com/braket/latest/developerguide/braket-devices.html",
+   "points": [
+    [
+     5,
+     3575.0
+    ],
+    [
+     10,
+     15525.0
+    ],
+    [
+     12,
+     22650.0
+    ]
+   ],
+   "short": "Braket"
+  }
+ ]
+}

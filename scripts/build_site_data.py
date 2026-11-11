@@ -327,6 +327,10 @@ def main() -> int:
         "runs": sorted(runs, key=lambda r: (r["topology"], r["device"], r["nq"], r["variant"] or "")),
         "pending": pending,
     }
+    # time of one fully connected layer per processor (scripts/layer_times.py writes it)
+    layer_times = DATA / "layer_times.json"
+    if layer_times.exists():
+        out["layer_times"] = json.loads(layer_times.read_text())
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(out, separators=(",", ":")))
     print(f"\nWrote {args.out}: {len(runs)} runs on {len(out['devices'])} devices, {len(pending)} pending")

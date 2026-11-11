@@ -234,7 +234,7 @@
     setTimeout(openFromHash, 0);
 
     /* each section on its own: one failing section must not blank the others */
-    [["#fc", renderFC], ["#nl", renderNL], ["#chain", renderChain]].forEach(([sel, fn]) => {
+    [["#fc", renderFC], ["#nl", renderNL], ["#chain", renderChain], ["#speed", renderSpeed]].forEach(([sel, fn]) => {
       try { fn(); } catch (err) {
         console.error(err);
         const note = document.createElement("p");
@@ -532,6 +532,120 @@
         pickers[size] = renderCurves("chain", chain.filter((r) => r.nq === size), pickers[size]);
       };
       show();
+    }
+
+    /* ---------- time per fully connected layer (Data/layer_times.json, scripts/layer_times.py) ---------- */
+    function renderSpeed() {
+      const LT = data.layer_times;
+      if (!LT || !LT.series || !LT.series.length) { $("#speed").hidden = true; return; }
+      const S = LT.series;
+      // color follows the processor line, fixed by key; anything new is drawn as context
+      const COL = { eagle: "var(--s1)", heron: "var(--s2)", nighthawk: "var(--s3)", helios: "var(--c8)", ionq_aria_2: "var(--c4)",
+                    ionq_forte: "var(--c5)", ionq_forte_enterprise: "var(--c6)", aqt_ibexq1: "var(--c7)" };
+      const col = (s) => COL[s.key] || "var(--faint)";
+      const est = (s) => s.status !== "computed";
+      // value and unit apart, so a range in one unit reads "117–187 ms"
+      const tP = (us) => us >= 1e6 ? [(us / 1e6).toFixed(2), "s"] : us >= 1e3 ? [(us / 1e3).toFixed(us >= 1e4 ? 0 : 1), "ms"] : [us.toFixed(us >= 10 ? 0 : 1), "µs"];
+      const nsP = (ns) => ns >= 1e3 ? [String(Math.round(ns / 1e3)), "µs"] : [String(Math.round(ns)), "ns"];
+      const fT = (us) => tP(us).join(" "), fNs = (ns) => nsP(ns).join(" ");
+      const range = (a, P) => {
+        if (!a.length) return "–";
+        const [x, ux] = P(Math.min(...a)), [y, uy] = P(Math.max(...a));
+        return x === y && ux === uy ? `${x} ${ux}` : ux === uy ? `${x}–${y} ${uy}` : `${x} ${ux} – ${y} ${uy}`;
+      };
+      const decade = (e) => (e >= 6 ? 10 ** (e - 6) + " s" : e >= 3 ? 10 ** (e - 3) + " ms" : 10 ** e + " µs");
+      const at = (pts, n) => { const p = (pts || []).find((q) => q[0] === n); return p ? p[1] : null; };
+      const vals20 = (s) => (s.lo ? [at(s.lo, 20), at(s.hi, 20)] : [at(s.points, 20)]).filter((v) => v != null);
+      const tag = (st) => `<span class="tag ${st === "computed" ? "" : st === "estimate" ? "est" : "none"}">${st === "computed" ? "Computed" : st === "estimate" ? "Estimate" : "No data"}</span>`;
+      const src = (s) => s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.short || s.source)}</a>` : esc(s.short || s.source);
+
+      /* chart: log time vs N */
+      const host = $("#ltChart");
+      const draw = () => {
+        host.innerHTML = "";
+        const W = host.clientWidth, H = host.clientHeight;
+        if (!W || !H) return;
+        const m = { t: 12, r: 14, b: 44, l: 64 };
+        const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Time of one fully connected layer versus problem size, log scale" }, host);
+        const all = S.flatMap((s) => [...s.points, ...(s.hi || [])]);
+        const xMax = Math.ceil(Math.max(...all.map((p) => p[0])) / 10) * 10;
+        const e0 = Math.floor(Math.log10(Math.min(...all.map((p) => p[1])))), e1 = Math.ceil(Math.log10(Math.max(...all.map((p) => p[1]))));
+        const X = (n) => m.l + n / xMax * (W - m.l - m.r);
+        const Y = (us) => H - m.b - (Math.log10(us) - e0) / (e1 - e0) * (H - m.t - m.b);
+        const grid = el("g", { class: "grid" }, svg), axis = el("g", { class: "axis" }, svg);
+        for (let e = e0; e <= e1; e++) {
+          el("line", { x1: m.l, x2: W - m.r, y1: Y(10 ** e), y2: Y(10 ** e) }, grid);
+          el("text", { x: m.l - 8, y: Y(10 ** e) + 4, "text-anchor": "end" }, axis).textContent = decade(e);
+        }
+        const step = W < 480 ? 40 : 20;
+        for (let n = 0; n <= xMax; n += step) {
+          el("line", { x1: X(n), x2: X(n), y1: m.t, y2: H - m.b }, grid);
+          el("text", { x: X(n), y: H - m.b + 17, "text-anchor": "middle" }, axis).textContent = n;
+        }
+        el("text", { x: (m.l + W - m.r) / 2, y: H - 6, "text-anchor": "middle", class: "title" }, axis).textContent = "Problem size N (nodes)";
+        el("text", { x: -(m.t + H - m.b) / 2, y: 14, transform: "rotate(-90)", "text-anchor": "middle", class: "title" }, axis).textContent = "Time of one layer";
+        const hits = [];
+        S.forEach((s) => {
+          const c = col(s);
+          if (s.lo) {
+            const d = s.lo.map((p, i) => `${i ? "L" : "M"}${X(p[0])},${Y(p[1])}`).join("") + [...s.hi].reverse().map((p) => `L${X(p[0])},${Y(p[1])}`).join("") + "Z";
+            el("path", { d, fill: c, opacity: 0.18 }, svg);
+          }
+          el("path", { d: s.points.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(""), fill: "none", stroke: c, "stroke-width": 2,
+                       "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": est(s) ? "5 4" : "none" }, svg);
+          s.points.forEach((p, i) => {
+            el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 3.5, fill: c, stroke: "var(--card)", "stroke-width": 1.5 }, svg);
+            hits.push({ x: X(p[0]), y: Y(p[1]), s, n: p[0], us: p[1], lo: s.lo ? s.lo[i][1] : null, hi: s.hi ? s.hi[i][1] : null });
+          });
+        });
+        const ring = el("circle", { r: 7, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5, visibility: "hidden" }, svg);
+        svg.addEventListener("pointermove", (ev) => {
+          const b = svg.getBoundingClientRect(), mx = (ev.clientX - b.left) * W / b.width, my = (ev.clientY - b.top) * H / b.height;
+          let h = null, bd = 24 * 24;
+          for (const q of hits) { const d = (q.x - mx) ** 2 + (q.y - my) ** 2; if (d < bd) { bd = d; h = q; } }
+          if (!h) { ring.setAttribute("visibility", "hidden"); hideTip(); return; }
+          ring.setAttribute("cx", h.x); ring.setAttribute("cy", h.y); ring.setAttribute("visibility", "visible");
+          const s = h.s, rounds = s.key === "helios" ? `<br><span class="k">${h.n - 1} rounds × ${fT(h.us / (h.n - 1))}, ${Math.ceil(h.n / 16)} batch${h.n > 16 ? "es" : ""} each</span>` : "";
+          showTip(`<b>${esc(s.label)}</b> · N = ${h.n}${est(s) ? " · <i>estimate</i>" : ""}<br><span class="k">one layer:</span> ${h.lo != null ? `${fT(h.lo)} – ${fT(h.hi)}` : fT(h.us)}${rounds}<br><span class="k">source: ${esc(s.short || s.source)}</span>`, ev.clientX, ev.clientY);
+        });
+        svg.addEventListener("pointerleave", () => { ring.setAttribute("visibility", "hidden"); hideTip(); });
+      };
+      draw(); autoRedraw(host, draw);
+      $("#ltLegend").innerHTML = S.map((s) => `<span><i class="${s.lo ? "area" : est(s) ? "dash" : ""}" style="${est(s) && !s.lo ? "border-top-color" : "background"}:${col(s)}"></i>${esc(s.label)}${est(s) ? " (est.)" : ""}</span>`).join("");
+
+      /* by provider; vendors with QPUs on this site but no timing get a "No data" row */
+      const qpus = Object.entries(DEV).filter(([, v]) => v.kind === "qpu");
+      const covered = new Set(S.flatMap((s) => s.covers || []));
+      const provs = [...new Set(S.map((s) => s.provider))];
+      const rows = provs.map((pv) => {
+        const ss = S.filter((s) => s.provider === pv);
+        const status = ss.every((s) => !est(s)) ? "computed" : "estimate";
+        const n20 = ss.flatMap(vals20);
+        const missing = qpus.filter(([k, v]) => v.vendor === pv && !covered.has(k)).map(([, v]) => v.name);
+        return { pv, status, src: [...new Map(ss.map((s) => [s.short, s])).values()].map(src).join(", "),
+                 gate: range(ss.flatMap((s) => s.t2q_ns || []), nsP), n20: range(n20, tP), missing,
+                 tip: ss.map((s) => s.label).join(", ") };
+      });
+      const none = [...new Set(qpus.map(([, v]) => v.vendor))].filter((v) => v && !provs.includes(v));
+      $("#ltProv").innerHTML = `<thead><tr><th>Provider</th><th class="l">Status · source</th><th>2Q gate</th><th>N = 20</th></tr></thead><tbody>`
+        + rows.map((r) => `<tr title="${esc(r.tip)}"><td class="nm">${esc(r.pv)}</td><td class="l">${tag(r.status)}${r.src}</td><td>${r.gate}</td><td>${r.n20}</td></tr>`).join("")
+        + (none.length ? `<tr><td class="nm">${none.map(esc).join(", ")}</td><td class="l">${tag("none")}</td><td>–</td><td>–</td></tr>` : "") + "</tbody>";
+      const missing = rows.flatMap((r) => r.missing);
+      $("#ltKey").innerHTML = `${tag("computed")} compiled and scheduled with calibrated gate durations · ${tag("estimate")} from vendor-published timings · ${tag("none")} nothing usable yet`
+        + (missing.length ? `, also for ${missing.map(esc).join(", ")}` : "");
+
+      /* each processor: IBM lines split into the devices they were computed on */
+      const procRows = S.flatMap((s) => (s.members || [{ device: null, source: s.source, points: s.points, t2q_ns: (s.t2q_ns || [])[0] }]).map((mb) => ({ s, mb })));
+      $("#ltRows").innerHTML = `<thead><tr><th>Processor</th><th class="l">Status · source</th><th>2Q gate</th><th>N = 20</th><th>Largest N</th><th>Layer at largest N</th><th class="l">Method</th></tr></thead><tbody>`
+        + procRows.map(({ s, mb }) => {
+          const last = mb.points[mb.points.length - 1], v20 = at(mb.points, 20);
+          const gen = s.label.replace(/^IBM /, "").replace(/ r1–r3$/, "");
+          const name = mb.device ? `${esc(DEV[mb.device] ? DEV[mb.device].name : mb.device)} <span class="k">· ${esc(gen)}</span>` : esc(s.label);
+          const source = mb.device ? esc(mb.source) : src(s);
+          return `<tr><td class="nm"><span class="sw" style="background:${col(s)}"></span>${name}</td><td class="l">${tag(s.status)}${source}</td><td>${mb.t2q_ns ? fNs(mb.t2q_ns) : "–"}</td>`
+            + `<td>${v20 != null ? fT(v20) : "–"}</td><td>${last[0]}</td><td>${fT(last[1])}</td><td class="meth">${esc(s.method)}</td></tr>`;
+        }).join("") + "</tbody>";
+      $("#ltUpdated").innerHTML = `Numbers from <code>scripts/layer_times.py</code>, last run ${fDate(LT.updated)}. It recompiles the IBM layers with live calibrations and records the source of every other value.`;
     }
   }
 
