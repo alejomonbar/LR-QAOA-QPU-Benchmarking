@@ -32,7 +32,8 @@ FAMILY = {
     "ibm_torino": "heron-r1",
     **{b: "heron-r2" for b in ["ibm_fez", "ibm_marrakesh", "ibm_aachen", "ibm_kingston",
                                "ibm_boston", "ibm_pittsburgh"]},
-    **{b: "nighthawk-r1" for b in ["ibm_miami", "ibm_phoenix"]},
+    # Nighthawk: 12 x 10 square lattice, 218 couplers (ibm_chicago checked against ibm_phoenix)
+    **{b: "nighthawk-r1" for b in ["ibm_miami", "ibm_phoenix", "ibm_chicago"]},
 }
 
 LINES = {

@@ -80,3 +80,30 @@ def test_example_configs(path):
     for nq in cfg.sizes:
         G, optimal = problems.load_problem(cfg.topology, ROOT / "Data", nq, cfg.backend)
         assert len(optimal) >= G.number_of_nodes()
+
+
+def nighthawk_coupling():
+    """The real Nighthawk coupling map, as stored in the native-layout bank."""
+    import numpy as np
+
+    bank = np.load(ROOT / "Data" / "NL-problems.npy", allow_pickle=True).item()
+    return FakeDevice(120, [tuple(e) for e in bank["nighthawk-r1"]["G"].edges()])
+
+
+@pytest.mark.parametrize("backend", ["ibm_chicago", "ibm_future_nighthawk"])
+def test_nighthawk_devices_found_by_name_or_coupling_map(backend):
+    device = nighthawk_coupling()
+    nl = experiment.Config(backend=backend, topology="NL", ps=[2], data_dir=str(ROOT / "Data"))
+    items, shared = experiment.build(nl, device)
+    assert shared["family"] == "nighthawk-r1" and shared["n"] == 120
+    fc = experiment.Config(backend=backend, topology="FC", nq=20, ps=[2], strategy="ladder",
+                           data_dir=str(ROOT / "Data"))
+    experiment.build(fc, device)  # ladder geometry comes with the family
+
+
+def test_layout_that_does_not_fit_is_refused():
+    device = nighthawk_coupling()
+    device.edges = device.edges[1:]  # one coupler missing: not the stored Nighthawk device
+    cfg = experiment.Config(backend="ibm_phoenix", topology="NL", ps=[2], data_dir=str(ROOT / "Data"))
+    with pytest.raises(ValueError, match="does not fit the coupling map"):
+        experiment.build(cfg, device)

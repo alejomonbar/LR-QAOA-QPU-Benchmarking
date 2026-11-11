@@ -86,13 +86,26 @@ def output_path(cfg: Config, nq: int) -> Path:
 
 
 # --------------------------------------------------------------------- building
-def _line(cfg: Config, device, n_needed: int) -> list[int]:
+def resolve_family(cfg: Config, device) -> str:
+    """Processor family of the backend: from its name, else by matching its coupling map against
+    the device graphs in the native-layout bank (so a new device of a known family just works)."""
+    fam = layouts.family(cfg.backend)
+    if fam in layouts.LINES or fam in layouts.NL_BANK_KEY or device.edges is None:
+        return fam
+    match = problems.family_from_coupling(device.edges, Path(cfg.data_dir))
+    if match:
+        print(f"{cfg.backend} has the same coupling map as the '{match}' devices; using their layout and problems.")
+        return match
+    return fam
+
+
+def _line(cfg: Config, device, n_needed: int, fam: str) -> list[int]:
     if cfg.line:
         return list(cfg.line)
     if device.edges is None:  # simulator / all-to-all
         return list(range(n_needed))
     edge_set = {frozenset(e) for e in device.edges}
-    known = layouts.known_line(cfg.backend)
+    known = layouts.LINES.get(fam)
     if known and layouts.is_valid_line(known, edge_set):
         return known
     found = layouts.find_line(device.edges)
@@ -100,9 +113,25 @@ def _line(cfg: Config, device, n_needed: int) -> list[int]:
     return found
 
 
+def _check_coupling(items: list[dict], device, cfg: Config):
+    """Every 2-qubit gate must sit on a coupled pair; otherwise the layout does not fit this device."""
+    if device.edges is None:
+        return
+    allowed = {frozenset(e) for e in device.edges}
+    circ = items[0]["program"].circuit
+    bad = {tuple(sorted(circ.find_bit(q).index for q in inst.qubits))
+           for inst in circ.data if inst.operation.num_qubits == 2} - {tuple(sorted(e)) for e in allowed}
+    if bad:
+        raise ValueError(f"The {cfg.topology} layout does not fit the coupling map of {cfg.backend}: "
+                         f"{len(bad)} gate pair(s) are not coupled, e.g. {sorted(bad)[:3]}. "
+                         "Its stored layout/problem belongs to a different device; set `line`, or create a "
+                         f"problem with: python -m lrqaoa new-problem NL --backend {cfg.backend}")
+
+
 def build(cfg: Config, device) -> tuple[list[dict], dict]:
     """Circuits for every (delta, p), plus problem data shared by all of them."""
-    G, optimal = problems.load_problem(cfg.topology, Path(cfg.data_dir), cfg.nq, cfg.backend)
+    fam = resolve_family(cfg, device)
+    G, optimal = problems.load_problem(cfg.topology, Path(cfg.data_dir), cfg.nq, cfg.backend, family=fam)
     n = G.number_of_nodes()
     deltas = cfg.deltas or [default_delta(cfg.topology, n, cfg.fractional_gates and cfg.topology == "1D")]
     simulator = device.edges is None and device.num_qubits is None
@@ -114,7 +143,6 @@ def build(cfg: Config, device) -> tuple[list[dict], dict]:
     if cfg.topology == "FC":
         strategy = strategy or ("all_to_all" if device.edges is None else "swap_network")
         if strategy == "ladder":
-            fam = layouts.family(cfg.backend)
             if fam not in layouts.GRID_SHAPES:
                 raise ValueError(f"The ladder needs a square-lattice device; {cfg.backend} is not one.")
             rows, cols = layouts.GRID_SHAPES[fam]
@@ -123,11 +151,11 @@ def build(cfg: Config, device) -> tuple[list[dict], dict]:
                 raise ValueError(f"A ladder on a {rows}x{cols} lattice holds at most {2 * max(rows, cols)} nodes.")
             ladders = layouts.ladder_qubits(m, rows, cols)
         elif strategy == "swap_network":
-            line = _line(cfg, device, n)
+            line = _line(cfg, device, n, fam)
             if len(line) < n:
                 raise ValueError(f"The qubit line has {len(line)} qubits, fewer than the {n} nodes.")
     elif cfg.topology == "1D":
-        line = _line(cfg, device, n)
+        line = _line(cfg, device, n, fam)
         if len(line) < n:
             raise ValueError(f"The qubit line has {len(line)} qubits, fewer than the {n} nodes.")
     elif device.num_qubits and max(G.nodes) >= device.num_qubits:
@@ -148,9 +176,10 @@ def build(cfg: Config, device) -> tuple[list[dict], dict]:
             else:
                 prog = circuits.native_layout(G, betas, gammas, two_qubit, width=width)
             items.append({"delta": delta, "p": p, "program": prog, "betas": betas, "gammas": gammas})
+    _check_coupling(items, device, cfg)
 
     shared = {"G": G, "optimal": optimal, "n": n, "deltas": deltas, "strategy": strategy,
-              "two_qubit": two_qubit, "line": line, "ladders": ladders}
+              "two_qubit": two_qubit, "line": line, "ladders": ladders, "family": fam}
     return items, shared
 
 
@@ -241,7 +270,7 @@ def _new_results(cfg: Config, items, shared, stats, device, now, sweep) -> dict:
         "meta": {
             "config": asdict(cfg), "device": device.describe(), "strategy": shared["strategy"],
             "two_qubit": shared["two_qubit"], "line": shared["line"], "ladders": shared["ladders"],
-            "submitted_at": now.isoformat(timespec="seconds"), "sweep": sweep,
+            "family": shared["family"], "submitted_at": now.isoformat(timespec="seconds"), "sweep": sweep,
             "circuits": [{"delta": it["delta"], "p": it["p"], **st} for it, st in zip(items, stats)],
             "versions": _versions(),
         },
