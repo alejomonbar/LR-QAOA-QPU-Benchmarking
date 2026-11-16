@@ -1,63 +1,11 @@
-# 🚀 Quick Deploy Guide
+# Deployment
 
-## Deploy Your Dashboard to the Web (Free!)
+The results are published as a static website, not as this Streamlit app:
 
-Follow these 3 simple steps to make your dashboard publicly accessible:
+**<https://alejomonbar.github.io/LR-QAOA-QPU-Benchmarking/>**
 
-### 1️⃣ Push to GitHub
+- The site's source is in [`site/`](../site), and its data is built from `Data/` by [`scripts/build_site_data.py`](../scripts/build_site_data.py).
+- The [GitHub Actions workflow](../.github/workflows/site.yml) rebuilds and deploys it to GitHub Pages on every push to `main` that touches `Data/`, `site/` or the build script. No separate deployment step is needed.
+- To publish a new result, commit its `.npy` file under `Data/<backend>/` and push. The steps are in the [Website section of the main README](../README.md#-website).
 
-```bash
-# In your project directory
-git add .
-git commit -m "Add QAOA benchmarking dashboard"
-git push
-```
-
-### 2️⃣ Deploy on Streamlit Cloud
-
-1. Visit **https://share.streamlit.io**
-2. Sign in with your GitHub account
-3. Click **"New app"**
-4. Configure deployment:
-   - Repository: `your-username/LR-QAOA-QPU-Benchmarking`
-   - Branch: `main`
-   - Main file: `dashboard/dashboard.py`
-5. Click **"Deploy"**
-
-### 3️⃣ Share Your URL! 🎉
-
-In 2-3 minutes, your dashboard will be live at:
-```
-https://[your-chosen-name].streamlit.app
-```
-
-Anyone can now view your benchmarking results by visiting this URL - no installation required!
-
----
-
-## 🔄 Automatic Updates
-
-Every time you push new `.npy` files to GitHub:
-- Streamlit Cloud automatically detects changes
-- Dashboard updates with new data
-- No redeployment needed!
-
-## 🔒 Keep Data Private (Optional)
-
-If your benchmarking data is sensitive:
-1. Make your GitHub repository **private**
-2. Streamlit Cloud still works with private repos
-3. Only people with the dashboard URL can access it
-
-## 💡 Pro Tips
-
-- **Custom Domain**: Streamlit Cloud supports custom domains
-- **Analytics**: Add Google Analytics to track visitors
-- **Password Protection**: See DASHBOARD_README.md for code example
-- **Usage Limits**: Free tier is generous (unlimited public apps)
-
-## 🆘 Need Help?
-
-- [Streamlit Cloud Docs](https://docs.streamlit.io/streamlit-community-cloud)
-- [Streamlit Forum](https://discuss.streamlit.io/)
-- Check the troubleshooting section in DASHBOARD_README.md
+The Streamlit dashboard in this folder is only for local use; see [DASHBOARD_README.md](DASHBOARD_README.md).

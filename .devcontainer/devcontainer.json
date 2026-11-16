@@ -5,8 +5,7 @@
   "customizations": {
     "codespaces": {
       "openFiles": [
-        "README.md",
-        "dashboard/dashboard.py"
+        "README.md"
       ]
     },
     "vscode": {
@@ -17,17 +16,18 @@
       ]
     }
   },
-  "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; [ -f requirements.txt ] && pip3 install --user -r requirements.txt; pip3 install --user streamlit; echo '✅ Packages installed and Requirements met'",
+  "updateContentCommand": "pip3 install --user -r scripts/requirements-site.txt && pip3 install --user -e . ; echo '✅ Packages installed'",
+  // Build the website data from Data/ and preview the site (the same page GitHub Pages serves)
   "postAttachCommand": {
-    "server": "streamlit run dashboard/dashboard.py --server.enableCORS false --server.enableXsrfProtection false"
+    "site": "python3 scripts/build_site_data.py && python3 -m http.server -d site 8000"
   },
   "portsAttributes": {
-    "8501": {
-      "label": "Application",
+    "8000": {
+      "label": "Website preview",
       "onAutoForward": "openPreview"
     }
   },
   "forwardPorts": [
-    8501
+    8000
   ]
 }

@@ -1,11 +1,8 @@
-```
----  
-title: LR-QAOA # Title for the tab in the web browser. The final title will be "{title} - Quantum Benchmark Zoo"  
-datatable: true # Set to true if there is at least a datatable in the page  
-description: LR-QAOA is a scalable benchmark that measures quantum processor performance by tracking signal decay with circuit depth.> # Description of the page. Used to set the content of the meta tag used by SEO. Should be one or two sentences with well chosen keywords.  
-  Presentation of the awesome protocol blablabla...   
 ---
-```
+title: LR-QAOA # Title for the tab in the web browser. The final title will be "{title} - Quantum Benchmark Zoo"
+datatable: false
+description: LR-QAOA is a scalable, platform-agnostic benchmark that measures how long a quantum processor keeps a coherent signal as circuit width and depth grow, by tracking the approximation ratio of a fixed linear-ramp QAOA against random sampling.
+---
 
 # LR-QAOA
 
@@ -26,18 +23,26 @@ As devices improve, we expect the crossover between these regions to occur at la
 We benchmark quantum devices by solving instances of the weighted maxcut problem using LR-QAOA. The key performance metric is the approximation ratio $r$, which increases with depth and saturates at 1 in the absence of noise, degrading as coherence is lost. LR-QAOA quantifies a QPU’s ability to preserve a coherent signal as circuit depth increases, identifying when performance becomes statistically indistinguishable from random sampling.  
 
 
-## Assumptions 
+## Assumptions
 
-- We choose well-conditioned ramp schedules with observable signal growth in noise-free settings and balanced saturation under noise, validated in prior simulations
-- If possible, try to describe the consequences if the assumptions are not respected
+- **A fixed, well-conditioned schedule.** The angles follow a linear ramp, γ<sub>k</sub> = kΔ/p and β<sub>k</sub> = (p − k + 1)Δ/p, with the slope Δ chosen per graph type and size (fully connected: 0.63 up to 17 nodes, 0.3 up to 45, 0.2 above; 1D chain: 1.0, or 0.75 with fractional gates; native layout: 0.75). These values make the noiseless approximation ratio grow with p. If Δ is poorly chosen, r grows slowly even without noise, and a failing run says more about the schedule than about the hardware.
+- **Known optimum.** Each instance is a weighted MaxCut problem (weights drawn from {0.1, 0.2, 0.3, 0.5, 1}) whose optimal cut is computed exactly, so r is an absolute measure.
+- **Uniform random sampling as the null model.** The baseline is the approximation ratio of the same number of uniformly random bitstrings. A run passes when r exceeds the random mean with a one-sided p-value below 10<sup>−3</sup>; plots show the random mean + 3σ (99.73%) threshold. A fully depolarised device produces exactly this distribution, so passing means some coherent signal survived.
+- **Same circuit on every platform, compiled natively.** Each vendor's stack decides how to route and decompose the circuit (SWAP networks on fixed-coupling chips, direct gates on all-to-all devices, fractional gates where available), so the benchmark measures the whole stack, not the bare qubits.
 
 ## Limitations
 
-- Describe the limitations of the protocol
+- **Signal, not usefulness.** Passing shows the output is distinguishable from random sampling. It does not show that the device solves MaxCut better than a classical heuristic.
+- **One instance per size.** Each width uses a single problem instance, so instance-to-instance variation is not averaged out.
+- **Look-elsewhere effect.** When several copies of a problem run in parallel on one chip, or several depths are tried, reporting the best one raises the chance of a false pass near the threshold. Borderline passes should be checked by re-running or by pooling the copies.
+- **Native-layout results are not comparable across lattices.** The native-layout problem graph is the device's own coupling map, so heavy-hex chips (2–3 neighbours per qubit) and square lattices (up to 4) solve different problems.
+- **No time or cost dimension.** r says nothing about how long a circuit takes or how many shots it needs; a slow but accurate device and a fast but noisy one can look similar.
 
-## Extensions (Facultative)
+## Extensions
 
-- Describe the extensions to the protocol (if extensions exist)
+- **Fractional gates.** Running RZZ(θ) directly instead of two CNOTs per coupling, on devices that support it, reaching p = 10,000 on a 100-qubit 1D chain.
+- **Square-lattice ladders.** On square-lattice chips (IBM Nighthawk), a fully connected problem can run on a 2 × m ladder, about 17% shallower than the 1D SWAP network.
+- **Layer time.** The time one fully connected layer takes on each processor, computed from calibrated gate durations or estimated from vendor-published timings. It is shown on the website next to the results.
 
 ## Implementation
 
@@ -45,19 +50,7 @@ We benchmark quantum devices by solving instances of the weighted maxcut problem
 
 ## Results
 
-{% include tables/q-score-table.html %}  
-<script type="text/javascript"> 
-    $(document).ready(function() {
-      $('./Data/qpu_benchmark_results.xlsx').DataTable(
-        {
-          "pageLength": 10,
-          "drawCallback": function(settings){
-           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);ss
-          }  
-        }  
-      );  
-    });  
-</script>
+Up-to-date results for every processor, with interactive plots and a downloadable JSON file, are on the website: <https://alejomonbar.github.io/LR-QAOA-QPU-Benchmarking/>. The figures below are from the paper [2].
 
 ### 1D-Chain
 
@@ -102,8 +95,14 @@ Fully connected (FC) benchmarking using LR-QAOA for WMC problems with 5 to 56 qu
 Shaded region denotes the 99.73\% confidence interval of a random sampler. 
 (b) Effective approximation ratio $r_{\mathrm{eff}}$ versus problem size for multiple QPUs. 
 Each point reflects the best-performing depth not within the random region.
-# References
 
+## References
+
+[1] J. A. Montanez-Barrera and K. Michielsen, *Towards a universal QAOA protocol: Evidence of a scaling advantage in solving some combinatorial optimization problems*, [arXiv:2405.09169](https://arxiv.org/abs/2405.09169) (2024).
+
+[2] J. A. Montanez-Barrera, K. Michielsen and D. E. Bernal Neira, *Evaluating the performance of quantum processing units at large width and depth*, [arXiv:2502.06471](https://arxiv.org/abs/2502.06471) (2025).
+
+```bibtex
 @misc{montanezbarrera2024universal,
     title={Towards a universal QAOA protocol: Evidence of a scaling advantage in solving some combinatorial optimization problems},
     author={J. A. Montanez-Barrera and Kristel Michielsen},
@@ -121,43 +120,4 @@ Each point reflects the best-performing depth not within the random region.
     archivePrefix={arXiv},
     primaryClass={quant-ph}
 }
-
-## Cite references
-
-To cite a reference, add it under the BibTex format in bibliography/references.bib and cite it with its id. The latex reference are rebuilt each time the website is being deployed `{% cite magesan2011scalable %}`
-
-## Latex expressions 
-Latex expression are surrounded by `$$`:   
-`$$ C_{rand}(n) = \sum_{i=1}^n i \times (1-p^i)p^{i(i-1)/2} $$`
-
-## Datatables
-To add a datatable (example here with the Q-score datatable) that is automatically generated.  
-The javascript permits to format the table content as latex and to set the default number of items per page.
-
-```
-{% include tables/q-score-table.html %}  
-<script type="text/javascript"> 
-    $(document).ready(function() {
-      $('.q-score-table').DataTable(
-        {
-          "pageLength": 10,
-          "drawCallback": function(settings){
-           MathJax.Hub.Queue(["Typeset", MathJax.Hub]);ss
-          }  
-        }  
-      );  
-    });  
-</script>
-```
-
-## Images
-
-To add an image, simply use the img tag within a div that centers the content.  
-The classes img-small (50% width), img-medium (70% width), img-large (90% width) are only used for devices with more than 769px width.  
-Alt expression is really important to improve the indexation of the content.  
-
-```
-<div class="center">
-  <img src="/img/application-level-benchmark/qBAS-1.png" class="img-medium" alt="Bars and Stripes data set with segmentation of images that are in/outside the set."/> 
-</div>
 ```
