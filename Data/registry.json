@@ -51,6 +51,7 @@
   "skip_dirs": ["MPS", "H1-1", "helios_1e_lite"],
   "exclude_files": ["iqm_emerald/54_NL.npy"],
   "extra_files": [
+    {"file": "iqm_emerald/54_NL_2026.npy",             "nq": 54,  "topology": "NL", "variant": "2026 rerun"},
     {"file": "ibm_brisbane/127_HE_day2.npy",          "nq": 127, "topology": "NL"},
     {"file": "ibm_torino/133_HE_v1.npy",              "nq": 133, "topology": "NL", "variant": "run 2"},
     {"file": "ibm_torino/133_HE_fractional.npy",      "nq": 133, "topology": "NL", "variant": "fractional gates"},

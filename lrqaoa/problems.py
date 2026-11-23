@@ -40,7 +40,8 @@ def family_from_coupling(edges, data_dir: Path) -> str | None:
 
 
 def load_problem(topology: str, data_dir: Path, nq: int | None = None,
-                 backend: str | None = None, family: str | None = None) -> tuple[nx.Graph, str]:
+                 backend: str | None = None, family: str | None = None,
+                 key: str | None = None) -> tuple[nx.Graph, str]:
     """(G, optimal bitstring) for an experiment, or KeyError with a hint."""
     bank = _load(Path(data_dir) / BANKS[topology])
     if topology == "FC":
@@ -54,7 +55,7 @@ def load_problem(topology: str, data_dir: Path, nq: int | None = None,
                            f"Create one: python -m lrqaoa new-problem 1D --nq {nq}")
         sol = bank["sol"][nq]
         return bank["G"][nq], sol[0] if isinstance(sol, (list, tuple)) else sol
-    key = nl_key(backend or "", family)
+    key = key or nl_key(backend or "", family)
     if key not in bank:
         raise KeyError(f"No native-layout problem for '{key}' in {BANKS['NL']}. "
                        f"Create one from the device coupling map: python -m lrqaoa new-problem NL --backend {backend}")

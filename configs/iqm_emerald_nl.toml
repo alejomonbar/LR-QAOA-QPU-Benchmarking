@@ -1,0 +1,17 @@
+# Native layout on IQM Emerald through Amazon Braket (AWS credentials in the environment).
+# Problem: the instance of the published run (Data/iqm_emerald/54_HE.npy, 84 edges) without coupler
+# (49, 53), which is off on Emerald since then. Same weights and the same optimal cut (35.7 instead of
+# 35.9), stored as "iqm_emerald_2026" in Data/NL-problems.npy. delta and shots match that run; ps
+# stop at 15 because Braket caps IQM programs at 10,000 native gates (about 620 per layer here:
+# p=15 is 9,400, p=20 would be 12,485). Braket charges per task and per shot: 10 depths x 1000 shots.
+backend = "iqm_emerald"
+topology = "NL"
+ps = [3, 4, 5, 6, 7, 8, 9, 10, 13, 15]
+deltas = [0.75]
+shots = 1000
+problem = "iqm_emerald_2026"
+tag = "_2026"   # Data/iqm_emerald/54_NL.npy is an old excluded test run; list the new file under extra_files
+
+[provider]
+kind = "braket"
+device = "Emerald"

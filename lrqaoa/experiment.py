@@ -38,6 +38,7 @@ class Config:
     fractional_gates: bool = True        # IBM: request the fractional-gate (RZZ) target
     max_sections: int | None = None      # cap on parallel copies of the problem
     line: list[int] | None = None        # override the qubit line (FC swap network, 1D)
+    problem: str | None = None           # NL: key in Data/NL-problems.npy (default: the device's family)
     optimization_level: int = 1
     random_shots: int = 10_000
     mitigation: bool = False
@@ -131,7 +132,8 @@ def _check_coupling(items: list[dict], device, cfg: Config):
 def build(cfg: Config, device) -> tuple[list[dict], dict]:
     """Circuits for every (delta, p), plus problem data shared by all of them."""
     fam = resolve_family(cfg, device)
-    G, optimal = problems.load_problem(cfg.topology, Path(cfg.data_dir), cfg.nq, cfg.backend, family=fam)
+    G, optimal = problems.load_problem(cfg.topology, Path(cfg.data_dir), cfg.nq, cfg.backend,
+                                         family=fam, key=cfg.problem)
     n = G.number_of_nodes()
     deltas = cfg.deltas or [default_delta(cfg.topology, n, cfg.fractional_gates and cfg.topology == "1D")]
     simulator = device.edges is None and device.num_qubits is None

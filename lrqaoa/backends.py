@@ -23,6 +23,7 @@ BRAKET_DEVICES = {
     "rigetti_ankaa_3": "Ankaa-3", "rigetti_cepheus_1_108q": "Cepheus-1-108Q",
     "aqt_ibexq1": "IBEX Q1",
 }
+IQM_BRAKET_MAX_GATES = 10_000  # Braket's per-program limit on native gates for IQM devices
 NEXUS_SYSTEMS = {"quantinuum_helios_1": "Helios-1", "quantinuum_helios_1e": "Helios-1E"}
 
 
@@ -201,8 +202,8 @@ class _QiskitProviderDevice(Device):
 
 
 class BraketDevice(_QiskitProviderDevice):
-    """provider options: device (Braket name, e.g. "Forte 1"), run_options, local = true for the
-    local state-vector simulator (testing)."""
+    """provider options: device (Braket name, e.g. "Forte 1"), run_options (e.g. {verbatim = true}),
+    local = true for the local state-vector simulator (testing)."""
     kind = "braket"
 
     def __init__(self, name, provider):
@@ -217,6 +218,23 @@ class BraketDevice(_QiskitProviderDevice):
             from qiskit_braket_provider import BraketProvider
 
             self._from_backend(BraketProvider().get_backend(provider.get("device", BRAKET_DEVICES.get(name))))
+
+    def submit(self, executables, shots):
+        # IQM circuits are already placed and compiled to the native CZ + PRx, so they go in a verbatim
+        # box: Braket keeps the chosen physical qubits (no rewiring) and reads the qubit labels as
+        # physical. IQM's labels start at 1; outside a box they are virtual indices from 0, so label 54
+        # of Emerald counts as a 55th qubit and the task is rejected. Rigetti's qiskit target has
+        # gates (v, vi) that are not Braket-native, so it keeps the default (non-verbatim) mode.
+        verbatim = self.edges is not None and self.name.startswith("iqm_")
+        if self.name.startswith("iqm_"):  # Braket rejects the whole program set if one circuit is too big
+            sizes = [sum(v for k, v in c.count_ops().items() if k != "barrier") for c in executables]
+            big = [(i, n) for i, n in enumerate(sizes) if n > IQM_BRAKET_MAX_GATES]
+            if big:
+                raise ValueError(f"Braket allows at most {IQM_BRAKET_MAX_GATES:,} native gates per IQM program; "
+                                 f"circuit(s) {', '.join(f'#{i} ({n:,})' for i, n in big)} exceed it. Use smaller ps.")
+        opts = {"verbatim": verbatim, **self.provider.get("run_options", {})}
+        job = self.backend.run(executables, shots=shots, **opts)
+        return {"job_id": job.job_id()}
 
     def run(self, executables, shots):
         counts = self.backend.run(executables, shots=shots).result().get_counts()
