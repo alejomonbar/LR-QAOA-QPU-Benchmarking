@@ -380,23 +380,25 @@
       let drawChart = () => {};
       const update = () => {
         const fc = RUNS.filter((r) => r.topology === "FC" && (isQpu(r) || (emuBox.checked && dev(r).kind === "emulator")));
+        /* one series per device and variant (e.g. "IQM Emerald" and "IQM Emerald (2026 rerun)"), as in the NL charts */
         const byDev = {};
-        fc.forEach((r) => (byDev[r.device] = byDev[r.device] || []).push(r));
+        fc.forEach((r) => { const k = r.variant ? `${r.device}::${r.variant}` : r.device; (byDev[k] = byDev[k] || []).push(r); });
+        const nameOf = (k) => (byDev[k] ? runLabel(byDev[k][0]) : k);
         const rows = Object.entries(byDev).map(([d, rs]) => {
           const pass = rs.filter((r) => r.passes).sort((a, b) => b.nq - a.nq)[0];
-          return { d, rs, pass, n: pass ? pass.nq : 0 };
-        }).sort((a, b) => b.n - a.n || DEV[a.d].name.localeCompare(DEV[b.d].name));
+          return { d, rs, pass, n: pass ? pass.nq : 0, meta: dev(rs[0]), name: nameOf(d) };
+        }).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
         const maxN = Math.max(...rows.map((r) => r.n), 1);
 
         /* leaderboard */
         const lb = $("#lb"); lb.innerHTML = "";
         rows.forEach((row) => {
-          const meta = DEV[row.d], col = meta.modality === "trapped ion" ? "var(--ion)" : "var(--sc)";
+          const meta = row.meta, col = meta.modality === "trapped ion" ? "var(--ion)" : "var(--sc)";
           const div = document.createElement("div");
           div.className = "lb-row"; div.setAttribute("role", "listitem");
-          div.innerHTML = `<span class="lb-name">${esc(meta.name)}</span><span class="lb-track">${row.n ? `<span class="lb-bar" style="width:${(row.n / maxN) * 82}%;background:${col}"></span>` : ""}<span class="lb-val">${row.n ? row.n + " qubits" : "none above random"}</span></span>`;
+          div.innerHTML = `<span class="lb-name">${esc(row.name)}</span><span class="lb-track">${row.n ? `<span class="lb-bar" style="width:${(row.n / maxN) * 82}%;background:${col}"></span>` : ""}<span class="lb-val">${row.n ? row.n + " qubits" : "none above random"}</span></span>`;
           const r = row.pass;
-          const html = `<b>${esc(meta.name)}</b>${meta.kind !== "qpu" ? " (emulator)" : ""}<br>` + (r
+          const html = `<b>${esc(row.name)}</b>${meta.kind !== "qpu" ? " (emulator)" : ""}<br>` + (r
             ? `<span class="k">Largest N above random:</span> ${r.nq}<br><span class="k">Best r:</span> ${f3(r.best.r)} at p = ${r.best.p}<br><span class="k">r<sub>eff</sub>:</span> ${f3(r.r_eff)}${gatesTip(r, r.best.p)}<br><span class="k">Shots:</span> ${fInt(r.shots)} · ${fDate(r.date)}<br><span class="k">Click for r<sub>eff</sub> vs p</span>`
             : `No size above random. Sizes tried: ${row.rs.map((x) => x.nq).sort((a, b) => a - b).join(", ")}`);
           div.addEventListener("pointermove", (ev) => showTip(html, ev.clientX, ev.clientY));
@@ -417,11 +419,11 @@
         picker.keepOnly((k) => !!byDev[k]);
         drawChart = () => {
           const series = Object.entries(byDev).map(([d, rs]) => ({
-            key: d, label: DEV[d].name, color: picker.color(d),
+            key: d, label: nameOf(d), color: picker.color(d),
             pts: rs.filter((r) => r.r_eff != null).map((r) => ({ x: r.nq, y: r.r_eff, hollow: !r.passes, run: r })),
           }));
-          renderChips($("#fcChips"), rows.map((r) => ({ key: r.d, label: DEV[r.d].name })), picker);
-          renderLegend($("#fcLegend"), picker, (k) => DEV[k].name,
+          renderChips($("#fcChips"), rows.map((r) => ({ key: r.d, label: r.name })), picker);
+          renderLegend($("#fcLegend"), picker, nameOf,
             `<span><i class="dot" style="background:var(--muted)"></i>above random</span><span><i class="hollow"></i>not above random</span>`);
           const host = $("#fcChart");
           const fn = () => lineChart(host, {

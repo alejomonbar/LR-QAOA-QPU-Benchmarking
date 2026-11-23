@@ -223,16 +223,25 @@ def run(cfg: Config, dry_run: bool = False, force: bool = False, skip_existing: 
         print("Nothing to run.")
         return []
 
-    compiled = []
+    compiled, fitted = [], []
     for c, items, shared, path in plans:
+        execs = device.prepare(items, c.optimization_level)
+        if device.max_gates:
+            c, items, shared, execs = _fit_gate_limit(c, items, shared, execs, device)
+            if c is None:
+                continue
+        fitted.append((c, items, shared, path))
         print(f"{c.backend} · {c.topology} · {shared['n']} nodes · {items[0]['program'].sections} section(s)"
               + (f" · strategy {shared['strategy']}" if shared["strategy"] else ""))
-        execs = device.prepare(items, c.optimization_level)
         stats = [_gate_stats(e) for e in execs]
         for it, st in zip(items, stats):
             print(f"  delta={it['delta']:<5} p={it['p']:<6} depth={st.get('depth', '-'):<8} "
                   f"2q gates={st.get('two_qubit_gates', '-')}")
         compiled.append((execs, stats))
+    plans = fitted
+    if not plans:
+        print("Nothing to run: no circuit fits the device's gate limit.")
+        return []
     if dry_run:
         print("Dry run: nothing submitted.")
         return []
@@ -265,6 +274,49 @@ def run(cfg: Config, dry_run: bool = False, force: bool = False, skip_existing: 
         np.save(path, results)
         print(f"Saved {path}")
     return paths
+
+
+def _fit_gate_limit(c: Config, items, shared, execs, device):
+    """Keep every compiled circuit of one size under device.max_gates (e.g. Braket's 10,000 native
+    gates per IQM program). Depths that are too big even with a single copy of the problem are dropped
+    first; then the parallel copies are reduced until the deepest remaining depth fits.
+    Returns (None, ...) when no depth fits at all."""
+    from .backends import native_gates
+
+    limit, n = device.max_gates, shared["n"]
+    sizes = [native_gates(e) for e in execs]
+    if max(sizes) <= limit:
+        return c, items, shared, execs
+    first = items[0]["program"].sections
+
+    def compile_(cfg):
+        its, sh = build(cfg, device)
+        ex = device.prepare(its, cfg.optimization_level)
+        return its, sh, ex, [native_gates(e) for e in ex]
+
+    if first > 1:  # which depths fit with one copy?
+        one, _, _, one_sizes = compile_(replace(c, max_sections=1))
+    else:
+        one, one_sizes = items, sizes
+    too_big = sorted({it["p"] for it, k in zip(one, one_sizes) if k > limit})
+    keep = [p for p in c.ps if p not in too_big]
+    if not keep:
+        print(f"  N={n}: skipped, one copy needs {min(one_sizes):,} gates at p={min(c.ps)} (limit {limit:,})")
+        return None, None, None, None
+    if too_big:
+        print(f"  N={n}: dropping p={too_big} (over {limit:,} gates even with one copy); running p={keep}")
+        c = replace(c, ps=keep)
+        items, shared, execs, sizes = compile_(c)
+
+    sections = items[0]["program"].sections
+    while max(sizes) > limit and sections > 1:
+        # gates grow about linearly with the copies; aim a little under the limit
+        sections = max(1, min(sections - 1, int(sections * 0.98 * limit / max(sizes))))
+        c = replace(c, max_sections=sections)
+        items, shared, execs, sizes = compile_(c)
+    if sections < first:
+        print(f"  N={n}: {first} -> {sections} parallel copies to stay under {limit:,} gates per circuit")
+    return c, items, shared, execs
 
 
 def _new_results(cfg: Config, items, shared, stats, device, now, sweep) -> dict:

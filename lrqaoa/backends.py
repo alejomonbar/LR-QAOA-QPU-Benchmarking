@@ -63,10 +63,16 @@ def connect(backend: str, provider: dict | None = None, fractional_gates: bool =
     raise ValueError(f"Unknown provider kind '{kind}'")
 
 
+def native_gates(circuit) -> int:
+    """Gates in a compiled circuit as Braket counts them for a program limit (barriers excluded)."""
+    return sum(v for k, v in circuit.count_ops().items() if k != "barrier")
+
+
 class Device:
     kind = "base"
     synchronous = False
     all_to_all = False
+    max_gates: int | None = None  # per-circuit gate limit of the service; run() fits circuits under it
 
     def __init__(self, name: str, provider: dict):
         self.name, self.provider = name, provider
@@ -218,6 +224,8 @@ class BraketDevice(_QiskitProviderDevice):
             from qiskit_braket_provider import BraketProvider
 
             self._from_backend(BraketProvider().get_backend(provider.get("device", BRAKET_DEVICES.get(name))))
+            if name.startswith("iqm_"):
+                self.max_gates = IQM_BRAKET_MAX_GATES
 
     def submit(self, executables, shots):
         # IQM circuits are already placed and compiled to the native CZ + PRx, so they go in a verbatim
@@ -227,7 +235,7 @@ class BraketDevice(_QiskitProviderDevice):
         # gates (v, vi) that are not Braket-native, so it keeps the default (non-verbatim) mode.
         verbatim = self.edges is not None and self.name.startswith("iqm_")
         if self.name.startswith("iqm_"):  # Braket rejects the whole program set if one circuit is too big
-            sizes = [sum(v for k, v in c.count_ops().items() if k != "barrier") for c in executables]
+            sizes = [native_gates(c) for c in executables]
             big = [(i, n) for i, n in enumerate(sizes) if n > IQM_BRAKET_MAX_GATES]
             if big:
                 raise ValueError(f"Braket allows at most {IQM_BRAKET_MAX_GATES:,} native gates per IQM program; "
