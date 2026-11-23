@@ -36,7 +36,8 @@ class Config:
     strategy: str | None = None          # FC: swap_network | ladder | all_to_all (default from device)
     two_qubit: str | None = None         # rzz | cx (default: rzz with fractional gates / all-to-all)
     fractional_gates: bool = True        # IBM: request the fractional-gate (RZZ) target
-    max_sections: int | None = None      # cap on parallel copies of the problem
+    max_sections: int | dict | None = None  # cap on parallel copies of the problem, for every size or
+                                            # per size {"7": 6, "15": 1} (a size left out: no cap)
     line: list[int] | None = None        # override the qubit line (FC swap network, 1D)
     problem: str | None = None           # NL: key in Data/NL-problems.npy (default: the device's family)
     optimization_level: int = 1
@@ -69,7 +70,10 @@ class Config:
         deltas = self.deltas
         if isinstance(deltas, dict):
             deltas = deltas.get(str(nq), deltas.get(nq))
-        return replace(self, nq=nq, deltas=deltas)
+        sections = self.max_sections
+        if isinstance(sections, dict):
+            sections = sections.get(str(nq), sections.get(nq))
+        return replace(self, nq=nq, deltas=deltas, max_sections=sections)
 
 
 def load_config(path: str | None = None, **overrides) -> Config:
