@@ -310,8 +310,8 @@ def _fit_gate_limit(c: Config, items, shared, execs, device):
 
     sections = items[0]["program"].sections
     while max(sizes) > limit and sections > 1:
-        # gates grow about linearly with the copies; aim a little under the limit
-        sections = max(1, min(sections - 1, int(sections * 0.98 * limit / max(sizes))))
+        # gates grow about linearly with the copies; if the estimate is still over, the loop takes one more off
+        sections = max(1, min(sections - 1, int(sections * limit / max(sizes))))
         c = replace(c, max_sections=sections)
         items, shared, execs, sizes = compile_(c)
     if sections < first:

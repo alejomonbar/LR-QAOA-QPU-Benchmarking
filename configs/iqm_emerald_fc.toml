@@ -1,8 +1,10 @@
 # Fully connected problems on IQM Emerald through Amazon Braket (AWS credentials in the environment).
 # SWAP network along a qubit line; small sizes run several copies of the problem side by side on the
 # chip. Same problems (Data/WMC_FC.npy), delta and depths as the earlier Emerald FC runs, so the 2026
-# files compare directly with Data/iqm_emerald/<N>_FC.npy. The whole sweep is one Braket submission;
-# each circuit must stay under Braket's 10,000 native gates for IQM (checked before submitting).
+# files compare directly with Data/iqm_emerald/<N>_FC.npy. The whole sweep is one Braket submission.
+# Braket allows 10,000 native gates per IQM circuit: run() fits each size under it automatically,
+# first dropping depths too big even for one copy, then running fewer copies side by side
+# (here N=7: 7 -> 6, N=10: 5 -> 2, N=12: 4 -> 2, N=15: 3 -> 1; N=17-18 lose p=5, N=19-20 run p=3 only).
 backend = "iqm_emerald"
 topology = "FC"
 nq = [5, 7, 10, 12, 15]
@@ -11,14 +13,3 @@ deltas = [0.63]
 shots = 1000
 tag = "_2026"   # <N>_FC.npy already hold the earlier runs; list the new files under extra_files
 
-# Parallel copies per size, capped so the p = 5 circuit stays under 10,000 native gates
-# (native gates per copy at p = 5: N=5 739, 7 1,555, 10 3,344, 12 4,910, 15 7,819). N = 5 keeps all 10.
-[max_sections]
-"7" = 6
-"10" = 2
-"12" = 2
-"15" = 1
-
-[provider]
-kind = "braket"
-device = "Emerald"

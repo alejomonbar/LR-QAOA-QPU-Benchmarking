@@ -110,3 +110,26 @@ def test_website_reads_new_files(data):
     runs = json.loads(out.read_text())["runs"]
     run = next(r for r in runs if r["device"] == "qasm_simulator" and r["topology"] == "1D")
     assert run["p"] == [2, 5] and run["date_source"] == "file"
+
+
+def test_gate_limit_fits_copies_then_depths(data, monkeypatch):
+    """A device with a per-circuit gate cap (Braket's 10,000 for IQM) gets fewer parallel copies first,
+    then loses only the depths that cannot fit with one copy; the results file records what ran."""
+    from lrqaoa import backends, experiment
+    from lrqaoa.backends import native_gates
+
+    real_connect = experiment.connect
+
+    def capped(*a, **k):
+        dev = real_connect(*a, **k)
+        dev.max_gates = 3000  # fake_fez, N=6: one copy needs 627 / 1,233 / 3,657 gates at p = 2 / 4 / 12
+        return dev
+
+    monkeypatch.setattr(experiment, "connect", capped)
+    main(["run", "--backend", "fake_fez", "--topology", "FC", "--nq", "6", "--ps", "2", "4", "12",
+          "--deltas", "0.63", "--data-dir", str(data)])
+    res = load(data / "fake_fez" / "6_FC.npy")
+    assert res["ps"] == [2, 4]  # p=12 does not fit even with one copy
+    assert res["sections"] == 2  # 21 copies -> 2: as many as p=4 allows (2 x 1,233 <= 3,000 < 3 x 1,233)
+    assert all(c["two_qubit_gates"] for c in res["meta"]["circuits"])
+    assert backends.native_gates  # exported for the submit-time check
